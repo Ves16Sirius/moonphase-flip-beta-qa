@@ -6,476 +6,242 @@
 <meta name="color-scheme" content="light dark" />
 <meta name="theme-color" content="#F7F7F5" media="(prefers-color-scheme: light)" />
 <meta name="theme-color" content="#08090A" media="(prefers-color-scheme: dark)" />
-<title>Moonphase Flip — Beta Q&amp;A</title>
-<link rel="icon" href="favicon.svg" type="image/svg+xml" />
+<title>Moonphase Flip — Beta Help Center</title>
+<link rel="icon" href="favicon.png" type="image/png" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&display=swap" rel="stylesheet" />
 <style>
-  :root {
-    /* Light: Linear/Claude-inspired cool paper — neutral, not cream-yellow */
-    --bg: #F7F7F5;
-    --bg-elev: #FFFFFF;
-    --bg-soft: #EEEEEC;
-    --bg-glass: rgba(247, 247, 245, 0.72);
-    --ink: #0A0A0A;
-    --ink-soft: #3F3F46;
-    --muted: #71717A;
-    --line: rgba(10, 10, 10, 0.08);
-    --line-strong: rgba(10, 10, 10, 0.14);
-    --accent: #52525B;          /* zinc — formal B/W Flip */
-    --accent-soft: rgba(82, 82, 91, 0.10);
-    --focus: #5E6AD2;           /* Linear indigo — focus ring only */
-    --focus-soft: rgba(94, 106, 210, 0.18);
-    --ok: #15803D;
-    --ok-bg: rgba(21, 128, 61, 0.08);
-    --new: #0A0A0A;
-    --new-bg: rgba(10, 10, 10, 0.06);
-    --shadow: 0 0 0 1px rgba(10,10,10,0.04), 0 8px 24px rgba(10,10,10,0.04), 0 1px 0 rgba(255,255,255,0.8) inset;
-    --radius: 14px;
-    --ease: cubic-bezier(0.16, 1, 0.3, 1);
-    --dur: 0.55s;
-    color-scheme: light dark;
-  }
-  @media (prefers-color-scheme: dark) {
-    :root {
-      /* Dark: Grok/Linear near-black */
-      --bg: #08090A;
-      --bg-elev: #111113;
-      --bg-soft: #18181B;
-      --bg-glass: rgba(8, 9, 10, 0.72);
-      --ink: #FAFAFA;
-      --ink-soft: #D4D4D8;
-      --muted: #A1A1AA;
-      --line: rgba(250, 250, 250, 0.08);
-      --line-strong: rgba(250, 250, 250, 0.14);
-      --accent: #A1A1AA;
-      --accent-soft: rgba(161, 161, 170, 0.12);
-      --focus: #8FA4FF;
-      --focus-soft: rgba(143, 164, 255, 0.22);
-      --ok: #4ADE80;
-      --ok-bg: rgba(74, 222, 128, 0.10);
-      --new: #FAFAFA;
-      --new-bg: rgba(250, 250, 250, 0.08);
-      --shadow: 0 0 0 1px rgba(255,255,255,0.04), 0 16px 40px rgba(0,0,0,0.45);
-    }
-  }
-  html.theme-light {
-    --bg: #F7F7F5; --bg-elev: #FFFFFF; --bg-soft: #EEEEEC; --bg-glass: rgba(247,247,245,0.72);
-    --ink: #0A0A0A; --ink-soft: #3F3F46; --muted: #71717A;
-    --line: rgba(10,10,10,0.08); --line-strong: rgba(10,10,10,0.14);
-    --accent: #52525B; --accent-soft: rgba(82,82,91,0.10);
-    --focus: #5E6AD2; --focus-soft: rgba(94,106,210,0.18);
-    --ok: #15803D; --ok-bg: rgba(21,128,61,0.08);
-    --new: #0A0A0A; --new-bg: rgba(10,10,10,0.06);
-    --shadow: 0 0 0 1px rgba(10,10,10,0.04), 0 8px 24px rgba(10,10,10,0.04), 0 1px 0 rgba(255,255,255,0.8) inset;
-  }
-  html.theme-dark {
-    --bg: #08090A; --bg-elev: #111113; --bg-soft: #18181B; --bg-glass: rgba(8,9,10,0.72);
-    --ink: #FAFAFA; --ink-soft: #D4D4D8; --muted: #A1A1AA;
-    --line: rgba(250,250,250,0.08); --line-strong: rgba(250,250,250,0.14);
-    --accent: #A1A1AA; --accent-soft: rgba(161,161,170,0.12);
-    --focus: #8FA4FF; --focus-soft: rgba(143,164,255,0.22);
-    --ok: #4ADE80; --ok-bg: rgba(74,222,128,0.10);
-    --new: #FAFAFA; --new-bg: rgba(250,250,250,0.08);
-    --shadow: 0 0 0 1px rgba(255,255,255,0.04), 0 16px 40px rgba(0,0,0,0.45);
-  }
-  * { box-sizing: border-box; }
-  html { scroll-behavior: smooth; }
-  body {
-    margin: 0; min-height: 100vh;
-    font-family: Inter, ui-sans-serif, system-ui, -apple-system, sans-serif;
-    background:
-      radial-gradient(1000px 520px at 50% -18%, var(--accent-soft), transparent 55%),
-      linear-gradient(180deg, var(--bg), var(--bg-soft));
-    color: var(--ink); line-height: 1.55; -webkit-font-smoothing: antialiased;
-    transition: background-color var(--dur) var(--ease), color var(--dur) var(--ease);
-  }
-  .freshness {
-    position: sticky; top: 0; z-index: 20;
-    display: flex; justify-content: center; padding: 10px 16px;
-    background: var(--bg-glass);
-    backdrop-filter: saturate(1.2) blur(14px);
-    -webkit-backdrop-filter: saturate(1.2) blur(14px);
-    border-bottom: 1px solid var(--line);
-    opacity: 0; transform: translateY(-8px);
-    animation: rise 0.6s var(--ease) 0.02s forwards;
-  }
-  .freshness-pill {
-    display: inline-flex; align-items: center; gap: 8px;
-    font-size: 0.72rem; font-weight: 500; letter-spacing: 0.04em;
-    color: var(--muted); text-transform: uppercase;
-  }
-  .freshness-pill .dot {
-    width: 6px; height: 6px; border-radius: 999px; background: var(--ok);
-    box-shadow: 0 0 0 3px var(--ok-bg);
-  }
-  .wrap { max-width: 740px; margin: 0 auto; padding: 36px 22px 88px; }
-  .brand {
-    display: flex; align-items: center; gap: 12px; margin-bottom: 26px;
-    opacity: 0; transform: translateY(12px);
-    animation: rise 0.7s var(--ease) 0.08s forwards;
-  }
-  .wordmark {
-    font-family: Inter, ui-sans-serif, system-ui, sans-serif;
-    font-weight: 700; font-size: 0.88rem; letter-spacing: 0.28em;
-    color: var(--ink); line-height: 1; padding: 6px 0;
-  }
-  .brand-text {
-    font-size: 0.7rem; letter-spacing: 0.16em; text-transform: uppercase;
-    color: var(--muted); font-weight: 500;
-  }
-  .hero {
-    opacity: 0; transform: translateY(14px);
-    animation: rise 0.8s var(--ease) 0.14s forwards;
-  }
-  h1 {
-    font-family: Newsreader, Georgia, "Times New Roman", serif;
-    font-weight: 400; font-size: clamp(2.1rem, 5.2vw, 2.75rem);
-    letter-spacing: -0.03em; line-height: 1.1; margin: 0 0 12px; color: var(--ink);
-  }
-  h1 em { font-style: italic; color: var(--ink-soft); }
-  .sub { color: var(--muted); font-size: 0.98rem; margin: 0 0 22px; max-width: 38em; }
-  .search-wrap {
-    position: relative; margin-bottom: 16px;
-    opacity: 0; transform: translateY(12px);
-    animation: rise 0.7s var(--ease) 0.22s forwards;
-  }
-  .search-wrap svg {
-    position: absolute; left: 14px; top: 50%; transform: translateY(-50%);
-    width: 16px; height: 16px; color: var(--muted); pointer-events: none;
-  }
-  input[type="search"] {
-    width: 100%; background: var(--bg-elev); border: 1px solid var(--line-strong);
-    color: var(--ink); border-radius: 12px; padding: 14px 14px 14px 42px;
-    font-size: 0.95rem; font-family: inherit; outline: none;
-    transition: border-color 0.25s var(--ease), box-shadow 0.3s var(--ease), background var(--dur) var(--ease), transform 0.3s var(--ease);
-  }
-  input[type="search"]::placeholder { color: var(--muted); }
-  input[type="search"]:focus {
-    border-color: color-mix(in srgb, var(--focus) 55%, var(--line-strong));
-    box-shadow: 0 0 0 4px var(--focus-soft);
-  }
-  .cat-grid {
-    display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px;
-    margin-bottom: 22px;
-    opacity: 0; transform: translateY(12px);
-    animation: rise 0.7s var(--ease) 0.3s forwards;
-  }
-  .cat {
-    appearance: none; border: 1px solid var(--line); background: var(--bg-elev);
-    color: var(--ink-soft); border-radius: 12px; padding: 12px 12px 11px;
-    cursor: pointer; text-align: left; font-family: inherit;
-    box-shadow: var(--shadow);
-    transition: border-color 0.25s var(--ease), transform 0.35s var(--ease), background 0.25s var(--ease), color 0.25s var(--ease), box-shadow 0.35s var(--ease);
-  }
-  .cat:hover { border-color: var(--line-strong); transform: translateY(-2px); color: var(--ink); }
-  .cat[aria-selected="true"] {
-    border-color: var(--ink);
-    background: var(--ink); color: var(--bg);
-    box-shadow: none;
-  }
-  .cat[aria-selected="true"] .hint { color: color-mix(in srgb, var(--bg) 70%, transparent); }
-  .cat .label { display: block; font-size: 0.8rem; font-weight: 600; letter-spacing: -0.01em; }
-  .cat .hint { display: block; margin-top: 3px; font-size: 0.68rem; color: var(--muted); font-weight: 400; }
-  .section-label {
-    font-size: 0.7rem; letter-spacing: 0.14em; text-transform: uppercase;
-    color: var(--muted); font-weight: 500; margin: 4px 0 12px;
-  }
-  #list { min-height: 160px; }
-  .item {
-    background: var(--bg-elev); border: 1px solid var(--line); border-radius: var(--radius);
-    padding: 18px 18px 16px; margin-bottom: 10px; box-shadow: var(--shadow);
-    transition: border-color 0.3s var(--ease), transform 0.4s var(--ease), box-shadow 0.4s var(--ease), background var(--dur) var(--ease), filter 0.4s var(--ease);
-    opacity: 0; transform: translateY(18px); filter: blur(4px);
-  }
-  .item.is-in { opacity: 1; transform: translateY(0); filter: blur(0); }
-  .item:hover {
-    border-color: var(--line-strong);
-    transform: translateY(-3px);
-    box-shadow: 0 0 0 1px rgba(10,10,10,0.06), 0 20px 48px rgba(10,10,10,0.08);
-  }
-  @media (prefers-color-scheme: dark) {
-    .item:hover { box-shadow: 0 0 0 1px rgba(255,255,255,0.08), 0 24px 56px rgba(0,0,0,0.55); }
-  }
-  html.theme-dark .item:hover { box-shadow: 0 0 0 1px rgba(255,255,255,0.08), 0 24px 56px rgba(0,0,0,0.55); }
-  .item.is-new { border-color: color-mix(in srgb, var(--ink) 22%, var(--line)); }
-  .item h3 {
-    margin: 0 0 8px; font-size: 1.02rem; font-weight: 600;
-    letter-spacing: -0.015em; line-height: 1.35; color: var(--ink);
-  }
-  .item p { margin: 0; color: var(--ink-soft); font-size: 0.92rem; line-height: 1.58; }
-  .meta { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 14px; align-items: center; }
-  .pill {
-    font-size: 0.68rem; font-weight: 500; letter-spacing: 0.03em; border-radius: 999px;
-    padding: 4px 9px; border: 1px solid var(--line); color: var(--ink-soft); background: var(--bg-soft);
-  }
-  .ok { color: var(--ok); border-color: color-mix(in srgb, var(--ok) 28%, transparent); background: var(--ok-bg); }
-  .asof { color: var(--muted); }
-  .recent {
-    color: var(--new); border-color: color-mix(in srgb, var(--new) 22%, transparent); background: var(--new-bg);
-  }
-  .empty { color: var(--muted); padding: 48px 8px; text-align: center; font-size: 0.95rem; }
-  footer {
-    margin-top: 48px; padding-top: 22px; border-top: 1px solid var(--line);
-    color: var(--muted); font-size: 0.78rem;
-    display: flex; flex-wrap: wrap; gap: 10px 18px; align-items: center; justify-content: space-between;
-  }
-  footer a {
-    color: var(--muted); text-decoration: none; border-bottom: 1px solid transparent;
-    transition: color 0.25s var(--ease), border-color 0.25s var(--ease);
-  }
-  footer a:hover { color: var(--ink); border-bottom-color: var(--line-strong); }
-  @keyframes rise { to { opacity: 1; transform: translateY(0); } }
-  @media (prefers-reduced-motion: reduce) {
-    html { scroll-behavior: auto; }
-    .freshness, .brand, .hero, .search-wrap, .cat-grid, .item {
-      animation: none !important; opacity: 1 !important; transform: none !important; filter: none !important; transition: none !important;
-    }
-    .item:hover, .cat:hover { transform: none; }
-  }
-  @media (max-width: 640px) {
-    .wrap { padding: 28px 16px 72px; }
-    .cat-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  }
-  @media (max-width: 380px) { .cat-grid { grid-template-columns: 1fr; } }
+:root{
+  --bg:#F7F7F5;--elev:#FFF;--soft:#EEEEEC;--glass:rgba(247,247,245,.78);
+  --ink:#0A0A0A;--soft-ink:#3F3F46;--muted:#71717A;
+  --line:rgba(10,10,10,.08);--line2:rgba(10,10,10,.14);
+  --focus:#5E6AD2;--focus-soft:rgba(94,106,210,.18);
+  --ok:#15803D;--ok-bg:rgba(21,128,61,.08);
+  --hl:#0A0A0A;
+  --shadow:0 0 0 1px rgba(10,10,10,.04),0 10px 28px rgba(10,10,10,.05);
+  --ease:cubic-bezier(.16,1,.3,1);--r:14px;
+  color-scheme:light dark;
+}
+@media (prefers-color-scheme:dark){:root{
+  --bg:#08090A;--elev:#111113;--soft:#18181B;--glass:rgba(8,9,10,.78);
+  --ink:#FAFAFA;--soft-ink:#D4D4D8;--muted:#A1A1AA;
+  --line:rgba(250,250,250,.08);--line2:rgba(250,250,250,.14);
+  --focus:#8FA4FF;--focus-soft:rgba(143,164,255,.22);
+  --ok:#4ADE80;--ok-bg:rgba(74,222,128,.1);
+  --hl:#FAFAFA;
+  --shadow:0 0 0 1px rgba(255,255,255,.04),0 16px 40px rgba(0,0,0,.5);
+}}
+html.theme-light{
+  --bg:#F7F7F5;--elev:#FFF;--soft:#EEEEEC;--glass:rgba(247,247,245,.78);
+  --ink:#0A0A0A;--soft-ink:#3F3F46;--muted:#71717A;
+  --line:rgba(10,10,10,.08);--line2:rgba(10,10,10,.14);
+  --focus:#5E6AD2;--focus-soft:rgba(94,106,210,.18);
+  --ok:#15803D;--ok-bg:rgba(21,128,61,.08);--hl:#0A0A0A;
+  --shadow:0 0 0 1px rgba(10,10,10,.04),0 10px 28px rgba(10,10,10,.05);
+}
+html.theme-dark{
+  --bg:#08090A;--elev:#111113;--soft:#18181B;--glass:rgba(8,9,10,.78);
+  --ink:#FAFAFA;--soft-ink:#D4D4D8;--muted:#A1A1AA;
+  --line:rgba(250,250,250,.08);--line2:rgba(250,250,250,.14);
+  --focus:#8FA4FF;--focus-soft:rgba(143,164,255,.22);
+  --ok:#4ADE80;--ok-bg:rgba(74,222,128,.1);--hl:#FAFAFA;
+  --shadow:0 0 0 1px rgba(255,255,255,.04),0 16px 40px rgba(0,0,0,.5);
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;min-height:100vh;font-family:Inter,system-ui,sans-serif;background:radial-gradient(900px 480px at 50% -16%,rgba(94,106,210,.06),transparent 55%),linear-gradient(180deg,var(--bg),var(--soft));color:var(--ink);line-height:1.55;-webkit-font-smoothing:antialiased;transition:background-color .5s var(--ease),color .5s var(--ease)}
+.fresh{position:sticky;top:0;z-index:30;display:flex;justify-content:center;padding:10px 16px;background:var(--glass);backdrop-filter:saturate(1.2) blur(14px);-webkit-backdrop-filter:saturate(1.2) blur(14px);border-bottom:1px solid var(--line);opacity:0;transform:translateY(-8px);animation:rise .55s var(--ease) .02s forwards}
+.fresh span{display:inline-flex;align-items:center;gap:8px;font-size:.7rem;font-weight:500;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.fresh i{width:6px;height:6px;border-radius:99px;background:var(--ok);box-shadow:0 0 0 3px var(--ok-bg);font-style:normal}
+.wrap{max-width:740px;margin:0 auto;padding:32px 22px 88px}
+.brand{display:flex;align-items:center;gap:12px;margin-bottom:22px;opacity:0;transform:translateY(12px);animation:rise .65s var(--ease) .08s forwards}
+.brand .oo{width:28px;height:28px;object-fit:contain}
+.brand .oo-light{display:block}
+.brand .oo-dark{display:none}
+@media (prefers-color-scheme:dark){.brand .oo-light{display:none}.brand .oo-dark{display:block}}
+html.theme-dark .brand .oo-light{display:none}
+html.theme-dark .brand .oo-dark{display:block}
+html.theme-light .brand .oo-light{display:block}
+html.theme-light .brand .oo-dark{display:none}
+.wordmark{font-family:Newsreader,Georgia,serif;font-weight:600;font-size:1.05rem;letter-spacing:.18em;color:var(--ink);line-height:1;transition:color .45s var(--ease)}
+.brand-meta{font-size:.68rem;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);font-weight:500}
+.hero{opacity:0;transform:translateY(14px);animation:rise .75s var(--ease) .14s forwards}
+h1{font-family:Newsreader,Georgia,serif;font-weight:400;font-size:clamp(2rem,5vw,2.65rem);letter-spacing:-.03em;line-height:1.1;margin:0 0 10px}
+h1 em{font-style:italic;color:var(--soft-ink)}
+.sub{color:var(--muted);font-size:.95rem;margin:0 0 20px;max-width:38em}
+.search{position:relative;margin-bottom:14px;opacity:0;transform:translateY(12px);animation:rise .65s var(--ease) .22s forwards}
+.search svg{position:absolute;left:14px;top:50%;transform:translateY(-50%);width:16px;height:16px;color:var(--muted);pointer-events:none}
+input[type=search]{width:100%;background:var(--elev);border:1px solid var(--line2);color:var(--ink);border-radius:12px;padding:13px 14px 13px 40px;font:inherit;font-size:.95rem;outline:none;transition:border-color .25s var(--ease),box-shadow .3s var(--ease)}
+input[type=search]:focus{border-color:color-mix(in srgb,var(--focus) 55%,var(--line2));box-shadow:0 0 0 4px var(--focus-soft)}
+.cats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-bottom:20px;opacity:0;transform:translateY(12px);animation:rise .65s var(--ease) .28s forwards}
+.cat{appearance:none;border:1px solid var(--line);background:var(--elev);color:var(--soft-ink);border-radius:12px;padding:11px 12px;cursor:pointer;text-align:left;font:inherit;box-shadow:var(--shadow);transition:transform .35s var(--ease),border-color .25s var(--ease),background .25s var(--ease),color .25s var(--ease)}
+.cat:hover{transform:translateY(-2px);border-color:var(--line2);color:var(--ink)}
+.cat[aria-selected=true]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.cat[aria-selected=true] .h{color:color-mix(in srgb,var(--bg) 72%,transparent)}
+.cat .l{display:block;font-size:.78rem;font-weight:600}
+.cat .h{display:block;margin-top:2px;font-size:.66rem;color:var(--muted)}
+.sec{font-size:.68rem;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin:2px 0 10px;font-weight:500}
+.item{background:var(--elev);border:1px solid var(--line);border-radius:var(--r);margin-bottom:10px;box-shadow:var(--shadow);opacity:0;transform:translateY(16px);filter:blur(3px);transition:border-color .3s var(--ease),transform .4s var(--ease),box-shadow .4s var(--ease),filter .4s var(--ease),background .45s var(--ease)}
+.item.is-in{opacity:1;transform:none;filter:none}
+.item:hover{border-color:var(--line2);transform:translateY(-2px)}
+.item.is-new{border-color:color-mix(in srgb,var(--ink) 20%,var(--line))}
+.item summary{list-style:none;cursor:pointer;padding:16px 18px 14px;display:grid;gap:8px}
+.item summary::-webkit-details-marker{display:none}
+.item summary .q{font-size:1rem;font-weight:600;letter-spacing:-.015em;line-height:1.35;color:var(--ink);padding-right:28px;position:relative}
+.item summary .q::after{content:"+";position:absolute;right:0;top:0;color:var(--muted);font-weight:500;font-size:1.1rem;transition:transform .3s var(--ease)}
+.item[open] summary .q::after{content:"–"}
+.item summary .teaser{margin:0;color:var(--soft-ink);font-size:.88rem;line-height:1.45}
+.item .body{padding:0 18px 16px;color:var(--soft-ink);font-size:.92rem;line-height:1.58;border-top:1px solid var(--line)}
+.item .body p{margin:12px 0 0}
+.item .body strong{color:var(--hl);font-weight:600}
+.meta{display:flex;flex-wrap:wrap;gap:7px;margin-top:12px}
+.pill{font-size:.66rem;font-weight:500;letter-spacing:.03em;border-radius:999px;padding:3px 8px;border:1px solid var(--line);color:var(--soft-ink);background:var(--soft)}
+.ok{color:var(--ok);border-color:color-mix(in srgb,var(--ok) 28%,transparent);background:var(--ok-bg)}
+.asof{color:var(--muted)}
+.recent{color:var(--ink);background:color-mix(in srgb,var(--ink) 6%,transparent)}
+.empty{color:var(--muted);padding:44px 8px;text-align:center}
+footer{margin-top:44px;padding-top:20px;border-top:1px solid var(--line);color:var(--muted);font-size:.76rem;display:flex;flex-wrap:wrap;gap:10px 18px;justify-content:space-between}
+footer a{color:var(--muted);text-decoration:none;border-bottom:1px solid transparent;transition:color .25s var(--ease),border-color .25s var(--ease)}
+footer a:hover{color:var(--ink);border-bottom-color:var(--line2)}
+@keyframes rise{to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  .fresh,.brand,.hero,.search,.cats,.item{animation:none!important;opacity:1!important;transform:none!important;filter:none!important;transition:none!important}
+  .item:hover,.cat:hover{transform:none}
+}
+@media (max-width:640px){.wrap{padding:24px 16px 72px}.cats{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:380px){.cats{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
-  <div class="freshness" role="status">
-    <div class="freshness-pill"><span class="dot" aria-hidden="true"></span> Updated Oct 24, 2026</div>
-  </div>
+<div class="fresh" role="status"><span><i></i> Updated Oct 24, 2026</span></div>
 <div class="wrap">
   <div class="brand">
+    <img class="oo oo-light" src="mark-oo-black.png" width="28" height="28" alt="" />
+    <img class="oo oo-dark" src="mark-oo-white.png" width="28" height="28" alt="" />
     <div class="wordmark" aria-label="MOONPHASE">MOONPHASE</div>
-    <div class="brand-text">Flip · Beta</div>
+    <div class="brand-meta">Flip · Beta</div>
   </div>
   <div class="hero">
-    <h1>Beta Q&amp;A <em>window</em></h1>
-    <p class="sub">Official answers for Moonphase Flip beta testers. Search first, then browse by topic. Each answer shows when it was last confirmed.</p>
+    <h1>Beta Help <em>Center</em></h1>
+    <p class="sub">Official answers for Moonphase Flip testers — browse here beyond chat. Tap a card for the full answer.</p>
   </div>
-  <div class="search-wrap">
+  <div class="search">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
     <input id="q" type="search" placeholder="Search shipping, firmware, calendar, MCP…" autocomplete="off" />
   </div>
-  <div class="cat-grid" role="tablist" aria-label="Topics">
-    <button class="cat" data-tab="all" aria-selected="true"><span class="label">All answers</span><span class="hint">Everything answered</span></button>
-    <button class="cat" data-tab="setup" aria-selected="false"><span class="label">Getting started</span><span class="hint">Setup &amp; shipping</span></button>
-    <button class="cat" data-tab="device" aria-selected="false"><span class="label">Device</span><span class="hint">Hardware &amp; MagSafe</span></button>
-    <button class="cat" data-tab="app" aria-selected="false"><span class="label">App &amp; firmware</span><span class="hint">Updates &amp; sync</span></button>
-    <button class="cat" data-tab="recording" aria-selected="false"><span class="label">Recording &amp; AI</span><span class="hint">Capture &amp; storage</span></button>
-    <button class="cat" data-tab="privacy" aria-selected="false"><span class="label">Privacy &amp; MCP</span><span class="hint">Data &amp; other AIs</span></button>
-    <button class="cat" data-tab="report" aria-selected="false"><span class="label">How to report</span><span class="hint">Channels &amp; tips</span></button>
+  <div class="cats" role="tablist" aria-label="Topics">
+    <button class="cat" data-tab="all" aria-selected="true"><span class="l">All</span><span class="h">Every answered item</span></button>
+    <button class="cat" data-tab="setup" aria-selected="false"><span class="l">Getting started</span><span class="h">Setup &amp; shipping</span></button>
+    <button class="cat" data-tab="device" aria-selected="false"><span class="l">Device</span><span class="h">Hardware recovery</span></button>
+    <button class="cat" data-tab="app" aria-selected="false"><span class="l">App &amp; firmware</span><span class="h">Updates &amp; sync</span></button>
+    <button class="cat" data-tab="recording" aria-selected="false"><span class="l">Recording &amp; AI</span><span class="h">Capture &amp; storage</span></button>
+    <button class="cat" data-tab="privacy" aria-selected="false"><span class="l">Privacy &amp; MCP</span><span class="h">Data &amp; other AIs</span></button>
+    <button class="cat" data-tab="report" aria-selected="false"><span class="l">How to report</span><span class="h">Channels &amp; tips</span></button>
   </div>
-  <div class="section-label" id="sectionLabel">All answers</div>
+  <div class="sec" id="sec">All answers</div>
   <div id="list"></div>
   <footer>
-    <span>Moonphase Flip beta support · refreshed regularly</span>
+    <span>Moonphase Flip beta support</span>
     <a href="https://hellomoonphase.com/" target="_blank" rel="noopener noreferrer">Moonphase Flip</a>
   </footer>
 </div>
 <script>
-const PAGE_UPDATED = "2026-10-24";
-const LABELS = {
-  all: "All answers",
-  setup: "Getting started",
-  device: "Device",
-  app: "App & firmware",
-  recording: "Recording & AI",
-  privacy: "Privacy & MCP",
-  report: "How to report"
-};
-/* asOf = last official confirmation date (ISO). Sources: Feishu 问题汇总 timestamps / 进度 notes + overnight WA digest (2026-10-24). */
-const DATA = [
-  {
-    id: "FB-004",
-    cat: "setup",
-    asOf: "2026-10-22",
-    q: "Will I get shipping tracking, and how do I send bug reports?",
-    a: "Units ship via UPS. The team emails you about shipment; tracking can take a while to appear. For bugs and beta feedback, post in General or your personal Beta Support group.",
-    status: "Answered",
-    tone: "ok"
-  },
-  {
-    id: "FB-035",
-    cat: "setup",
-    asOf: "2026-10-24",
-    q: "My device just arrived — what should I do next?",
-    a: "Send your serial number to the team so they can push a firmware update to your device. After the push, check Announcements for Checklist_revised.pdf (and the QuickStart / Checklist docs).",
-    status: "Answered",
-    tone: "ok"
-  },
-  {
-    id: "FB-014",
-    cat: "device",
-    asOf: "2026-10-24",
-    q: "The device shows recording but nothing comes back — or I’m stuck after a factory reset on 1.0.68.",
-    a: "Share your serial number with the team for a targeted firmware update. A factory reset from the app has helped some testers recover a stuck device. If you remain on 1.0.68 after a reset, a firmware update for that device is already in progress.",
-    status: "Answered · workaround",
-    tone: "ok"
-  },
-  {
-    id: "FB-034",
-    cat: "app",
-    asOf: "2026-10-24",
-    q: "After an iOS app update, which build should I be on?",
-    a: "Use TestFlight. The current correct build is 1.0.1 (1217).",
-    status: "Answered",
-    tone: "ok"
-  },
-  {
-    id: "FB-009",
-    cat: "app",
-    asOf: "2026-10-24",
-    q: "Google Calendar shows in the app but not on the device — or Bluetooth is connected but voice isn’t reaching calendar / todos.",
-    a: "This is usually older firmware. Install the latest firmware; Google Calendar events for calendars listed in the app can then appear on the device. Flip currently only connects calendars listed in the app — more calendar types are coming. Android / Fold calendar support is noted feedback with no commitment yet.",
-    status: "Answered · workaround",
-    tone: "ok"
-  },
-  {
-    id: "FB-028",
-    cat: "app",
-    asOf: "2026-10-24",
-    q: "Why am I seeing Chinese characters in the UI or AI output?",
-    a: "This language bug was fixed. If it returns, report with a screenshot in General or your personal Beta Support group.",
-    status: "Fixed — watch",
-    tone: "ok"
-  },
-  {
-    id: "FB-015",
-    cat: "recording",
-    asOf: "2026-10-23",
-    q: "Is the device meant to record most of the day? How much can it store?",
-    a: "You can leave it on all day. It only keeps audio when someone is speaking. After recordings sync to your phone, they’re cleared from the device automatically — no manual purge needed.",
-    status: "Answered",
-    tone: "ok"
-  },
-  {
-    id: "FB-024",
-    cat: "privacy",
-    asOf: "2026-10-24",
-    q: "Is it allowed to use Flip with other AIs (for example via MCP) under the NDA?",
-    a: "MCP is part of the beta; it’s fine to try with other AIs.",
-    status: "Answered",
-    tone: "ok"
-  },
-  {
-    id: "PRIV-01",
-    cat: "privacy",
-    asOf: "2026-10-24",
-    q: "Where is beta data stored, and does it meet US requirements?",
-    a: "Beta data is stored on AWS in the United States and is handled to meet applicable US rules.",
-    status: "Answered",
-    tone: "ok"
-  },
-  {
-    id: "R1",
-    cat: "report",
-    asOf: "2026-10-22",
-    q: "General",
-    a: "Shared questions, announcements, and bug reports visible to the beta group.",
-    status: "Channel",
-    tone: "ok"
-  },
-  {
-    id: "R2",
-    cat: "report",
-    asOf: "2026-10-22",
-    q: "Personal Beta Support group",
-    a: "Your private thread with the support team for shipment, serial number, and one-to-one issues.",
-    status: "Channel",
-    tone: "ok"
-  },
-  {
-    id: "R3",
-    cat: "report",
-    asOf: "2026-10-24",
-    q: "Docs and what helps most when you report",
-    a: "Check Announcements for Checklist.pdf, QuickStartGuide.pdf, and Checklist_revised.pdf after firmware pushes. When reporting, include steps to reproduce, serial number (for firmware), app + firmware versions, and a screenshot or short video.",
-    status: "Tips",
-    tone: "ok"
-  }
+const PAGE_UPDATED="2026-10-24";
+const LABELS={all:"All answers",setup:"Getting started",device:"Device",app:"App & firmware",recording:"Recording & AI",privacy:"Privacy & MCP",report:"How to report"};
+/* asOf = last official confirmation from Feishu progress notes + overnight WA digest 2026-10-24. No invented dates. */
+const DATA=[
+{id:"FB-004",cat:"setup",asOf:"2026-10-22",
+ q:"Shipping tracking and where to send bug reports?",
+ teaser:"UPS shipping; team email; report bugs in General or Beta Support.",
+ a:"Units ship via <strong>UPS</strong>. The team emails you; <strong>tracking can take a while</strong>. For bugs, post in <strong>General</strong> or your personal <strong>Beta Support</strong> group.",
+ status:"Answered",tone:"ok"},
+{id:"FB-035",cat:"setup",asOf:"2026-10-24",
+ q:"Device just arrived — what next?",
+ teaser:"Send your SN for a firmware push; then check Checklist_revised.",
+ a:"Send your <strong>serial number</strong> so the team can push firmware. After the push, open Announcements for <strong>Checklist_revised.pdf</strong> (plus QuickStart / Checklist).",
+ status:"Answered",tone:"ok"},
+{id:"FB-014",cat:"device",asOf:"2026-10-24",
+ q:"Recording shows, but nothing returns — or stuck on 1.0.68 after reset?",
+ teaser:"Share SN for targeted firmware; factory reset may help.",
+ a:"Share your <strong>serial number</strong> for a <strong>targeted firmware</strong> update. A <strong>factory reset</strong> in the app has recovered some devices. Still on <strong>1.0.68</strong> after reset? A firmware update for that unit is already in progress.",
+ status:"Answered · workaround",tone:"ok"},
+{id:"FB-034",cat:"app",asOf:"2026-10-24",
+ q:"Which iOS app build should I use?",
+ teaser:"TestFlight 1.0.1 (1217).",
+ a:"Use <strong>TestFlight</strong>. Current correct build: <strong>1.0.1 (1217)</strong>.",
+ status:"Answered",tone:"ok"},
+{id:"FB-009",cat:"app",asOf:"2026-10-24",
+ q:"Calendar in app but not on device — or BT connected with no voice actions?",
+ teaser:"Usually old firmware; only calendars listed in the app sync.",
+ a:"Usually <strong>old firmware</strong> — install the latest. Then Google events for calendars <strong>listed in the app</strong> can show on device. Flip only connects calendars listed in the app for now; more types coming. Android / Fold calendar feedback is noted, <strong>no commitment yet</strong>.",
+ status:"Answered · workaround",tone:"ok"},
+{id:"FB-028",cat:"app",asOf:"2026-10-24",
+ q:"Why Chinese characters in the UI or AI output?",
+ teaser:"Language bug fixed — report if it returns.",
+ a:"This <strong>language bug was fixed</strong>. If it returns, send a screenshot in General or Beta Support.",
+ status:"Fixed — watch",tone:"ok"},
+{id:"FB-015",cat:"recording",asOf:"2026-10-23",
+ q:"Can I leave recording on all day?",
+ teaser:"Yes — only saves when someone speaks; auto-clears after sync.",
+ a:"Yes — leave it on. It <strong>only keeps audio when someone is speaking</strong>. After sync to your phone, device storage <strong>clears automatically</strong>.",
+ status:"Answered",tone:"ok"},
+{id:"FB-024",cat:"privacy",asOf:"2026-10-24",
+ q:"Can I use Flip with other AIs via MCP under the NDA?",
+ teaser:"MCP is part of beta — fine to try with other AIs.",
+ a:"<strong>MCP is part of the beta</strong>; it’s fine to try with other AIs.",
+ status:"Answered",tone:"ok"},
+{id:"PRIV-01",cat:"privacy",asOf:"2026-10-24",
+ q:"Where is beta data stored?",
+ teaser:"AWS in the United States.",
+ a:"Beta data is stored on <strong>AWS in the United States</strong> and handled to meet applicable US rules.",
+ status:"Answered",tone:"ok"},
+{id:"R1",cat:"report",asOf:"2026-10-22",
+ q:"General channel",
+ teaser:"Shared questions, announcements, and group bug reports.",
+ a:"Shared questions, announcements, and bug reports visible to the beta group.",
+ status:"Channel",tone:"ok"},
+{id:"R2",cat:"report",asOf:"2026-10-22",
+ q:"Personal Beta Support group",
+ teaser:"Private thread for shipment, SN, and one-to-one issues.",
+ a:"Your private thread for shipment, serial number, and one-to-one issues.",
+ status:"Channel",tone:"ok"},
+{id:"R3",cat:"report",asOf:"2026-10-24",
+ q:"Docs and what to include when reporting",
+ teaser:"Checklist docs in Announcements; include SN, versions, screenshot.",
+ a:"Announcements has <strong>Checklist.pdf</strong>, <strong>QuickStartGuide.pdf</strong>, and <strong>Checklist_revised.pdf</strong> after firmware pushes. Reports help most with repro steps, <strong>serial number</strong>, app + firmware versions, and a screenshot or short video.",
+ status:"Tips",tone:"ok"}
 ];
-
-let tab = "all";
-const listEl = document.getElementById("list");
-const qEl = document.getElementById("q");
-const labelEl = document.getElementById("sectionLabel");
-const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-
-function syncThemeClass() {
-  const dark = window.matchMedia("(prefers-color-scheme: dark)").matches;
-  document.documentElement.classList.toggle("theme-dark", dark);
-  document.documentElement.classList.toggle("theme-light", !dark);
+let tab="all";
+const list=document.getElementById("list"), qEl=document.getElementById("q"), sec=document.getElementById("sec");
+const reduce=window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+function syncTheme(){const d=window.matchMedia("(prefers-color-scheme: dark)").matches;document.documentElement.classList.toggle("theme-dark",d);document.documentElement.classList.toggle("theme-light",!d)}
+syncTheme();window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change",syncTheme);
+function esc(s){return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")}
+function fmt(iso){return new Date(iso+"T12:00:00Z").toLocaleDateString("en-US",{month:"short",day:"numeric",year:"numeric",timeZone:"UTC"})}
+function observe(){if(reduce){list.querySelectorAll(".item").forEach(el=>el.classList.add("is-in"));return}
+ const io=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting){const el=e.target;const i=[...list.querySelectorAll(".item")].indexOf(el);el.style.transitionDelay=Math.min(i,10)*40+"ms";el.classList.add("is-in");io.unobserve(el)}})},{threshold:.08,rootMargin:"0px 0px -6% 0px"});
+ list.querySelectorAll(".item").forEach(el=>io.observe(el))}
+function render(){
+ const q=(qEl.value||"").trim().toLowerCase();
+ let items=DATA.slice();
+ if(tab!=="all")items=items.filter(i=>i.cat===tab);
+ if(q)items=items.filter(i=>(i.q+" "+i.a+" "+i.teaser+" "+i.id).toLowerCase().includes(q));
+ items.sort((a,b)=>(b.asOf||"").localeCompare(a.asOf||""));
+ sec.textContent=LABELS[tab]||"Answers";
+ if(!items.length){list.innerHTML='<div class="empty">No matches — try another word or topic.</div>';return}
+ list.innerHTML=items.map(i=>{
+  const recent=i.asOf===PAGE_UPDATED;
+  return `<details class="item${recent?" is-new":""}" data-cat="${esc(i.cat)}" data-asof="${esc(i.asOf)}">
+   <summary><div class="q">${esc(i.q)}</div><p class="teaser">${esc(i.teaser)}</p>
+   <div class="meta"><span class="pill ${esc(i.tone)}">${esc(i.status)}</span><span class="pill asof">As of ${esc(fmt(i.asOf))}</span>${recent?'<span class="pill recent">Recently updated</span>':""}</div></summary>
+   <div class="body"><p>${i.a}</p></div>
+  </details>`}).join("");
+ observe();
 }
-syncThemeClass();
-window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", syncThemeClass);
-
-function esc(s) {
-  return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-}
-function fmtAsOf(iso) {
-  const d = new Date(iso + "T12:00:00Z");
-  return d.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric", timeZone: "UTC" });
-}
-function isRecent(iso) {
-  return iso === PAGE_UPDATED;
-}
-
-function observeItems() {
-  if (reduceMotion) {
-    listEl.querySelectorAll(".item").forEach(el => el.classList.add("is-in"));
-    return;
-  }
-  const io = new IntersectionObserver((entries) => {
-    entries.forEach((e) => {
-      if (e.isIntersecting) {
-        const el = e.target;
-        const i = [...listEl.querySelectorAll(".item")].indexOf(el);
-        el.style.transitionDelay = Math.min(i, 10) * 45 + "ms";
-        el.classList.add("is-in");
-        io.unobserve(el);
-      }
-    });
-  }, { threshold: 0.1, rootMargin: "0px 0px -6% 0px" });
-  listEl.querySelectorAll(".item").forEach(el => io.observe(el));
-}
-
-function render() {
-  const q = (qEl.value || "").trim().toLowerCase();
-  let items = DATA.slice();
-  if (tab !== "all") items = items.filter(i => i.cat === tab);
-  if (q) items = items.filter(i => (i.q + " " + i.a + " " + i.id + " " + i.cat).toLowerCase().includes(q));
-  // Newest confirmed first within the filter
-  items.sort((a, b) => (b.asOf || "").localeCompare(a.asOf || ""));
-  labelEl.textContent = LABELS[tab] || "Answers";
-  if (!items.length) {
-    listEl.innerHTML = '<div class="empty">No matches — try another word or topic.</div>';
-    return;
-  }
-  listEl.innerHTML = items.map(i => {
-    const recent = isRecent(i.asOf);
-    const recentPill = recent ? '<span class="pill recent">Recently updated</span>' : '';
-    return `<article class="item${recent ? ' is-new' : ''}" data-cat="${esc(i.cat)}" data-asof="${esc(i.asOf)}">
-      <h3>${esc(i.q)}</h3>
-      <p>${esc(i.a)}</p>
-      <div class="meta">
-        <span class="pill ${esc(i.tone)}">${esc(i.status)}</span>
-        <span class="pill asof">As of ${esc(fmtAsOf(i.asOf))}</span>
-        ${recentPill}
-      </div>
-    </article>`;
-  }).join("");
-  observeItems();
-}
-
-document.querySelectorAll(".cat").forEach(btn => btn.addEventListener("click", () => {
-  tab = btn.dataset.tab;
-  document.querySelectorAll(".cat").forEach(b => b.setAttribute("aria-selected", b === btn ? "true" : "false"));
-  render();
-}));
-qEl.addEventListener("input", render);
-render();
+document.querySelectorAll(".cat").forEach(btn=>btn.addEventListener("click",()=>{tab=btn.dataset.tab;document.querySelectorAll(".cat").forEach(b=>b.setAttribute("aria-selected",b===btn?"true":"false"));render()}));
+qEl.addEventListener("input",render);render();
 </script>
 </body>
 </html>
