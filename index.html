@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Moonphase Flip — Beta Q&amp;A</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop stop-color='%23f0e6d2'/%3E%3Cstop offset='1' stop-color='%23c9b896'/%3E%3C/linearGradient%3E%3C/defs%3E%3Ccircle cx='16' cy='16' r='14' fill='url(%23g)'/%3E%3Ccircle cx='11' cy='12' r='5' fill='rgba(255,255,255,0.35)'/%3E%3C/svg%3E" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --bg0: #07080b; --bg1: #0c0e14;
+    --card: rgba(255,255,255,0.035); --card-hover: rgba(255,255,255,0.055);
+    --text: #f2f0eb; --muted: #9a968c; --line: rgba(255,255,255,0.08);
+    --accent: #c9b896;
+    --ok: #7dcea0; --warn: #e0b35a; --bad: #e07a7a;
+    --shadow: 0 1px 0 rgba(255,255,255,0.04) inset, 0 12px 40px rgba(0,0,0,0.35);
+    --radius: 16px;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; min-height: 100vh;
+    font-family: Inter, ui-sans-serif, system-ui, -apple-system, sans-serif;
+    background:
+      radial-gradient(1200px 600px at 50% -10%, rgba(201,184,150,0.09), transparent 55%),
+      radial-gradient(800px 500px at 100% 20%, rgba(120,140,200,0.06), transparent 50%),
+      linear-gradient(180deg, var(--bg1), var(--bg0));
+    color: var(--text); line-height: 1.55; -webkit-font-smoothing: antialiased;
+  }
+  .wrap { max-width: 680px; margin: 0 auto; padding: 48px 20px 80px; }
+  .brand { display:flex; align-items:center; gap:12px; margin-bottom:28px; }
+  .moon {
+    width:36px; height:36px; border-radius:50%;
+    background: linear-gradient(135deg, #f0e6d2 0%, #c9b896 45%, #6a6356 100%);
+    box-shadow: 0 0 0 1px rgba(201,184,150,0.25), 0 8px 24px rgba(201,184,150,0.18);
+    position:relative; flex-shrink:0;
+  }
+  .moon::after {
+    content:""; position:absolute; inset:0; border-radius:50%;
+    background: radial-gradient(circle at 32% 32%, rgba(255,255,255,0.55), transparent 42%);
+  }
+  .brand-text { font-size:0.72rem; letter-spacing:0.14em; text-transform:uppercase; color:var(--muted); font-weight:500; }
+  h1 {
+    font-family: "Instrument Serif", Georgia, serif; font-weight:400;
+    font-size: clamp(2rem, 5vw, 2.55rem); letter-spacing:-0.02em; line-height:1.15; margin:0 0 12px;
+  }
+  h1 em { font-style:italic; color:var(--accent); }
+  .sub { color:var(--muted); font-size:0.98rem; margin:0 0 28px; max-width:36em; }
+  .tabs {
+    display:flex; flex-wrap:wrap; gap:6px; padding:4px;
+    background: rgba(255,255,255,0.03); border:1px solid var(--line);
+    border-radius:999px; margin-bottom:16px; width:fit-content; max-width:100%;
+  }
+  .tab {
+    appearance:none; border:none; background:transparent; color:var(--muted);
+    border-radius:999px; padding:9px 14px; cursor:pointer; font-size:0.84rem;
+    font-weight:500; font-family:inherit;
+  }
+  .tab:hover { color:var(--text); }
+  .tab[aria-selected="true"] { background:var(--text); color:#0a0b0f; }
+  .search-wrap { position:relative; margin-bottom:22px; }
+  .search-wrap svg {
+    position:absolute; left:14px; top:50%; transform:translateY(-50%);
+    width:16px; height:16px; color:var(--muted); pointer-events:none;
+  }
+  input[type="search"] {
+    width:100%; background:var(--card); border:1px solid var(--line); color:var(--text);
+    border-radius:12px; padding:13px 14px 13px 40px; font-size:0.95rem; font-family:inherit; outline:none;
+  }
+  input[type="search"]::placeholder { color:#6e6a62; }
+  input[type="search"]:focus { border-color: rgba(201,184,150,0.45); box-shadow:0 0 0 3px rgba(201,184,150,0.12); }
+  .item {
+    background:var(--card); border:1px solid var(--line); border-radius:var(--radius);
+    padding:18px 18px 16px; margin-bottom:10px; box-shadow:var(--shadow);
+  }
+  .item:hover { background:var(--card-hover); border-color:rgba(255,255,255,0.12); }
+  .item h3 { margin:0 0 8px; font-size:1.02rem; font-weight:560; letter-spacing:-0.01em; line-height:1.35; }
+  .item p { margin:0; color:var(--muted); font-size:0.92rem; line-height:1.55; }
+  .meta { display:flex; gap:8px; flex-wrap:wrap; margin-top:14px; align-items:center; }
+  .pill {
+    font-size:0.7rem; font-weight:500; letter-spacing:0.02em; border-radius:999px;
+    padding:4px 9px; border:1px solid var(--line); color:var(--muted); background:rgba(0,0,0,0.2);
+  }
+  .ok { color:var(--ok); border-color:rgba(125,206,160,.28); background:rgba(125,206,160,.08); }
+  .warn { color:var(--warn); border-color:rgba(224,179,90,.28); background:rgba(224,179,90,.08); }
+  .bad { color:var(--bad); border-color:rgba(224,122,122,.28); background:rgba(224,122,122,.08); }
+  .empty { color:var(--muted); padding:40px 8px; text-align:center; font-size:0.95rem; }
+  footer {
+    margin-top:40px; padding-top:20px; border-top:1px solid var(--line);
+    color:#6e6a62; font-size:0.78rem;
+  }
+  @media (max-width:520px) {
+    .wrap { padding:32px 16px 64px; }
+    .tabs { width:100%; }
+    .tab { flex:1 1 auto; text-align:center; padding:9px 10px; font-size:0.8rem; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="brand">
+    <div class="moon" aria-hidden="true"></div>
+    <div class="brand-text">Moonphase Flip · Beta</div>
+  </div>
+  <h1>Beta Q&amp;A <em>window</em></h1>
+  <p class="sub">Answers, known issues, and recent updates for Moonphase Flip beta testers.</p>
+  <div class="tabs" role="tablist">
+    <button class="tab" data-tab="latest" aria-selected="true">What’s new</button>
+    <button class="tab" data-tab="answers" aria-selected="false">Answers</button>
+    <button class="tab" data-tab="issues" aria-selected="false">Known issues</button>
+    <button class="tab" data-tab="report" aria-selected="false">How to report</button>
+  </div>
+  <div class="search-wrap">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+    <input id="q" type="search" placeholder="Search calendar, firmware, recording, sync…" autocomplete="off" />
+  </div>
+  <div id="list"></div>
+  <footer>Moonphase Flip beta support · content refreshed regularly</footer>
+</div>
+<script>
+const DATA = {
+  latest: [
+    {id:"FB-033", q:"Does the rule against exporting Flip data to other AIs also apply to paid Pro users who opted out of AI training?", a:"No official answer yet.", status:"Open", tone:"warn"},
+    {id:"FB-032", q:"What is the total token usage for the MCP?", a:"No official answer yet.", status:"Open", tone:"warn"},
+    {id:"FB-027", q:"Can Insights support swipe gestures — left to drop a block, right to highlight, double-tap to add to a weekly or monthly diary?", a:"Feature request — no official answer yet.", status:"Open", tone:"warn"},
+    {id:"FB-031", q:"Can the app or device show clearer processing feedback after a recording?", a:"Feature request — no official answer yet. Stuck recordings that never return are often fixed with a firmware update (see Answers / Known issues).", status:"Open", tone:"warn"},
+    {id:"FB-029", q:"How do I train speaker voices so the product can tell people apart?", a:"No official write-up yet. A tester noted speaker ID failed until voices were trained.", status:"Open", tone:"warn"},
+    {id:"FB-012", q:"Can the calendar view on the e-ink screen be made smaller so more of the day fits?", a:"Feature request — no official answer yet.", status:"Open", tone:"warn"},
+    {id:"FB-013", q:"How durable is the device outdoors — especially the e-ink display?", a:"No official durability or case guidance yet.", status:"Open", tone:"warn"},
+    {id:"FB-011", q:"Why does the back feel sticky and pick up lint?", a:"Mixed tester reports; no official material guidance yet.", status:"Open", tone:"warn"},
+    {id:"FB-006", q:"Could an Etch A Sketch–style overlay be used as an e-ink wallpaper?", a:"Feature request — no official answer yet.", status:"Open", tone:"warn"},
+    {id:"FB-005", q:"Can Moonphase listen or record continuously?", a:"Related: you can leave it on all day; it only keeps audio when someone is speaking (see Answers). Exact always-on limits and battery guidance still need an official write-up.", status:"Open", tone:"warn"}
+  ],
+  answers: [
+    {id:"FB-015", q:"Is the device meant to record most of the day? How much can it store, and how often should I clear recordings?", a:"You can leave it on all day. It only keeps audio when someone is speaking. After recordings sync to your phone, they're cleared from the device automatically — no manual purge needed.", status:"Answered", tone:"ok"},
+    {id:"FB-004", q:"Will I get shipping tracking, and how do I send bug reports / usage feedback to the team?", a:"Tracking is sent by DM after units ship. For bugs and beta feedback, post in General or your personal Beta Support group.", status:"Answered", tone:"ok"},
+    {id:"FB-034", q:"After an iOS app update, which build should I be on?", a:"Use TestFlight. The current correct build is 1.0.1 (1217).", status:"Answered", tone:"ok"},
+    {id:"FB-035", q:"My device just arrived — how do I get on the firmware upgrade list?", a:"Send your serial number to the team so you can be added to the upgrade list. Then watch the app for a firmware update prompt.", status:"Answered", tone:"ok"},
+    {id:"FB-024", q:"Is it allowed to use Flip with other AIs (for example via MCP) under the NDA?", a:"MCP is part of the beta; it's fine to try with other AIs. Whether paid Pro users who opted out of AI training have a different rule is still unanswered (see What's new).", status:"Answered", tone:"ok"},
+    {id:"FB-028", q:"Why am I seeing Chinese characters in the UI or AI output?", a:"The team says this language bug was fixed. If you still see it, report with a screenshot in General or your personal Beta Support group.", status:"Fixed — watch", tone:"ok"},
+    {id:"FB-009", q:"Google Calendar events show in the app but not on the device.", a:"Older firmware often won't show Google Calendar events on the device. Install the latest firmware push; events for calendars listed in the app can then appear on device. More calendar types are coming. Flip currently only connects calendars listed in the app.", status:"Partial", tone:"warn"},
+    {id:"FB-014", q:"How do I recover a stuck device / recording that never returns?", a:"If the device looks stuck (shows recording but nothing follows), try a factory reset from the app — several testers recovered this way. Stuck cases often also need a targeted firmware update after you share your serial number with the team. Exact button power-cycle steps still need an official write-up. Clearer in-app processing feedback is still a feature request (see What's new).", status:"Partial", tone:"warn"},
+    {id:"FB-010", q:"Is MagSafe hold strong enough, or do I need a metal ring on my case?", a:"It depends on your case. Some MagSafe cases hold securely with no ring; others feel stronger with a metal ring added. Official case guidance still pending.", status:"Answered", tone:"ok"}
+  ],
+  issues: [
+    {id:"FB-009", q:"Google Calendar events show in the app but not on the device.", a:"Usually tied to older firmware. Install the latest firmware; events listed in the app for a connected calendar can then appear on the device. More calendar types are coming. See also Answers.", status:"Open · workaround", tone:"warn"},
+    {id:"FB-021", q:"I'm on firmware V1.0.6.8; tapping Firmware Update offers nothing. Where is my serial number, and when will the push land?", a:"Open issue. Send your serial number in General or your personal Beta Support group so you can be added to the upgrade list, then check the app for a firmware prompt.", status:"Open · P1", tone:"warn"},
+    {id:"FB-020", q:"Bluetooth shows connected, but the device doesn't sync until I tap a red icon in the app.", a:"Open issue. Tap the red icon to force a sync for now.", status:"Open · P1", tone:"warn"},
+    {id:"FB-008", q:"After recording I see \"recording saved we'll continue once your moonphase connects\" even though Bluetooth is still connected.", a:"Open issue.", status:"Open · P1", tone:"warn"},
+    {id:"FB-007", q:"Hold-to-talk \"set an appointment for 9am tomorrow…\" stays on Thinking… and never completes.", a:"Open issue.", status:"Open · P1", tone:"warn"},
+    {id:"FB-026", q:"Is the device monitoring my texts? It created a reminder for something I only remember seeing in a message.", a:"Open issue. No confirmed product answer yet — share the reminder text and time with Support.", status:"Open · P2", tone:"warn"},
+    {id:"FB-014", q:"Device says it's recording, then nothing happens afterward.", a:"Workaround: factory reset from the app. Many cases also need a targeted firmware update after you share your serial number. Exact power-cycle steps still need an official write-up. Processing-state UI is still missing (see What's new).", status:"Open · workaround", tone:"warn"}
+  ],
+  report: [
+    {id:"R1", q:"General", a:"Shared questions, announcements, and bug reports visible to the beta group.", status:"Channel", tone:"ok"},
+    {id:"R2", q:"Personal Beta Support group", a:"Your private thread with the support team for shipment, serial number, and one-to-one issues.", status:"Channel", tone:"ok"},
+    {id:"R3", q:"What helps most when you report", a:"Steps to reproduce, serial number (for firmware), app + firmware versions, and a screenshot or short video.", status:"Tips", tone:"ok"}
+  ]
+}
+let tab = "latest";
+const listEl = document.getElementById("list");
+const qEl = document.getElementById("q");
+function esc(s){return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");}
+function render() {
+  const q = (qEl.value || "").trim().toLowerCase();
+  let items = DATA[tab] || [];
+  if (q) items = items.filter(i => (i.q+i.a+i.id).toLowerCase().includes(q));
+  if (!items.length) { listEl.innerHTML = '<div class="empty">No matches — try another word.</div>'; return; }
+  listEl.innerHTML = items.map(i => `<article class="item"><h3>${esc(i.q)}</h3><p>${esc(i.a)}</p><div class="meta"><span class="pill ${esc(i.tone)}">${esc(i.status)}</span></div></article>`).join("");
+}
+document.querySelectorAll(".tab").forEach(btn => btn.addEventListener("click", () => {
+  tab = btn.dataset.tab;
+  document.querySelectorAll(".tab").forEach(b => b.setAttribute("aria-selected", b===btn ? "true":"false"));
+  render();
+}));
+qEl.addEventListener("input", render);
+render();
+</script>
+</body>
+</html>
