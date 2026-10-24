@@ -62,14 +62,14 @@ body{margin:0;min-height:100vh;font-family:"Instrument Sans",system-ui,sans-seri
 .fresh span{display:inline-flex;align-items:center;gap:8px;font-size:.7rem;font-weight:500;letter-spacing:.07em;text-transform:uppercase;color:var(--muted)}
 .fresh i{width:6px;height:6px;border-radius:99px;background:var(--ok);box-shadow:0 0 0 3px var(--ok-bg);font-style:normal;animation:pulse 2.4s var(--ease) infinite}
 .shell{max-width:1120px;margin:0 auto;padding:28px 22px 88px}
-.brand{display:flex;align-items:center;gap:14px;margin-bottom:20px;opacity:0;transform:translateY(14px);animation:rise .7s var(--ease) .06s forwards;position:relative}
-.wm-wrap{position:relative;height:40px;min-width:200px;max-width:min(420px,72vw);flex:0 1 auto}
-.wm{position:absolute;left:0;top:0;height:40px;width:auto;max-width:100%;object-fit:contain;display:block;transition:opacity .45s var(--ease)}
-.wm-light{opacity:1}.wm-dark{opacity:0;pointer-events:none}
-@media (prefers-color-scheme:dark){.wm-light{opacity:0;pointer-events:none}.wm-dark{opacity:1;pointer-events:auto}}
-html.theme-dark .wm-light{opacity:0;pointer-events:none}html.theme-dark .wm-dark{opacity:1;pointer-events:auto}
-html.theme-light .wm-light{opacity:1;pointer-events:auto}html.theme-light .wm-dark{opacity:0;pointer-events:none}
-.brand-meta{font-size:.68rem;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);font-weight:500}
+.brand{display:flex;flex-direction:column;align-items:flex-start;gap:10px;margin:0 0 18px;opacity:0;transform:translateY(14px);animation:rise .7s var(--ease) .06s forwards}
+.wm-wrap{position:relative;display:inline-block;height:36px;width:auto;max-width:100%;line-height:0;overflow:visible}
+.wm{display:block;height:36px;width:auto;max-width:min(520px,92vw);object-fit:contain;object-position:left center;image-rendering:auto;-webkit-font-smoothing:antialiased}
+.wm-dark{position:absolute;left:0;top:0;opacity:0;pointer-events:none;transition:opacity .4s var(--ease)}
+.wm-light{position:relative;opacity:1;transition:opacity .4s var(--ease)}
+@media (prefers-color-scheme:dark){.wm-light{opacity:0}.wm-dark{opacity:1;pointer-events:auto}}
+html.theme-dark .wm-light{opacity:0}html.theme-dark .wm-dark{opacity:1;pointer-events:auto}
+html.theme-light .wm-light{opacity:1}html.theme-light .wm-dark{opacity:0;pointer-events:none}
 .hero{opacity:0;transform:translateY(16px);animation:rise .75s var(--ease) .12s forwards}
 h1{font-family:"Instrument Serif",Georgia,serif;font-weight:400;font-size:clamp(2.05rem,4.6vw,2.85rem);letter-spacing:-.02em;line-height:1.08;margin:0 0 10px;color:var(--ink)}
 h1 em{font-style:italic;color:var(--soft-ink)}
@@ -142,7 +142,7 @@ footer a:hover{color:var(--ink);border-bottom-color:var(--line2)}
   .layout{display:grid;grid-template-columns:240px minmax(0,1fr);gap:36px;align-items:start}
   .rail{position:sticky;top:56px;margin-bottom:0}
   .cats{grid-template-columns:1fr;gap:6px}
-  .wm-wrap,.wm{height:44px;max-width:460px}
+  .wm-wrap,.wm{height:42px}.wm{max-width:min(560px,70vw)}
   h1{font-size:clamp(2.35rem,3.4vw,3rem)}
   #list{grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;grid-auto-rows:minmax(132px,auto)}
 }
@@ -174,8 +174,7 @@ footer a:hover{color:var(--ink);border-bottom-color:var(--line2)}
       <img class="wm wm-light" src="wordmark-flip-black.png" height="40" alt="Moonphase Flip" />
       <img class="wm wm-dark" src="wordmark-flip-white.png" height="40" alt="Moonphase Flip" />
     </div>
-    <div class="brand-meta">Beta</div>
-  </div>
+</div>
   <div class="hero">
     <h1>Beta Q&amp;A <em>Center</em></h1>
     <p class="sub">Official answers for Moonphase Flip testers. Search, filter by topic, sort newest or oldest — open a card for the full answer.</p>
