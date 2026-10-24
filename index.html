@@ -3,261 +3,381 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="color-scheme" content="light dark" />
+<meta name="theme-color" content="#f2eee6" media="(prefers-color-scheme: light)" />
+<meta name="theme-color" content="#12110f" media="(prefers-color-scheme: dark)" />
 <title>Moonphase Flip — Beta Q&amp;A</title>
-<link rel="icon" href="favicon-landing.svg" type="image/svg+xml" />
+<link rel="icon" href="favicon.svg" type="image/svg+xml" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Instrument+Sans:wght@400;500;600&family=Noto+Sans:wght@400;500;600&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&display=swap" rel="stylesheet" />
 <style>
   :root {
-    --lp-bg: #F6F4F1;
-    --lp-yellow: #FFFBC1;
-    --lp-brown: #402F1E;
-    --lp-gray: #9D968B;
-    --lp-cream: #F3EFE8;
-    --lp-ink: #000000;
-    --lp-line: #605A50;
-    --lp-answer: #7F715C;
-    --radius: 14px;
+    --bg: #f2eee6; --bg-elev: #faf7f1; --bg-soft: #ebe6db;
+    --ink: #1c1915; --ink-soft: #4a453c; --muted: #8a8378;
+    --line: rgba(28, 25, 21, 0.10); --line-strong: rgba(28, 25, 21, 0.16);
+    --gold: #b89a6a; --gold-soft: rgba(184, 154, 106, 0.16);
+    --ok: #3d6b4f; --ok-bg: rgba(61, 107, 79, 0.10);
+    --shadow: 0 1px 0 rgba(255,255,255,0.55) inset, 0 12px 32px rgba(28, 25, 21, 0.06);
+    --radius: 16px; --ease: cubic-bezier(0.22, 1, 0.36, 1);
+    color-scheme: light dark;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #12110f; --bg-elev: #1a1814; --bg-soft: #22201b;
+      --ink: #f0ebe3; --ink-soft: #c4bdb0; --muted: #8f877b;
+      --line: rgba(240, 235, 227, 0.10); --line-strong: rgba(240, 235, 227, 0.16);
+      --gold: #c9b896; --gold-soft: rgba(201, 184, 150, 0.14);
+      --ok: #7fb892; --ok-bg: rgba(127, 184, 146, 0.12);
+      --shadow: 0 1px 0 rgba(255,255,255,0.03) inset, 0 16px 40px rgba(0, 0, 0, 0.35);
+    }
+  }
+  html.theme-light {
+    --bg: #f2eee6; --bg-elev: #faf7f1; --bg-soft: #ebe6db;
+    --ink: #1c1915; --ink-soft: #4a453c; --muted: #8a8378;
+    --line: rgba(28, 25, 21, 0.10); --line-strong: rgba(28, 25, 21, 0.16);
+    --gold: #b89a6a; --gold-soft: rgba(184, 154, 106, 0.16);
+    --ok: #3d6b4f; --ok-bg: rgba(61, 107, 79, 0.10);
+    --shadow: 0 1px 0 rgba(255,255,255,0.55) inset, 0 12px 32px rgba(28, 25, 21, 0.06);
+  }
+  html.theme-dark {
+    --bg: #12110f; --bg-elev: #1a1814; --bg-soft: #22201b;
+    --ink: #f0ebe3; --ink-soft: #c4bdb0; --muted: #8f877b;
+    --line: rgba(240, 235, 227, 0.10); --line-strong: rgba(240, 235, 227, 0.16);
+    --gold: #c9b896; --gold-soft: rgba(201, 184, 150, 0.14);
+    --ok: #7fb892; --ok-bg: rgba(127, 184, 146, 0.12);
+    --shadow: 0 1px 0 rgba(255,255,255,0.03) inset, 0 16px 40px rgba(0, 0, 0, 0.35);
   }
   * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
   body {
     margin: 0; min-height: 100vh;
-    font-family: "Instrument Sans", "Noto Sans", ui-sans-serif, system-ui, -apple-system, sans-serif;
+    font-family: Inter, ui-sans-serif, system-ui, -apple-system, sans-serif;
     background:
-      radial-gradient(900px 420px at 50% -8%, rgba(255,251,193,0.55), transparent 55%),
-      linear-gradient(180deg, var(--lp-bg), var(--lp-cream));
-    color: var(--lp-brown);
-    line-height: 1.55;
-    -webkit-font-smoothing: antialiased;
+      radial-gradient(900px 480px at 50% -12%, var(--gold-soft), transparent 58%),
+      linear-gradient(180deg, var(--bg), var(--bg-soft));
+    color: var(--ink); line-height: 1.55; -webkit-font-smoothing: antialiased;
+    transition: background-color 0.45s var(--ease), color 0.45s var(--ease);
   }
-  .wrap { max-width: 680px; margin: 0 auto; padding: 48px 20px 80px; }
-  .brand { display:flex; align-items:center; gap:12px; margin-bottom:28px; }
-  .brand img {
-    width: 36px; height: 36px; border-radius: 8px;
-    object-fit: cover; background: var(--lp-ink);
-    box-shadow: 0 1px 0 rgba(64,47,30,0.08), 0 8px 20px rgba(64,47,30,0.08);
+  .wrap { max-width: 740px; margin: 0 auto; padding: 52px 22px 88px; }
+  .brand {
+    display: flex; align-items: center; gap: 12px; margin-bottom: 28px;
+    opacity: 0; transform: translateY(10px);
+    animation: rise 0.7s var(--ease) 0.05s forwards;
   }
+  .brand .mark {
+    width: 34px; height: 34px; color: var(--gold); display: grid; place-items: center;
+    border-radius: 10px; background: var(--bg-elev); border: 1px solid var(--line);
+    box-shadow: var(--shadow);
+  }
+  .brand .mark img { width: 20px; height: 20px; display: block; }
   .brand-text {
-    font-size: 0.72rem; letter-spacing: 0.14em; text-transform: uppercase;
-    color: var(--lp-gray); font-weight: 500;
+    font-size: 0.72rem; letter-spacing: 0.16em; text-transform: uppercase;
+    color: var(--muted); font-weight: 500;
+  }
+  .hero {
+    opacity: 0; transform: translateY(12px);
+    animation: rise 0.75s var(--ease) 0.12s forwards;
   }
   h1 {
-    font-family: "Instrument Serif", Georgia, serif; font-weight: 400;
-    font-size: clamp(2rem, 5vw, 2.55rem); letter-spacing: -0.02em;
-    line-height: 1.15; margin: 0 0 12px; color: var(--lp-ink);
+    font-family: Newsreader, Georgia, "Times New Roman", serif;
+    font-weight: 400; font-size: clamp(2.05rem, 5.2vw, 2.7rem);
+    letter-spacing: -0.025em; line-height: 1.12; margin: 0 0 12px; color: var(--ink);
   }
-  h1 em { font-style: italic; color: var(--lp-answer); }
-  .sub {
-    color: var(--lp-gray); font-size: 0.98rem; margin: 0 0 28px; max-width: 36em;
+  h1 em { font-style: italic; color: var(--gold); }
+  .sub { color: var(--muted); font-size: 0.98rem; margin: 0 0 22px; max-width: 38em; }
+  .search-wrap {
+    position: relative; margin-bottom: 18px;
+    opacity: 0; transform: translateY(10px);
+    animation: rise 0.7s var(--ease) 0.2s forwards;
   }
-  .tabs {
-    display: flex; flex-wrap: wrap; gap: 6px; padding: 4px;
-    background: rgba(64,47,30,0.04); border: 1px solid rgba(96,90,80,0.22);
-    border-radius: 999px; margin-bottom: 16px; width: fit-content; max-width: 100%;
-  }
-  .tab {
-    appearance: none; border: none; background: transparent; color: var(--lp-gray);
-    border-radius: 999px; padding: 9px 14px; cursor: pointer; font-size: 0.84rem;
-    font-weight: 500; font-family: inherit;
-  }
-  .tab:hover { color: var(--lp-brown); }
-  .tab[aria-selected="true"] {
-    background: var(--lp-brown); color: var(--lp-yellow);
-  }
-  .search-wrap { position: relative; margin-bottom: 22px; }
   .search-wrap svg {
     position: absolute; left: 14px; top: 50%; transform: translateY(-50%);
-    width: 16px; height: 16px; color: var(--lp-gray); pointer-events: none;
+    width: 16px; height: 16px; color: var(--muted); pointer-events: none;
   }
   input[type="search"] {
-    width: 100%; background: #fff; border: 1px solid rgba(96,90,80,0.28);
-    color: var(--lp-brown); border-radius: 12px;
-    padding: 13px 14px 13px 40px; font-size: 0.95rem; font-family: inherit; outline: none;
+    width: 100%; background: var(--bg-elev); border: 1px solid var(--line-strong);
+    color: var(--ink); border-radius: 14px; padding: 14px 14px 14px 42px;
+    font-size: 0.95rem; font-family: inherit; outline: none;
+    transition: border-color 0.25s var(--ease), box-shadow 0.25s var(--ease), background 0.45s var(--ease);
   }
-  input[type="search"]::placeholder { color: var(--lp-gray); }
+  input[type="search"]::placeholder { color: var(--muted); }
   input[type="search"]:focus {
-    border-color: var(--lp-answer);
-    box-shadow: 0 0 0 3px rgba(127,113,92,0.18);
+    border-color: color-mix(in srgb, var(--gold) 70%, var(--line-strong));
+    box-shadow: 0 0 0 3px var(--gold-soft);
+  }
+  .cat-grid {
+    display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px;
+    margin-bottom: 22px;
+    opacity: 0; transform: translateY(10px);
+    animation: rise 0.7s var(--ease) 0.28s forwards;
+  }
+  .cat {
+    appearance: none; border: 1px solid var(--line); background: var(--bg-elev);
+    color: var(--ink-soft); border-radius: 14px; padding: 12px 12px 11px;
+    cursor: pointer; text-align: left; font-family: inherit;
+    box-shadow: var(--shadow);
+    transition: border-color 0.25s var(--ease), transform 0.25s var(--ease), background 0.25s var(--ease), color 0.25s var(--ease);
+  }
+  .cat:hover { border-color: color-mix(in srgb, var(--gold) 40%, var(--line)); transform: translateY(-1px); color: var(--ink); }
+  .cat[aria-selected="true"] {
+    border-color: color-mix(in srgb, var(--gold) 55%, var(--line));
+    background: linear-gradient(180deg, var(--bg-elev), color-mix(in srgb, var(--gold-soft) 80%, var(--bg-elev)));
+    color: var(--ink);
+  }
+  .cat .label { display: block; font-size: 0.8rem; font-weight: 600; letter-spacing: -0.01em; }
+  .cat .hint { display: block; margin-top: 3px; font-size: 0.68rem; color: var(--muted); font-weight: 400; }
+  .cat[aria-selected="true"] .hint { color: var(--ink-soft); }
+  #list { min-height: 160px; }
+  .section-label {
+    font-size: 0.72rem; letter-spacing: 0.12em; text-transform: uppercase;
+    color: var(--muted); font-weight: 500; margin: 4px 0 12px;
   }
   .item {
-    background: #fff;
-    border: 1px solid rgba(96,90,80,0.18);
-    border-radius: var(--radius);
-    padding: 18px 18px 16px; margin-bottom: 10px;
-    box-shadow: 0 1px 0 rgba(255,255,255,0.8) inset, 0 10px 28px rgba(64,47,30,0.05);
+    background: var(--bg-elev); border: 1px solid var(--line); border-radius: var(--radius);
+    padding: 18px 18px 16px; margin-bottom: 10px; box-shadow: var(--shadow);
+    transition: border-color 0.3s var(--ease), transform 0.35s var(--ease), background 0.45s var(--ease), box-shadow 0.35s var(--ease);
+    opacity: 0; transform: translateY(14px);
   }
+  .item.is-in { opacity: 1; transform: translateY(0); }
   .item:hover {
-    border-color: rgba(96,90,80,0.32);
-    background: linear-gradient(180deg, #fff, var(--lp-yellow));
+    border-color: color-mix(in srgb, var(--gold) 45%, var(--line));
+    transform: translateY(-2px);
+    box-shadow: 0 1px 0 rgba(255,255,255,0.04) inset, 0 18px 40px color-mix(in srgb, var(--ink) 8%, transparent);
   }
   .item h3 {
     margin: 0 0 8px; font-size: 1.02rem; font-weight: 600;
-    letter-spacing: -0.01em; line-height: 1.35; color: var(--lp-ink);
+    letter-spacing: -0.015em; line-height: 1.35; color: var(--ink);
   }
-  .item p { margin: 0; color: var(--lp-answer); font-size: 0.92rem; line-height: 1.55; }
+  .item p { margin: 0; color: var(--ink-soft); font-size: 0.92rem; line-height: 1.58; }
   .meta { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 14px; align-items: center; }
   .pill {
-    font-size: 0.7rem; font-weight: 500; letter-spacing: 0.02em; border-radius: 999px;
-    padding: 4px 9px; border: 1px solid rgba(96,90,80,0.22);
-    color: var(--lp-answer); background: var(--lp-cream);
+    font-size: 0.68rem; font-weight: 500; letter-spacing: 0.03em; border-radius: 999px;
+    padding: 4px 9px; border: 1px solid var(--line); color: var(--ink-soft); background: var(--bg-soft);
   }
-  .ok {
-    color: #3f6b4a; border-color: rgba(63,107,74,0.28); background: rgba(63,107,74,0.08);
-  }
-  .warn {
-    color: #8a6a2a; border-color: rgba(138,106,42,0.28); background: rgba(255,251,193,0.65);
-  }
-  .empty { color: var(--lp-gray); padding: 40px 8px; text-align: center; font-size: 0.95rem; }
+  .ok { color: var(--ok); border-color: color-mix(in srgb, var(--ok) 30%, transparent); background: var(--ok-bg); }
+  .empty { color: var(--muted); padding: 48px 8px; text-align: center; font-size: 0.95rem; }
   footer {
-    margin-top: 40px; padding-top: 20px; border-top: 1px solid rgba(96,90,80,0.2);
-    color: var(--lp-gray); font-size: 0.78rem;
+    margin-top: 48px; padding-top: 22px; border-top: 1px solid var(--line);
+    color: var(--muted); font-size: 0.78rem;
+    display: flex; flex-wrap: wrap; gap: 10px 18px; align-items: center; justify-content: space-between;
   }
-  @media (max-width: 520px) {
-    .wrap { padding: 32px 16px 64px; }
-    .tabs { width: 100%; }
-    .tab { flex: 1 1 auto; text-align: center; padding: 9px 10px; font-size: 0.8rem; }
+  footer a {
+    color: var(--muted); text-decoration: none; border-bottom: 1px solid transparent;
+    transition: color 0.25s var(--ease), border-color 0.25s var(--ease);
+  }
+  footer a:hover { color: var(--gold); border-bottom-color: color-mix(in srgb, var(--gold) 50%, transparent); }
+  @keyframes rise { to { opacity: 1; transform: translateY(0); } }
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    .brand, .hero, .search-wrap, .cat-grid, .item {
+      animation: none !important; opacity: 1 !important; transform: none !important; transition: none !important;
+    }
+    .item:hover, .cat:hover { transform: none; }
+  }
+  @media (max-width: 640px) {
+    .wrap { padding: 36px 16px 72px; }
+    .cat-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  }
+  @media (max-width: 380px) {
+    .cat-grid { grid-template-columns: 1fr; }
   }
 </style>
 </head>
 <body>
 <div class="wrap">
   <div class="brand">
-    <img src="M.png" width="36" height="36" alt="Moonphase" />
+    <div class="mark" aria-hidden="true"><img src="mark.svg" width="20" height="20" alt="" /></div>
     <div class="brand-text">Moonphase Flip · Beta</div>
   </div>
-  <h1>Beta Q&amp;A <em>window</em></h1>
-  <p class="sub">Official answers and how to report for Moonphase Flip beta testers.</p>
-  <div class="tabs" role="tablist">
-    <button class="tab" data-tab="answers" aria-selected="true">Answers</button>
-    <button class="tab" data-tab="report" aria-selected="false">How to report</button>
+  <div class="hero">
+    <h1>Beta Q&amp;A <em>window</em></h1>
+    <p class="sub">Official answers for Moonphase Flip beta testers. Search first, then browse by topic.</p>
   </div>
   <div class="search-wrap">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
-    <input id="q" type="search" placeholder="Search calendar, firmware, recording, sync…" autocomplete="off" />
+    <input id="q" type="search" placeholder="Search shipping, firmware, calendar, MagSafe, MCP…" autocomplete="off" />
   </div>
+  <div class="cat-grid" role="tablist" aria-label="Topics">
+    <button class="cat" data-tab="all" aria-selected="true"><span class="label">All answers</span><span class="hint">Everything answered</span></button>
+    <button class="cat" data-tab="setup" aria-selected="false"><span class="label">Getting started</span><span class="hint">Setup &amp; shipping</span></button>
+    <button class="cat" data-tab="device" aria-selected="false"><span class="label">Device</span><span class="hint">Hardware &amp; MagSafe</span></button>
+    <button class="cat" data-tab="app" aria-selected="false"><span class="label">App &amp; firmware</span><span class="hint">Updates &amp; sync</span></button>
+    <button class="cat" data-tab="recording" aria-selected="false"><span class="label">Recording &amp; AI</span><span class="hint">Capture &amp; storage</span></button>
+    <button class="cat" data-tab="privacy" aria-selected="false"><span class="label">Privacy &amp; MCP</span><span class="hint">Data &amp; other AIs</span></button>
+    <button class="cat" data-tab="report" aria-selected="false"><span class="label">How to report</span><span class="hint">Channels &amp; tips</span></button>
+  </div>
+  <div class="section-label" id="sectionLabel">All answers</div>
   <div id="list"></div>
-  <footer>Moonphase Flip beta support · content refreshed regularly</footer>
+  <footer>
+    <span>Moonphase Flip beta support · refreshed regularly</span>
+    <a href="https://hellomoonphase.com/" target="_blank" rel="noopener noreferrer">Moonphase Flip</a>
+  </footer>
 </div>
 <script>
-const DATA = {
-  answers: [
-    {
-      id: "FB-015",
-      q: "Is the device meant to record most of the day? How much can it store, and how often should I clear recordings?",
-      a: "You can leave it on all day. It only keeps audio when someone is speaking. After recordings sync to your phone, they're cleared from the device automatically — no manual purge needed.",
-      status: "Answered",
-      tone: "ok"
-    },
-    {
-      id: "FB-004",
-      q: "Will I get shipping tracking, and how do I send bug reports / usage feedback to the team?",
-      a: "Tracking is sent by DM after units ship. For bugs and beta feedback, post in General or your personal Beta Support group.",
-      status: "Answered",
-      tone: "ok"
-    },
-    {
-      id: "FB-034",
-      q: "After an iOS app update, which build should I be on?",
-      a: "Use TestFlight. The current correct build is 1.0.1 (1217).",
-      status: "Answered",
-      tone: "ok"
-    },
-    {
-      id: "FB-035",
-      q: "My device just arrived — how do I get on the firmware upgrade list?",
-      a: "Send your serial number to the team so you can be added to the upgrade list. Then watch the app for a firmware update prompt.",
-      status: "Answered",
-      tone: "ok"
-    },
-    {
-      id: "FB-024",
-      q: "Is it allowed to use Flip with other AIs (for example via MCP) under the NDA?",
-      a: "MCP is part of the beta; it's fine to try with other AIs.",
-      status: "Answered",
-      tone: "ok"
-    },
-    {
-      id: "FB-028",
-      q: "Why am I seeing Chinese characters in the UI or AI output?",
-      a: "This language bug was fixed. If you still see it, report with a screenshot in General or your personal Beta Support group.",
-      status: "Fixed — watch",
-      tone: "ok"
-    },
-    {
-      id: "FB-009",
-      q: "Google Calendar events show in the app but not on the device.",
-      a: "Older firmware often won't show Google Calendar events on the device. Install the latest firmware; events for calendars listed in the app can then appear on device. Flip currently only connects calendars listed in the app. More calendar types are coming.",
-      status: "Answered · workaround",
-      tone: "ok"
-    },
-    {
-      id: "FB-014",
-      q: "How do I recover a stuck device / recording that never returns?",
-      a: "If the device looks stuck (shows recording but nothing follows), try a factory reset from the app — several testers recovered this way. Stuck cases often also need a targeted firmware update after you share your serial number with the team.",
-      status: "Answered · workaround",
-      tone: "ok"
-    },
-    {
-      id: "FB-010",
-      q: "Is MagSafe hold strong enough, or do I need a metal ring on my case?",
-      a: "It depends on your case. Some MagSafe cases hold securely with no ring; others feel stronger with a metal ring added.",
-      status: "Answered",
-      tone: "ok"
-    },
-    {
-      id: "PRIV-01",
-      q: "Where is beta data stored, and does it meet US requirements?",
-      a: "Beta data is stored on AWS in the United States and is handled to meet applicable US rules.",
-      status: "Answered",
-      tone: "ok"
-    }
-  ],
-  report: [
-    {
-      id: "R1",
-      q: "General",
-      a: "Shared questions, announcements, and bug reports visible to the beta group.",
-      status: "Channel",
-      tone: "ok"
-    },
-    {
-      id: "R2",
-      q: "Personal Beta Support group",
-      a: "Your private thread with the support team for shipment, serial number, and one-to-one issues.",
-      status: "Channel",
-      tone: "ok"
-    },
-    {
-      id: "R3",
-      q: "What helps most when you report",
-      a: "Steps to reproduce, serial number (for firmware), app + firmware versions, and a screenshot or short video.",
-      status: "Tips",
-      tone: "ok"
-    }
-  ]
+const LABELS = {
+  all: "All answers",
+  setup: "Getting started",
+  device: "Device",
+  app: "App & firmware",
+  recording: "Recording & AI",
+  privacy: "Privacy & MCP",
+  report: "How to report"
 };
-let tab = "answers";
+const DATA = [
+  {
+    id: "FB-004",
+    cat: "setup",
+    q: "Will I get shipping tracking, and how do I send bug reports?",
+    a: "Units ship via UPS. The team emails you about shipment; tracking can take a while to appear. For bugs and beta feedback, post in General or your personal Beta Support group.",
+    status: "Answered",
+    tone: "ok"
+  },
+  {
+    id: "FB-035",
+    cat: "setup",
+    q: "My device just arrived — what should I do next?",
+    a: "Send your serial number to the team so they can push a firmware update to your device. After the push, check Announcements for Checklist_revised.pdf (and the QuickStart / Checklist docs).",
+    status: "Answered",
+    tone: "ok"
+  },
+  {
+    id: "FB-014",
+    cat: "device",
+    q: "The device shows recording but nothing comes back — or I’m stuck after a factory reset on 1.0.68.",
+    a: "Share your serial number with the team for a targeted firmware update. A factory reset from the app has helped some testers recover a stuck device. If you remain on 1.0.68 after a reset, a firmware update for that device is already in progress.",
+    status: "Answered · workaround",
+    tone: "ok"
+  },
+  {
+    id: "FB-034",
+    cat: "app",
+    q: "After an iOS app update, which build should I be on?",
+    a: "Use TestFlight. The current correct build is 1.0.1 (1217).",
+    status: "Answered",
+    tone: "ok"
+  },
+  {
+    id: "FB-009",
+    cat: "app",
+    q: "Google Calendar shows in the app but not on the device — or Bluetooth is connected but voice isn’t reaching calendar / todos.",
+    a: "This is usually older firmware. Install the latest firmware; Google Calendar events for calendars listed in the app can then appear on the device. Flip currently only connects calendars listed in the app — more calendar types are coming. Android / Fold calendar support is noted feedback with no commitment yet.",
+    status: "Answered · workaround",
+    tone: "ok"
+  },
+  {
+    id: "FB-028",
+    cat: "app",
+    q: "Why am I seeing Chinese characters in the UI or AI output?",
+    a: "This language bug was fixed. If it returns, report with a screenshot in General or your personal Beta Support group.",
+    status: "Fixed — watch",
+    tone: "ok"
+  },
+  {
+    id: "FB-015",
+    cat: "recording",
+    q: "Is the device meant to record most of the day? How much can it store?",
+    a: "You can leave it on all day. It only keeps audio when someone is speaking. After recordings sync to your phone, they’re cleared from the device automatically — no manual purge needed.",
+    status: "Answered",
+    tone: "ok"
+  },
+  {
+    id: "FB-024",
+    cat: "privacy",
+    q: "Is it allowed to use Flip with other AIs (for example via MCP) under the NDA?",
+    a: "MCP is part of the beta; it’s fine to try with other AIs.",
+    status: "Answered",
+    tone: "ok"
+  },
+  {
+    id: "PRIV-01",
+    cat: "privacy",
+    q: "Where is beta data stored, and does it meet US requirements?",
+    a: "Beta data is stored on AWS in the United States and is handled to meet applicable US rules.",
+    status: "Answered",
+    tone: "ok"
+  },
+  {
+    id: "R1",
+    cat: "report",
+    q: "General",
+    a: "Shared questions, announcements, and bug reports visible to the beta group.",
+    status: "Channel",
+    tone: "ok"
+  },
+  {
+    id: "R2",
+    cat: "report",
+    q: "Personal Beta Support group",
+    a: "Your private thread with the support team for shipment, serial number, and one-to-one issues.",
+    status: "Channel",
+    tone: "ok"
+  },
+  {
+    id: "R3",
+    cat: "report",
+    q: "Docs and what helps most when you report",
+    a: "Check Announcements for Checklist.pdf, QuickStartGuide.pdf, and Checklist_revised.pdf after firmware pushes. When reporting, include steps to reproduce, serial number (for firmware), app + firmware versions, and a screenshot or short video.",
+    status: "Tips",
+    tone: "ok"
+  }
+];
+
+let tab = "all";
 const listEl = document.getElementById("list");
 const qEl = document.getElementById("q");
+const labelEl = document.getElementById("sectionLabel");
+const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+function syncThemeClass() {
+  const dark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+  document.documentElement.classList.toggle("theme-dark", dark);
+  document.documentElement.classList.toggle("theme-light", !dark);
+}
+syncThemeClass();
+window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", syncThemeClass);
+
 function esc(s) {
   return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 }
+
+function observeItems() {
+  if (reduceMotion) {
+    listEl.querySelectorAll(".item").forEach(el => el.classList.add("is-in"));
+    return;
+  }
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach((e, idx) => {
+      if (e.isIntersecting) {
+        const el = e.target;
+        el.style.transitionDelay = (idx % 8) * 40 + "ms";
+        el.classList.add("is-in");
+        io.unobserve(el);
+      }
+    });
+  }, { threshold: 0.12, rootMargin: "0px 0px -8% 0px" });
+  listEl.querySelectorAll(".item").forEach(el => io.observe(el));
+}
+
 function render() {
   const q = (qEl.value || "").trim().toLowerCase();
-  let items = DATA[tab] || [];
-  if (q) items = items.filter(i => (i.q + i.a + i.id).toLowerCase().includes(q));
+  let items = DATA.slice();
+  if (tab !== "all") items = items.filter(i => i.cat === tab);
+  if (q) items = items.filter(i => (i.q + " " + i.a + " " + i.id + " " + i.cat).toLowerCase().includes(q));
+  labelEl.textContent = LABELS[tab] || "Answers";
   if (!items.length) {
-    listEl.innerHTML = '<div class="empty">No matches — try another word.</div>';
+    listEl.innerHTML = '<div class="empty">No matches — try another word or topic.</div>';
     return;
   }
   listEl.innerHTML = items.map(i =>
-    `<article class="item"><h3>${esc(i.q)}</h3><p>${esc(i.a)}</p><div class="meta"><span class="pill ${esc(i.tone)}">${esc(i.status)}</span></div></article>`
+    `<article class="item" data-cat="${esc(i.cat)}"><h3>${esc(i.q)}</h3><p>${esc(i.a)}</p><div class="meta"><span class="pill ${esc(i.tone)}">${esc(i.status)}</span></div></article>`
   ).join("");
+  observeItems();
 }
-document.querySelectorAll(".tab").forEach(btn => btn.addEventListener("click", () => {
+
+document.querySelectorAll(".cat").forEach(btn => btn.addEventListener("click", () => {
   tab = btn.dataset.tab;
-  document.querySelectorAll(".tab").forEach(b => b.setAttribute("aria-selected", b === btn ? "true" : "false"));
+  document.querySelectorAll(".cat").forEach(b => b.setAttribute("aria-selected", b === btn ? "true" : "false"));
   render();
 }));
 qEl.addEventListener("input", render);
