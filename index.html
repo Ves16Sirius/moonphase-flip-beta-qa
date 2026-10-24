@@ -55,8 +55,8 @@ body{
 }
 .shell{max-width:1000px;margin:0 auto;padding:28px 24px 96px}
 .brand{display:flex;flex-direction:column;align-items:flex-start;gap:10px;margin:0 0 20px}
-.wm-wrap{display:block;line-height:0;height:30px}
-.wm{display:none;height:30px;width:auto;max-width:min(420px,100%)}
+.wm-wrap{display:block;line-height:0;overflow:visible;width:min(400px,90vw);max-width:100%}
+.wm{display:none;width:100%;height:auto;max-height:42px}
 .wm-light{display:block}
 @media (prefers-color-scheme:dark){.wm-light{display:none}.wm-dark{display:block}}
 .hero{margin:0 0 28px;padding:0}
@@ -192,7 +192,7 @@ footer a:hover{color:var(--ink)}
   .layout{display:grid;grid-template-columns:220px minmax(0,1fr);gap:36px;align-items:start}
   .rail{position:sticky;top:52px;margin-bottom:0}
   .cats{grid-template-columns:1fr;gap:6px}
-  .wm-wrap,.wm{height:32px}.wm{max-width:min(480px,70vw)}
+  .wm-wrap{width:min(460px,68vw)}.wm{max-height:46px}
   h1{font-size:clamp(2rem,3vw,2.5rem)}
 }
 @media (min-width:1280px){
@@ -226,9 +226,14 @@ footer a:hover{color:var(--ink)}
 <div class="shell">
   <div class="brand">
     <div class="wm-wrap" aria-label="Moonphase Flip">
-      <img class="wm wm-light" src="wordmark-flip-black.svg" height="30" width="248" alt="Moonphase Flip" />
-      <img class="wm wm-dark" src="wordmark-flip-white.svg" height="30" width="248" alt="" aria-hidden="true" />
-    </div>
+<svg class="wm wm-light" viewBox="0 0 994 120" width="994" height="120" role="img" aria-label="MOONPHASE flip1" preserveAspectRatio="xMinYMid meet" shape-rendering="geometricPrecision">
+  <title>MOONPHASE flip1</title>
+  <image href="wordmark-flip-black@2x.png" width="994" height="120" />
+</svg>
+<svg class="wm wm-dark" viewBox="0 0 994 120" width="994" height="120" role="img" aria-hidden="true" preserveAspectRatio="xMinYMid meet" shape-rendering="geometricPrecision">
+  <image href="wordmark-flip-white@2x.png" width="994" height="120" />
+</svg>
+</div>
   </div>
   <div class="hero">
     <h1>Beta Q&amp;A Center</h1>
