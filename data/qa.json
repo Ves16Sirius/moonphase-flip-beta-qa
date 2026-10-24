@@ -73,8 +73,8 @@
     {
       "id": "FB-009",
       "question": "Calendar in app but not on device — or BT connected with no voice actions?",
-      "teaser": "Usually old firmware; only calendars listed in the app sync.",
-      "answerHtml": "Usually <strong>old firmware</strong> — install the latest. Then Google events for calendars <strong>listed in the app</strong> can show on device. Flip only connects calendars listed in the app for now; more types coming. Android / Fold calendar feedback is noted, <strong>no commitment yet</strong>.",
+      "teaser": "Usually an app + firmware version issue; wait for the pending push.",
+      "answerHtml": "This is usually an <strong>app + firmware version</strong> issue. Send your <strong>serial number (SN)</strong> if asked, then <strong>wait for our notification</strong> that a firmware update has been pushed. After the push, calendars listed in the app should be able to sync to the device. Android / Fold calendar feedback is noted; <strong>no commitment yet</strong>.",
       "category": "app-firmware",
       "updatedAt": "2026-10-24",
       "status": "answered"
@@ -82,8 +82,8 @@
     {
       "id": "FB-028",
       "question": "Why Chinese characters in the UI or AI output?",
-      "teaser": "Language bug fixed — report if it returns.",
-      "answerHtml": "This <strong>language bug was fixed</strong>. If it returns, send a screenshot in General or Beta Support.",
+      "teaser": "AI language bug under fix; send a screenshot if it returns.",
+      "answerHtml": "Chinese characters in the UI or AI output are treated as an <strong>AI language / prompt bug</strong>. The team is optimizing prompts. If you still see it, send a screenshot in <strong>General</strong> or your personal <strong>Beta Support</strong> group.",
       "category": "app-firmware",
       "updatedAt": "2026-10-24",
       "status": "answered"
