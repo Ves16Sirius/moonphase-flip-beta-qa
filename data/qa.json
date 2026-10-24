@@ -83,12 +83,13 @@
     },
     {
       "id": "FB-028",
-      "question": "Why Chinese characters in the UI or AI output?",
+      "question": "Why are there characters in other languages in the UI or AI output?",
       "teaser": "AI language/prompt bug under fix — send a screenshot if it returns.",
-      "answerHtml": "Chinese characters in the UI or AI output are treated as an <strong>AI language / prompt bug</strong>. The team is optimizing prompts. If you still see it, send a screenshot in <strong>General</strong> or your personal <strong>Beta Support</strong> group.",
+      "answerHtml": "Characters in other languages in the UI or AI output are treated as an <strong>AI language / prompt bug</strong>. The team is optimizing prompts. If you still see it, send a screenshot in <strong>General</strong> or your personal <strong>Beta Support</strong> group.",
       "category": "app-firmware",
       "updatedAt": "2026-10-24",
-      "status": "answered"
+      "status": "answered",
+      "teaserHtml": "AI language/prompt bug under fix — send a screenshot if it returns."
     },
     {
       "id": "FB-015",
