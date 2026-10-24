@@ -1,0 +1,146 @@
+{
+  "version": 1,
+  "siteTitle": "Beta Q&A Center",
+  "categories": [
+    {
+      "key": "getting-started",
+      "label": "Getting started",
+      "hint": "Setup & shipping"
+    },
+    {
+      "key": "device",
+      "label": "Device",
+      "hint": "Hardware recovery"
+    },
+    {
+      "key": "app-firmware",
+      "label": "App & firmware",
+      "hint": "Updates & sync"
+    },
+    {
+      "key": "recording-ai",
+      "label": "Recording & AI",
+      "hint": "Capture & storage"
+    },
+    {
+      "key": "privacy",
+      "label": "Privacy & MCP",
+      "hint": "Data & other AIs"
+    },
+    {
+      "key": "feedback",
+      "label": "How to report",
+      "hint": "Channels & tips"
+    }
+  ],
+  "entries": [
+    {
+      "id": "FB-004",
+      "question": "Shipping tracking and where to send bug reports?",
+      "teaser": "UPS shipping; team email; report bugs in General or Beta Support.",
+      "answerHtml": "Units ship via <strong>UPS</strong>. The team emails you; <strong>tracking can take a while</strong>. For bugs, post in <strong>General</strong> or your personal <strong>Beta Support</strong> group.",
+      "category": "getting-started",
+      "updatedAt": "2026-10-22",
+      "status": "answered"
+    },
+    {
+      "id": "FB-035",
+      "question": "Device just arrived — what next?",
+      "teaser": "Send your serial number (SN), wait for our firmware-push notification, then follow Checklist_revised.",
+      "answerHtml": "<p>Send your <strong>serial number (SN)</strong> so the team can prepare a firmware push.</p><p><strong>Pause</strong> — wait until <strong>we notify you</strong> that the new firmware update has been pushed.</p><p>Then open Announcements and continue with <strong>Checklist_revised.pdf</strong> (plus QuickStart / Checklist as needed).</p>",
+      "category": "getting-started",
+      "updatedAt": "2026-10-24",
+      "status": "answered"
+    },
+    {
+      "id": "FB-014",
+      "question": "Recording shows, but nothing returns — or stuck on firmware 1.0.68?",
+      "teaser": "Send your serial number (SN), then wait for our firmware-push notification before continuing the checklist.",
+      "answerHtml": "<p>Send your <strong>serial number (SN)</strong> to the team.</p><p><strong>Pause</strong> — wait until <strong>we notify you</strong> that the new firmware update has been pushed to your unit.</p><p>Only after that notification, continue with the steps in <strong>Checklist_revised</strong> (Announcements).</p><p>If you are still on <strong>1.0.68</strong>, the same path applies: share your SN and wait for our push notification.</p>",
+      "category": "device",
+      "updatedAt": "2026-10-24",
+      "status": "answered"
+    },
+    {
+      "id": "FB-034",
+      "question": "Which iOS app build should I use?",
+      "teaser": "TestFlight 1.0.1 (1217).",
+      "answerHtml": "Use <strong>TestFlight</strong>. Current correct build: <strong>1.0.1 (1217)</strong>.",
+      "category": "app-firmware",
+      "updatedAt": "2026-10-24",
+      "status": "answered"
+    },
+    {
+      "id": "FB-009",
+      "question": "Calendar in app but not on device — or BT connected with no voice actions?",
+      "teaser": "Usually old firmware; only calendars listed in the app sync.",
+      "answerHtml": "Usually <strong>old firmware</strong> — install the latest. Then Google events for calendars <strong>listed in the app</strong> can show on device. Flip only connects calendars listed in the app for now; more types coming. Android / Fold calendar feedback is noted, <strong>no commitment yet</strong>.",
+      "category": "app-firmware",
+      "updatedAt": "2026-10-24",
+      "status": "answered"
+    },
+    {
+      "id": "FB-028",
+      "question": "Why Chinese characters in the UI or AI output?",
+      "teaser": "Language bug fixed — report if it returns.",
+      "answerHtml": "This <strong>language bug was fixed</strong>. If it returns, send a screenshot in General or Beta Support.",
+      "category": "app-firmware",
+      "updatedAt": "2026-10-24",
+      "status": "answered"
+    },
+    {
+      "id": "FB-015",
+      "question": "Can I leave recording on all day?",
+      "teaser": "Yes — only saves when someone speaks; auto-clears after sync.",
+      "answerHtml": "Yes — leave it on. It <strong>only keeps audio when someone is speaking</strong>. After sync to your phone, device storage <strong>clears automatically</strong>.",
+      "category": "recording-ai",
+      "updatedAt": "2026-10-23",
+      "status": "answered"
+    },
+    {
+      "id": "FB-024",
+      "question": "Can I use Flip with other AIs via MCP under the NDA?",
+      "teaser": "MCP is part of beta — fine to try with other AIs.",
+      "answerHtml": "<strong>MCP is part of the beta</strong>; it is fine to try with other AIs.",
+      "category": "privacy",
+      "updatedAt": "2026-10-24",
+      "status": "answered"
+    },
+    {
+      "id": "PRIV-01",
+      "question": "Where is beta data stored?",
+      "teaser": "AWS in the United States.",
+      "answerHtml": "Beta data is stored on <strong>AWS in the United States</strong> and handled to meet applicable US rules.",
+      "category": "privacy",
+      "updatedAt": "2026-10-24",
+      "status": "answered"
+    },
+    {
+      "id": "R1",
+      "question": "General channel",
+      "teaser": "Shared questions, announcements, and group bug reports.",
+      "answerHtml": "Shared questions, announcements, and bug reports visible to the beta group.",
+      "category": "feedback",
+      "updatedAt": "2026-10-22",
+      "status": "answered"
+    },
+    {
+      "id": "R2",
+      "question": "Personal Beta Support group",
+      "teaser": "Private thread for shipment, serial number (SN), and one-to-one issues.",
+      "answerHtml": "Your private thread for shipment, <strong>serial number (SN)</strong>, and one-to-one issues.",
+      "category": "feedback",
+      "updatedAt": "2026-10-22",
+      "status": "answered"
+    },
+    {
+      "id": "R3",
+      "question": "Docs and what to include when reporting",
+      "teaser": "Checklist docs in Announcements; include serial number (SN), versions, screenshot.",
+      "answerHtml": "Announcements has <strong>Checklist.pdf</strong>, <strong>QuickStartGuide.pdf</strong>, and <strong>Checklist_revised.pdf</strong> after firmware pushes. Reports help most with repro steps, <strong>serial number (SN)</strong>, app + firmware versions, and a screenshot or short video.",
+      "category": "feedback",
+      "updatedAt": "2026-10-24",
+      "status": "answered"
+    }
+  ]
+}
