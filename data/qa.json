@@ -37,7 +37,7 @@
     {
       "id": "FB-004",
       "question": "Shipping tracking and where to send bug reports?",
-      "teaser": "Tracking comes by email after UPS ships; report bugs in General or your Beta Support thread.",
+      "teaser": "UPS ships units; tracking arrives by email — report bugs in General or Beta Support.",
       "answerHtml": "Units ship via <strong>UPS</strong>. The team emails you; <strong>tracking can take a while</strong>. For bugs, post in <strong>General</strong> or your personal <strong>Beta Support</strong> group.",
       "category": "getting-started",
       "updatedAt": "2026-10-22",
@@ -46,25 +46,27 @@
     {
       "id": "FB-035",
       "question": "Device just arrived — what next?",
-      "teaser": "Share your serial number (SN), wait for our push notice, then open Checklist revised.",
-      "answerHtml": "<p>Send your <strong>serial number (SN)</strong> so the team can prepare a firmware push.</p><p><strong>Pause</strong> — wait until <strong>we notify you</strong> that the new firmware update has been pushed.</p><p>Then open Announcements and continue with <strong>Checklist_revised.pdf</strong> (plus QuickStart / Checklist as needed).</p>",
+      "teaser": "Send your SN, wait for our push notice, then follow Checklist_revised.pdf.",
+      "answerHtml": "<p>Send your device <strong>serial number (SN)</strong> in <strong>General</strong> or your private <strong>Beta Support</strong> group so we can push firmware to your unit.</p><p><strong>Pause</strong> until we notify you that the firmware update has been pushed.</p><p>Then open Announcements and follow <strong>Checklist_revised.pdf</strong> (plus QuickStart / Checklist as needed). After updating, keep app and firmware current; unbind and re-pair if the screen still needs a sync.</p>",
       "category": "getting-started",
       "updatedAt": "2026-10-24",
-      "status": "answered"
+      "status": "answered",
+      "teaserHtml": "Send your <mark>SN</mark>, wait for our push notice, then follow <mark>Checklist_revised.pdf</mark>."
     },
     {
       "id": "FB-014",
       "question": "Recording shows, but nothing returns — or stuck on firmware 1.0.68?",
-      "teaser": "Share your serial number (SN), wait for our firmware-push notice, then follow Checklist revised.",
-      "answerHtml": "<p>Send your <strong>serial number (SN)</strong> to the team.</p><p><strong>Pause</strong> — wait until <strong>we notify you</strong> that the new firmware update has been pushed to your unit.</p><p>Only after that notification, continue with the steps in <strong>Checklist_revised</strong> (Announcements).</p><p>If you are still on <strong>1.0.68</strong>, the same path applies: share your SN and wait for our push notification.</p>",
+      "teaser": "Send your SN, wait for our firmware-push notice, then follow Checklist_revised.pdf.",
+      "answerHtml": "<p>Devices often ship on older firmware (including <strong>1.0.68</strong>). Send your device <strong>serial number (SN)</strong> in <strong>General</strong> or your private <strong>Beta Support</strong> group.</p><p><strong>Wait</strong> for our notification that the new firmware was pushed to your unit — do not assume the app Firmware Update screen shows it immediately.</p><p>After that notice, open Announcements and follow <strong>Checklist_revised.pdf</strong> (use the TestFlight app build the checklist names). After the update, keep app and firmware current; then <strong>unbind and re-pair</strong> if data needs to sync to the Flip screen.</p>",
       "category": "device",
       "updatedAt": "2026-10-24",
-      "status": "answered"
+      "status": "answered",
+      "teaserHtml": "Send your <mark>SN</mark>, wait for our firmware-push notice, then follow <mark>Checklist_revised.pdf</mark>."
     },
     {
       "id": "FB-034",
       "question": "Which iOS app build should I use?",
-      "teaser": "Install the current TestFlight build listed for beta.",
+      "teaser": "Install the listed TestFlight build for iOS beta.",
       "answerHtml": "Use <strong>TestFlight</strong>. Current correct build: <strong>1.0.1 (1217)</strong>.",
       "category": "app-firmware",
       "updatedAt": "2026-10-24",
@@ -73,7 +75,7 @@
     {
       "id": "FB-009",
       "question": "Calendar in app but not on device — or BT connected with no voice actions?",
-      "teaser": "Usually fixed by the pending app + firmware push after you share SN if asked.",
+      "teaser": "Usually an app + firmware version issue — share SN if asked, then wait for our push.",
       "answerHtml": "This is usually an <strong>app + firmware version</strong> issue. Send your <strong>serial number (SN)</strong> if asked, then <strong>wait for our notification</strong> that a firmware update has been pushed. After the push, calendars listed in the app should be able to sync to the device. Android / Fold calendar feedback is noted; <strong>no commitment yet</strong>.",
       "category": "app-firmware",
       "updatedAt": "2026-10-24",
@@ -82,7 +84,7 @@
     {
       "id": "FB-028",
       "question": "Why Chinese characters in the UI or AI output?",
-      "teaser": "Team is fixing AI language/prompt output; report with a screenshot if it returns.",
+      "teaser": "AI language/prompt bug under fix — send a screenshot if it returns.",
       "answerHtml": "Chinese characters in the UI or AI output are treated as an <strong>AI language / prompt bug</strong>. The team is optimizing prompts. If you still see it, send a screenshot in <strong>General</strong> or your personal <strong>Beta Support</strong> group.",
       "category": "app-firmware",
       "updatedAt": "2026-10-24",
@@ -91,7 +93,7 @@
     {
       "id": "FB-015",
       "question": "Can I leave recording on all day?",
-      "teaser": "You can leave capture on; it only keeps speech and clears after phone sync.",
+      "teaser": "Yes — it only keeps speech and clears after phone sync.",
       "answerHtml": "Yes — leave it on. It <strong>only keeps audio when someone is speaking</strong>. After sync to your phone, device storage <strong>clears automatically</strong>.",
       "category": "recording-ai",
       "updatedAt": "2026-10-23",
@@ -100,17 +102,8 @@
     {
       "id": "FB-024",
       "question": "Can I use Flip with other AIs via MCP under the NDA?",
-      "teaser": "MCP with other AIs is allowed in this beta under the existing NDA rules.",
+      "teaser": "MCP with other AIs is allowed in this beta.",
       "answerHtml": "<strong>MCP is part of the beta</strong>; it is fine to try with other AIs.",
-      "category": "privacy",
-      "updatedAt": "2026-10-24",
-      "status": "answered"
-    },
-    {
-      "id": "PRIV-01",
-      "question": "Where is beta data stored?",
-      "teaser": "Beta data stays on AWS in the United States under applicable US rules.",
-      "answerHtml": "Beta data is stored on <strong>AWS in the United States</strong> and handled to meet applicable US rules.",
       "category": "privacy",
       "updatedAt": "2026-10-24",
       "status": "answered"
@@ -118,7 +111,7 @@
     {
       "id": "R1",
       "question": "General channel",
-      "teaser": "Use General for shared questions, announcements, and group bug reports.",
+      "teaser": "Shared questions, announcements, and group bug reports.",
       "answerHtml": "Shared questions, announcements, and bug reports visible to the beta group.",
       "category": "feedback",
       "updatedAt": "2026-10-22",
@@ -127,7 +120,7 @@
     {
       "id": "R2",
       "question": "Personal Beta Support group",
-      "teaser": "Use your private Beta Support thread for shipment, SN, and one-to-one issues.",
+      "teaser": "Private thread for shipment, SN, and one-to-one issues.",
       "answerHtml": "Your private thread for shipment, <strong>serial number (SN)</strong>, and one-to-one issues.",
       "category": "feedback",
       "updatedAt": "2026-10-22",
@@ -136,7 +129,7 @@
     {
       "id": "R3",
       "question": "Docs and what to include when reporting",
-      "teaser": "Include SN, app/firmware versions, and a screenshot; check Announcements for checklists.",
+      "teaser": "Include SN, versions, and a screenshot; checklists live in Announcements.",
       "answerHtml": "Announcements has <strong>Checklist.pdf</strong>, <strong>QuickStartGuide.pdf</strong>, and <strong>Checklist_revised.pdf</strong> after firmware pushes. Reports help most with repro steps, <strong>serial number (SN)</strong>, app + firmware versions, and a screenshot or short video.",
       "category": "feedback",
       "updatedAt": "2026-10-24",
