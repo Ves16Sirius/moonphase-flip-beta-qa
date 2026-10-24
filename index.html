@@ -4,49 +4,81 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <meta name="color-scheme" content="light dark" />
-<meta name="theme-color" content="#f2eee6" media="(prefers-color-scheme: light)" />
-<meta name="theme-color" content="#12110f" media="(prefers-color-scheme: dark)" />
+<meta name="theme-color" content="#F7F7F5" media="(prefers-color-scheme: light)" />
+<meta name="theme-color" content="#08090A" media="(prefers-color-scheme: dark)" />
 <title>Moonphase Flip — Beta Q&amp;A</title>
 <link rel="icon" href="favicon.svg" type="image/svg+xml" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&display=swap" rel="stylesheet" />
 <style>
   :root {
-    --bg: #f2eee6; --bg-elev: #faf7f1; --bg-soft: #ebe6db;
-    --ink: #1c1915; --ink-soft: #4a453c; --muted: #8a8378;
-    --line: rgba(28, 25, 21, 0.10); --line-strong: rgba(28, 25, 21, 0.16);
-    --gold: #b89a6a; --gold-soft: rgba(184, 154, 106, 0.16);
-    --ok: #3d6b4f; --ok-bg: rgba(61, 107, 79, 0.10);
-    --shadow: 0 1px 0 rgba(255,255,255,0.55) inset, 0 12px 32px rgba(28, 25, 21, 0.06);
-    --radius: 16px; --ease: cubic-bezier(0.22, 1, 0.36, 1);
+    /* Light: Linear/Claude-inspired cool paper — neutral, not cream-yellow */
+    --bg: #F7F7F5;
+    --bg-elev: #FFFFFF;
+    --bg-soft: #EEEEEC;
+    --bg-glass: rgba(247, 247, 245, 0.72);
+    --ink: #0A0A0A;
+    --ink-soft: #3F3F46;
+    --muted: #71717A;
+    --line: rgba(10, 10, 10, 0.08);
+    --line-strong: rgba(10, 10, 10, 0.14);
+    --accent: #52525B;          /* zinc — formal B/W Flip */
+    --accent-soft: rgba(82, 82, 91, 0.10);
+    --focus: #5E6AD2;           /* Linear indigo — focus ring only */
+    --focus-soft: rgba(94, 106, 210, 0.18);
+    --ok: #15803D;
+    --ok-bg: rgba(21, 128, 61, 0.08);
+    --new: #0A0A0A;
+    --new-bg: rgba(10, 10, 10, 0.06);
+    --shadow: 0 0 0 1px rgba(10,10,10,0.04), 0 8px 24px rgba(10,10,10,0.04), 0 1px 0 rgba(255,255,255,0.8) inset;
+    --radius: 14px;
+    --ease: cubic-bezier(0.16, 1, 0.3, 1);
+    --dur: 0.55s;
     color-scheme: light dark;
   }
   @media (prefers-color-scheme: dark) {
     :root {
-      --bg: #12110f; --bg-elev: #1a1814; --bg-soft: #22201b;
-      --ink: #f0ebe3; --ink-soft: #c4bdb0; --muted: #8f877b;
-      --line: rgba(240, 235, 227, 0.10); --line-strong: rgba(240, 235, 227, 0.16);
-      --gold: #c9b896; --gold-soft: rgba(201, 184, 150, 0.14);
-      --ok: #7fb892; --ok-bg: rgba(127, 184, 146, 0.12);
-      --shadow: 0 1px 0 rgba(255,255,255,0.03) inset, 0 16px 40px rgba(0, 0, 0, 0.35);
+      /* Dark: Grok/Linear near-black */
+      --bg: #08090A;
+      --bg-elev: #111113;
+      --bg-soft: #18181B;
+      --bg-glass: rgba(8, 9, 10, 0.72);
+      --ink: #FAFAFA;
+      --ink-soft: #D4D4D8;
+      --muted: #A1A1AA;
+      --line: rgba(250, 250, 250, 0.08);
+      --line-strong: rgba(250, 250, 250, 0.14);
+      --accent: #A1A1AA;
+      --accent-soft: rgba(161, 161, 170, 0.12);
+      --focus: #8FA4FF;
+      --focus-soft: rgba(143, 164, 255, 0.22);
+      --ok: #4ADE80;
+      --ok-bg: rgba(74, 222, 128, 0.10);
+      --new: #FAFAFA;
+      --new-bg: rgba(250, 250, 250, 0.08);
+      --shadow: 0 0 0 1px rgba(255,255,255,0.04), 0 16px 40px rgba(0,0,0,0.45);
     }
   }
   html.theme-light {
-    --bg: #f2eee6; --bg-elev: #faf7f1; --bg-soft: #ebe6db;
-    --ink: #1c1915; --ink-soft: #4a453c; --muted: #8a8378;
-    --line: rgba(28, 25, 21, 0.10); --line-strong: rgba(28, 25, 21, 0.16);
-    --gold: #b89a6a; --gold-soft: rgba(184, 154, 106, 0.16);
-    --ok: #3d6b4f; --ok-bg: rgba(61, 107, 79, 0.10);
-    --shadow: 0 1px 0 rgba(255,255,255,0.55) inset, 0 12px 32px rgba(28, 25, 21, 0.06);
+    --bg: #F7F7F5; --bg-elev: #FFFFFF; --bg-soft: #EEEEEC; --bg-glass: rgba(247,247,245,0.72);
+    --ink: #0A0A0A; --ink-soft: #3F3F46; --muted: #71717A;
+    --line: rgba(10,10,10,0.08); --line-strong: rgba(10,10,10,0.14);
+    --accent: #52525B; --accent-soft: rgba(82,82,91,0.10);
+    --focus: #5E6AD2; --focus-soft: rgba(94,106,210,0.18);
+    --ok: #15803D; --ok-bg: rgba(21,128,61,0.08);
+    --new: #0A0A0A; --new-bg: rgba(10,10,10,0.06);
+    --shadow: 0 0 0 1px rgba(10,10,10,0.04), 0 8px 24px rgba(10,10,10,0.04), 0 1px 0 rgba(255,255,255,0.8) inset;
   }
   html.theme-dark {
-    --bg: #12110f; --bg-elev: #1a1814; --bg-soft: #22201b;
-    --ink: #f0ebe3; --ink-soft: #c4bdb0; --muted: #8f877b;
-    --line: rgba(240, 235, 227, 0.10); --line-strong: rgba(240, 235, 227, 0.16);
-    --gold: #c9b896; --gold-soft: rgba(201, 184, 150, 0.14);
-    --ok: #7fb892; --ok-bg: rgba(127, 184, 146, 0.12);
-    --shadow: 0 1px 0 rgba(255,255,255,0.03) inset, 0 16px 40px rgba(0, 0, 0, 0.35);
+    --bg: #08090A; --bg-elev: #111113; --bg-soft: #18181B; --bg-glass: rgba(8,9,10,0.72);
+    --ink: #FAFAFA; --ink-soft: #D4D4D8; --muted: #A1A1AA;
+    --line: rgba(250,250,250,0.08); --line-strong: rgba(250,250,250,0.14);
+    --accent: #A1A1AA; --accent-soft: rgba(161,161,170,0.12);
+    --focus: #8FA4FF; --focus-soft: rgba(143,164,255,0.22);
+    --ok: #4ADE80; --ok-bg: rgba(74,222,128,0.10);
+    --new: #FAFAFA; --new-bg: rgba(250,250,250,0.08);
+    --shadow: 0 0 0 1px rgba(255,255,255,0.04), 0 16px 40px rgba(0,0,0,0.45);
   }
   * { box-sizing: border-box; }
   html { scroll-behavior: smooth; }
@@ -54,49 +86,60 @@
     margin: 0; min-height: 100vh;
     font-family: Inter, ui-sans-serif, system-ui, -apple-system, sans-serif;
     background:
-      radial-gradient(900px 480px at 50% -12%, var(--gold-soft), transparent 58%),
+      radial-gradient(1000px 520px at 50% -18%, var(--accent-soft), transparent 55%),
       linear-gradient(180deg, var(--bg), var(--bg-soft));
     color: var(--ink); line-height: 1.55; -webkit-font-smoothing: antialiased;
-    transition: background-color 0.45s var(--ease), color 0.45s var(--ease);
+    transition: background-color var(--dur) var(--ease), color var(--dur) var(--ease);
   }
-  .wrap { max-width: 740px; margin: 0 auto; padding: 52px 22px 88px; }
+  .freshness {
+    position: sticky; top: 0; z-index: 20;
+    display: flex; justify-content: center; padding: 10px 16px;
+    background: var(--bg-glass);
+    backdrop-filter: saturate(1.2) blur(14px);
+    -webkit-backdrop-filter: saturate(1.2) blur(14px);
+    border-bottom: 1px solid var(--line);
+    opacity: 0; transform: translateY(-8px);
+    animation: rise 0.6s var(--ease) 0.02s forwards;
+  }
+  .freshness-pill {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-size: 0.72rem; font-weight: 500; letter-spacing: 0.04em;
+    color: var(--muted); text-transform: uppercase;
+  }
+  .freshness-pill .dot {
+    width: 6px; height: 6px; border-radius: 999px; background: var(--ok);
+    box-shadow: 0 0 0 3px var(--ok-bg);
+  }
+  .wrap { max-width: 740px; margin: 0 auto; padding: 36px 22px 88px; }
   .brand {
-    display: flex; align-items: center; gap: 12px; margin-bottom: 28px;
-    opacity: 0; transform: translateY(10px);
-    animation: rise 0.7s var(--ease) 0.05s forwards;
+    display: flex; align-items: center; gap: 12px; margin-bottom: 26px;
+    opacity: 0; transform: translateY(12px);
+    animation: rise 0.7s var(--ease) 0.08s forwards;
   }
-  .brand .mark {
-    width: 34px; height: 34px; color: var(--gold); display: grid; place-items: center;
-    border-radius: 10px; background: var(--bg-elev); border: 1px solid var(--line);
-    box-shadow: var(--shadow);
+  .wordmark {
+    font-family: Inter, ui-sans-serif, system-ui, sans-serif;
+    font-weight: 700; font-size: 0.88rem; letter-spacing: 0.28em;
+    color: var(--ink); line-height: 1; padding: 6px 0;
   }
-  .brand .mark img { width: 20px; height: 20px; display: block; }
   .brand-text {
-    font-size: 0.72rem; letter-spacing: 0.16em; text-transform: uppercase;
+    font-size: 0.7rem; letter-spacing: 0.16em; text-transform: uppercase;
     color: var(--muted); font-weight: 500;
   }
-
-  .wordmark {
-    font-family: Inter, ui-sans-serif, system-ui, -apple-system, sans-serif;
-    font-weight: 600; font-size: 0.92rem; letter-spacing: 0.22em;
-    color: var(--ink); line-height: 1; padding: 8px 0;
-  }
-
   .hero {
-    opacity: 0; transform: translateY(12px);
-    animation: rise 0.75s var(--ease) 0.12s forwards;
+    opacity: 0; transform: translateY(14px);
+    animation: rise 0.8s var(--ease) 0.14s forwards;
   }
   h1 {
     font-family: Newsreader, Georgia, "Times New Roman", serif;
-    font-weight: 400; font-size: clamp(2.05rem, 5.2vw, 2.7rem);
-    letter-spacing: -0.025em; line-height: 1.12; margin: 0 0 12px; color: var(--ink);
+    font-weight: 400; font-size: clamp(2.1rem, 5.2vw, 2.75rem);
+    letter-spacing: -0.03em; line-height: 1.1; margin: 0 0 12px; color: var(--ink);
   }
   h1 em { font-style: italic; color: var(--ink-soft); }
   .sub { color: var(--muted); font-size: 0.98rem; margin: 0 0 22px; max-width: 38em; }
   .search-wrap {
-    position: relative; margin-bottom: 18px;
-    opacity: 0; transform: translateY(10px);
-    animation: rise 0.7s var(--ease) 0.2s forwards;
+    position: relative; margin-bottom: 16px;
+    opacity: 0; transform: translateY(12px);
+    animation: rise 0.7s var(--ease) 0.22s forwards;
   }
   .search-wrap svg {
     position: absolute; left: 14px; top: 50%; transform: translateY(-50%);
@@ -104,54 +147,59 @@
   }
   input[type="search"] {
     width: 100%; background: var(--bg-elev); border: 1px solid var(--line-strong);
-    color: var(--ink); border-radius: 14px; padding: 14px 14px 14px 42px;
+    color: var(--ink); border-radius: 12px; padding: 14px 14px 14px 42px;
     font-size: 0.95rem; font-family: inherit; outline: none;
-    transition: border-color 0.25s var(--ease), box-shadow 0.25s var(--ease), background 0.45s var(--ease);
+    transition: border-color 0.25s var(--ease), box-shadow 0.3s var(--ease), background var(--dur) var(--ease), transform 0.3s var(--ease);
   }
   input[type="search"]::placeholder { color: var(--muted); }
   input[type="search"]:focus {
-    border-color: color-mix(in srgb, var(--gold) 70%, var(--line-strong));
-    box-shadow: 0 0 0 3px var(--gold-soft);
+    border-color: color-mix(in srgb, var(--focus) 55%, var(--line-strong));
+    box-shadow: 0 0 0 4px var(--focus-soft);
   }
   .cat-grid {
     display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px;
     margin-bottom: 22px;
-    opacity: 0; transform: translateY(10px);
-    animation: rise 0.7s var(--ease) 0.28s forwards;
+    opacity: 0; transform: translateY(12px);
+    animation: rise 0.7s var(--ease) 0.3s forwards;
   }
   .cat {
     appearance: none; border: 1px solid var(--line); background: var(--bg-elev);
-    color: var(--ink-soft); border-radius: 14px; padding: 12px 12px 11px;
+    color: var(--ink-soft); border-radius: 12px; padding: 12px 12px 11px;
     cursor: pointer; text-align: left; font-family: inherit;
     box-shadow: var(--shadow);
-    transition: border-color 0.25s var(--ease), transform 0.25s var(--ease), background 0.25s var(--ease), color 0.25s var(--ease);
+    transition: border-color 0.25s var(--ease), transform 0.35s var(--ease), background 0.25s var(--ease), color 0.25s var(--ease), box-shadow 0.35s var(--ease);
   }
-  .cat:hover { border-color: color-mix(in srgb, var(--gold) 40%, var(--line)); transform: translateY(-1px); color: var(--ink); }
+  .cat:hover { border-color: var(--line-strong); transform: translateY(-2px); color: var(--ink); }
   .cat[aria-selected="true"] {
-    border-color: color-mix(in srgb, var(--gold) 55%, var(--line));
-    background: linear-gradient(180deg, var(--bg-elev), color-mix(in srgb, var(--gold-soft) 80%, var(--bg-elev)));
-    color: var(--ink);
+    border-color: var(--ink);
+    background: var(--ink); color: var(--bg);
+    box-shadow: none;
   }
+  .cat[aria-selected="true"] .hint { color: color-mix(in srgb, var(--bg) 70%, transparent); }
   .cat .label { display: block; font-size: 0.8rem; font-weight: 600; letter-spacing: -0.01em; }
   .cat .hint { display: block; margin-top: 3px; font-size: 0.68rem; color: var(--muted); font-weight: 400; }
-  .cat[aria-selected="true"] .hint { color: var(--ink-soft); }
-  #list { min-height: 160px; }
   .section-label {
-    font-size: 0.72rem; letter-spacing: 0.12em; text-transform: uppercase;
+    font-size: 0.7rem; letter-spacing: 0.14em; text-transform: uppercase;
     color: var(--muted); font-weight: 500; margin: 4px 0 12px;
   }
+  #list { min-height: 160px; }
   .item {
     background: var(--bg-elev); border: 1px solid var(--line); border-radius: var(--radius);
     padding: 18px 18px 16px; margin-bottom: 10px; box-shadow: var(--shadow);
-    transition: border-color 0.3s var(--ease), transform 0.35s var(--ease), background 0.45s var(--ease), box-shadow 0.35s var(--ease);
-    opacity: 0; transform: translateY(14px);
+    transition: border-color 0.3s var(--ease), transform 0.4s var(--ease), box-shadow 0.4s var(--ease), background var(--dur) var(--ease), filter 0.4s var(--ease);
+    opacity: 0; transform: translateY(18px); filter: blur(4px);
   }
-  .item.is-in { opacity: 1; transform: translateY(0); }
+  .item.is-in { opacity: 1; transform: translateY(0); filter: blur(0); }
   .item:hover {
-    border-color: color-mix(in srgb, var(--gold) 45%, var(--line));
-    transform: translateY(-2px);
-    box-shadow: 0 1px 0 rgba(255,255,255,0.04) inset, 0 18px 40px color-mix(in srgb, var(--ink) 8%, transparent);
+    border-color: var(--line-strong);
+    transform: translateY(-3px);
+    box-shadow: 0 0 0 1px rgba(10,10,10,0.06), 0 20px 48px rgba(10,10,10,0.08);
   }
+  @media (prefers-color-scheme: dark) {
+    .item:hover { box-shadow: 0 0 0 1px rgba(255,255,255,0.08), 0 24px 56px rgba(0,0,0,0.55); }
+  }
+  html.theme-dark .item:hover { box-shadow: 0 0 0 1px rgba(255,255,255,0.08), 0 24px 56px rgba(0,0,0,0.55); }
+  .item.is-new { border-color: color-mix(in srgb, var(--ink) 22%, var(--line)); }
   .item h3 {
     margin: 0 0 8px; font-size: 1.02rem; font-weight: 600;
     letter-spacing: -0.015em; line-height: 1.35; color: var(--ink);
@@ -162,7 +210,11 @@
     font-size: 0.68rem; font-weight: 500; letter-spacing: 0.03em; border-radius: 999px;
     padding: 4px 9px; border: 1px solid var(--line); color: var(--ink-soft); background: var(--bg-soft);
   }
-  .ok { color: var(--ok); border-color: color-mix(in srgb, var(--ok) 30%, transparent); background: var(--ok-bg); }
+  .ok { color: var(--ok); border-color: color-mix(in srgb, var(--ok) 28%, transparent); background: var(--ok-bg); }
+  .asof { color: var(--muted); }
+  .recent {
+    color: var(--new); border-color: color-mix(in srgb, var(--new) 22%, transparent); background: var(--new-bg);
+  }
   .empty { color: var(--muted); padding: 48px 8px; text-align: center; font-size: 0.95rem; }
   footer {
     margin-top: 48px; padding-top: 22px; border-top: 1px solid var(--line);
@@ -173,25 +225,26 @@
     color: var(--muted); text-decoration: none; border-bottom: 1px solid transparent;
     transition: color 0.25s var(--ease), border-color 0.25s var(--ease);
   }
-  footer a:hover { color: var(--gold); border-bottom-color: color-mix(in srgb, var(--gold) 50%, transparent); }
+  footer a:hover { color: var(--ink); border-bottom-color: var(--line-strong); }
   @keyframes rise { to { opacity: 1; transform: translateY(0); } }
   @media (prefers-reduced-motion: reduce) {
     html { scroll-behavior: auto; }
-    .brand, .hero, .search-wrap, .cat-grid, .item {
-      animation: none !important; opacity: 1 !important; transform: none !important; transition: none !important;
+    .freshness, .brand, .hero, .search-wrap, .cat-grid, .item {
+      animation: none !important; opacity: 1 !important; transform: none !important; filter: none !important; transition: none !important;
     }
     .item:hover, .cat:hover { transform: none; }
   }
   @media (max-width: 640px) {
-    .wrap { padding: 36px 16px 72px; }
+    .wrap { padding: 28px 16px 72px; }
     .cat-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   }
-  @media (max-width: 380px) {
-    .cat-grid { grid-template-columns: 1fr; }
-  }
+  @media (max-width: 380px) { .cat-grid { grid-template-columns: 1fr; } }
 </style>
 </head>
 <body>
+  <div class="freshness" role="status">
+    <div class="freshness-pill"><span class="dot" aria-hidden="true"></span> Updated Oct 24, 2026</div>
+  </div>
 <div class="wrap">
   <div class="brand">
     <div class="wordmark" aria-label="MOONPHASE">MOONPHASE</div>
@@ -199,11 +252,11 @@
   </div>
   <div class="hero">
     <h1>Beta Q&amp;A <em>window</em></h1>
-    <p class="sub">Official answers for Moonphase Flip beta testers. Search first, then browse by topic.</p>
+    <p class="sub">Official answers for Moonphase Flip beta testers. Search first, then browse by topic. Each answer shows when it was last confirmed.</p>
   </div>
   <div class="search-wrap">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
-    <input id="q" type="search" placeholder="Search shipping, firmware, calendar, MagSafe, MCP…" autocomplete="off" />
+    <input id="q" type="search" placeholder="Search shipping, firmware, calendar, MCP…" autocomplete="off" />
   </div>
   <div class="cat-grid" role="tablist" aria-label="Topics">
     <button class="cat" data-tab="all" aria-selected="true"><span class="label">All answers</span><span class="hint">Everything answered</span></button>
@@ -222,6 +275,7 @@
   </footer>
 </div>
 <script>
+const PAGE_UPDATED = "2026-10-24";
 const LABELS = {
   all: "All answers",
   setup: "Getting started",
@@ -231,10 +285,12 @@ const LABELS = {
   privacy: "Privacy & MCP",
   report: "How to report"
 };
+/* asOf = last official confirmation date (ISO). Sources: Feishu 问题汇总 timestamps / 进度 notes + overnight WA digest (2026-10-24). */
 const DATA = [
   {
     id: "FB-004",
     cat: "setup",
+    asOf: "2026-10-22",
     q: "Will I get shipping tracking, and how do I send bug reports?",
     a: "Units ship via UPS. The team emails you about shipment; tracking can take a while to appear. For bugs and beta feedback, post in General or your personal Beta Support group.",
     status: "Answered",
@@ -243,6 +299,7 @@ const DATA = [
   {
     id: "FB-035",
     cat: "setup",
+    asOf: "2026-10-24",
     q: "My device just arrived — what should I do next?",
     a: "Send your serial number to the team so they can push a firmware update to your device. After the push, check Announcements for Checklist_revised.pdf (and the QuickStart / Checklist docs).",
     status: "Answered",
@@ -251,6 +308,7 @@ const DATA = [
   {
     id: "FB-014",
     cat: "device",
+    asOf: "2026-10-24",
     q: "The device shows recording but nothing comes back — or I’m stuck after a factory reset on 1.0.68.",
     a: "Share your serial number with the team for a targeted firmware update. A factory reset from the app has helped some testers recover a stuck device. If you remain on 1.0.68 after a reset, a firmware update for that device is already in progress.",
     status: "Answered · workaround",
@@ -259,6 +317,7 @@ const DATA = [
   {
     id: "FB-034",
     cat: "app",
+    asOf: "2026-10-24",
     q: "After an iOS app update, which build should I be on?",
     a: "Use TestFlight. The current correct build is 1.0.1 (1217).",
     status: "Answered",
@@ -267,6 +326,7 @@ const DATA = [
   {
     id: "FB-009",
     cat: "app",
+    asOf: "2026-10-24",
     q: "Google Calendar shows in the app but not on the device — or Bluetooth is connected but voice isn’t reaching calendar / todos.",
     a: "This is usually older firmware. Install the latest firmware; Google Calendar events for calendars listed in the app can then appear on the device. Flip currently only connects calendars listed in the app — more calendar types are coming. Android / Fold calendar support is noted feedback with no commitment yet.",
     status: "Answered · workaround",
@@ -275,6 +335,7 @@ const DATA = [
   {
     id: "FB-028",
     cat: "app",
+    asOf: "2026-10-24",
     q: "Why am I seeing Chinese characters in the UI or AI output?",
     a: "This language bug was fixed. If it returns, report with a screenshot in General or your personal Beta Support group.",
     status: "Fixed — watch",
@@ -283,6 +344,7 @@ const DATA = [
   {
     id: "FB-015",
     cat: "recording",
+    asOf: "2026-10-23",
     q: "Is the device meant to record most of the day? How much can it store?",
     a: "You can leave it on all day. It only keeps audio when someone is speaking. After recordings sync to your phone, they’re cleared from the device automatically — no manual purge needed.",
     status: "Answered",
@@ -291,6 +353,7 @@ const DATA = [
   {
     id: "FB-024",
     cat: "privacy",
+    asOf: "2026-10-24",
     q: "Is it allowed to use Flip with other AIs (for example via MCP) under the NDA?",
     a: "MCP is part of the beta; it’s fine to try with other AIs.",
     status: "Answered",
@@ -299,6 +362,7 @@ const DATA = [
   {
     id: "PRIV-01",
     cat: "privacy",
+    asOf: "2026-10-24",
     q: "Where is beta data stored, and does it meet US requirements?",
     a: "Beta data is stored on AWS in the United States and is handled to meet applicable US rules.",
     status: "Answered",
@@ -307,6 +371,7 @@ const DATA = [
   {
     id: "R1",
     cat: "report",
+    asOf: "2026-10-22",
     q: "General",
     a: "Shared questions, announcements, and bug reports visible to the beta group.",
     status: "Channel",
@@ -315,6 +380,7 @@ const DATA = [
   {
     id: "R2",
     cat: "report",
+    asOf: "2026-10-22",
     q: "Personal Beta Support group",
     a: "Your private thread with the support team for shipment, serial number, and one-to-one issues.",
     status: "Channel",
@@ -323,6 +389,7 @@ const DATA = [
   {
     id: "R3",
     cat: "report",
+    asOf: "2026-10-24",
     q: "Docs and what helps most when you report",
     a: "Check Announcements for Checklist.pdf, QuickStartGuide.pdf, and Checklist_revised.pdf after firmware pushes. When reporting, include steps to reproduce, serial number (for firmware), app + firmware versions, and a screenshot or short video.",
     status: "Tips",
@@ -347,6 +414,13 @@ window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", syn
 function esc(s) {
   return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 }
+function fmtAsOf(iso) {
+  const d = new Date(iso + "T12:00:00Z");
+  return d.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric", timeZone: "UTC" });
+}
+function isRecent(iso) {
+  return iso === PAGE_UPDATED;
+}
 
 function observeItems() {
   if (reduceMotion) {
@@ -354,15 +428,16 @@ function observeItems() {
     return;
   }
   const io = new IntersectionObserver((entries) => {
-    entries.forEach((e, idx) => {
+    entries.forEach((e) => {
       if (e.isIntersecting) {
         const el = e.target;
-        el.style.transitionDelay = (idx % 8) * 40 + "ms";
+        const i = [...listEl.querySelectorAll(".item")].indexOf(el);
+        el.style.transitionDelay = Math.min(i, 10) * 45 + "ms";
         el.classList.add("is-in");
         io.unobserve(el);
       }
     });
-  }, { threshold: 0.12, rootMargin: "0px 0px -8% 0px" });
+  }, { threshold: 0.1, rootMargin: "0px 0px -6% 0px" });
   listEl.querySelectorAll(".item").forEach(el => io.observe(el));
 }
 
@@ -371,14 +446,26 @@ function render() {
   let items = DATA.slice();
   if (tab !== "all") items = items.filter(i => i.cat === tab);
   if (q) items = items.filter(i => (i.q + " " + i.a + " " + i.id + " " + i.cat).toLowerCase().includes(q));
+  // Newest confirmed first within the filter
+  items.sort((a, b) => (b.asOf || "").localeCompare(a.asOf || ""));
   labelEl.textContent = LABELS[tab] || "Answers";
   if (!items.length) {
     listEl.innerHTML = '<div class="empty">No matches — try another word or topic.</div>';
     return;
   }
-  listEl.innerHTML = items.map(i =>
-    `<article class="item" data-cat="${esc(i.cat)}"><h3>${esc(i.q)}</h3><p>${esc(i.a)}</p><div class="meta"><span class="pill ${esc(i.tone)}">${esc(i.status)}</span></div></article>`
-  ).join("");
+  listEl.innerHTML = items.map(i => {
+    const recent = isRecent(i.asOf);
+    const recentPill = recent ? '<span class="pill recent">Recently updated</span>' : '';
+    return `<article class="item${recent ? ' is-new' : ''}" data-cat="${esc(i.cat)}" data-asof="${esc(i.asOf)}">
+      <h3>${esc(i.q)}</h3>
+      <p>${esc(i.a)}</p>
+      <div class="meta">
+        <span class="pill ${esc(i.tone)}">${esc(i.status)}</span>
+        <span class="pill asof">As of ${esc(fmtAsOf(i.asOf))}</span>
+        ${recentPill}
+      </div>
+    </article>`;
+  }).join("");
   observeItems();
 }
 
