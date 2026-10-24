@@ -37,7 +37,7 @@
     {
       "id": "FB-004",
       "question": "Shipping tracking and where to send bug reports?",
-      "teaser": "UPS shipping; team email; report bugs in General or Beta Support.",
+      "teaser": "Tracking comes by email after UPS ships; report bugs in General or your Beta Support thread.",
       "answerHtml": "Units ship via <strong>UPS</strong>. The team emails you; <strong>tracking can take a while</strong>. For bugs, post in <strong>General</strong> or your personal <strong>Beta Support</strong> group.",
       "category": "getting-started",
       "updatedAt": "2026-10-22",
@@ -46,7 +46,7 @@
     {
       "id": "FB-035",
       "question": "Device just arrived — what next?",
-      "teaser": "Send your serial number (SN), wait for our firmware-push notification, then follow Checklist_revised.",
+      "teaser": "Share your serial number (SN), wait for our push notice, then open Checklist revised.",
       "answerHtml": "<p>Send your <strong>serial number (SN)</strong> so the team can prepare a firmware push.</p><p><strong>Pause</strong> — wait until <strong>we notify you</strong> that the new firmware update has been pushed.</p><p>Then open Announcements and continue with <strong>Checklist_revised.pdf</strong> (plus QuickStart / Checklist as needed).</p>",
       "category": "getting-started",
       "updatedAt": "2026-10-24",
@@ -55,7 +55,7 @@
     {
       "id": "FB-014",
       "question": "Recording shows, but nothing returns — or stuck on firmware 1.0.68?",
-      "teaser": "Send your serial number (SN), then wait for our firmware-push notification before continuing the checklist.",
+      "teaser": "Share your serial number (SN), wait for our firmware-push notice, then follow Checklist revised.",
       "answerHtml": "<p>Send your <strong>serial number (SN)</strong> to the team.</p><p><strong>Pause</strong> — wait until <strong>we notify you</strong> that the new firmware update has been pushed to your unit.</p><p>Only after that notification, continue with the steps in <strong>Checklist_revised</strong> (Announcements).</p><p>If you are still on <strong>1.0.68</strong>, the same path applies: share your SN and wait for our push notification.</p>",
       "category": "device",
       "updatedAt": "2026-10-24",
@@ -64,7 +64,7 @@
     {
       "id": "FB-034",
       "question": "Which iOS app build should I use?",
-      "teaser": "TestFlight 1.0.1 (1217).",
+      "teaser": "Install the current TestFlight build listed for beta.",
       "answerHtml": "Use <strong>TestFlight</strong>. Current correct build: <strong>1.0.1 (1217)</strong>.",
       "category": "app-firmware",
       "updatedAt": "2026-10-24",
@@ -73,7 +73,7 @@
     {
       "id": "FB-009",
       "question": "Calendar in app but not on device — or BT connected with no voice actions?",
-      "teaser": "Usually an app + firmware version issue; wait for the pending push.",
+      "teaser": "Usually fixed by the pending app + firmware push after you share SN if asked.",
       "answerHtml": "This is usually an <strong>app + firmware version</strong> issue. Send your <strong>serial number (SN)</strong> if asked, then <strong>wait for our notification</strong> that a firmware update has been pushed. After the push, calendars listed in the app should be able to sync to the device. Android / Fold calendar feedback is noted; <strong>no commitment yet</strong>.",
       "category": "app-firmware",
       "updatedAt": "2026-10-24",
@@ -82,7 +82,7 @@
     {
       "id": "FB-028",
       "question": "Why Chinese characters in the UI or AI output?",
-      "teaser": "AI language bug under fix; send a screenshot if it returns.",
+      "teaser": "Team is fixing AI language/prompt output; report with a screenshot if it returns.",
       "answerHtml": "Chinese characters in the UI or AI output are treated as an <strong>AI language / prompt bug</strong>. The team is optimizing prompts. If you still see it, send a screenshot in <strong>General</strong> or your personal <strong>Beta Support</strong> group.",
       "category": "app-firmware",
       "updatedAt": "2026-10-24",
@@ -91,7 +91,7 @@
     {
       "id": "FB-015",
       "question": "Can I leave recording on all day?",
-      "teaser": "Yes — only saves when someone speaks; auto-clears after sync.",
+      "teaser": "You can leave capture on; it only keeps speech and clears after phone sync.",
       "answerHtml": "Yes — leave it on. It <strong>only keeps audio when someone is speaking</strong>. After sync to your phone, device storage <strong>clears automatically</strong>.",
       "category": "recording-ai",
       "updatedAt": "2026-10-23",
@@ -100,7 +100,7 @@
     {
       "id": "FB-024",
       "question": "Can I use Flip with other AIs via MCP under the NDA?",
-      "teaser": "MCP is part of beta — fine to try with other AIs.",
+      "teaser": "MCP with other AIs is allowed in this beta under the existing NDA rules.",
       "answerHtml": "<strong>MCP is part of the beta</strong>; it is fine to try with other AIs.",
       "category": "privacy",
       "updatedAt": "2026-10-24",
@@ -109,7 +109,7 @@
     {
       "id": "PRIV-01",
       "question": "Where is beta data stored?",
-      "teaser": "AWS in the United States.",
+      "teaser": "Beta data stays on AWS in the United States under applicable US rules.",
       "answerHtml": "Beta data is stored on <strong>AWS in the United States</strong> and handled to meet applicable US rules.",
       "category": "privacy",
       "updatedAt": "2026-10-24",
@@ -118,7 +118,7 @@
     {
       "id": "R1",
       "question": "General channel",
-      "teaser": "Shared questions, announcements, and group bug reports.",
+      "teaser": "Use General for shared questions, announcements, and group bug reports.",
       "answerHtml": "Shared questions, announcements, and bug reports visible to the beta group.",
       "category": "feedback",
       "updatedAt": "2026-10-22",
@@ -127,7 +127,7 @@
     {
       "id": "R2",
       "question": "Personal Beta Support group",
-      "teaser": "Private thread for shipment, serial number (SN), and one-to-one issues.",
+      "teaser": "Use your private Beta Support thread for shipment, SN, and one-to-one issues.",
       "answerHtml": "Your private thread for shipment, <strong>serial number (SN)</strong>, and one-to-one issues.",
       "category": "feedback",
       "updatedAt": "2026-10-22",
@@ -136,7 +136,7 @@
     {
       "id": "R3",
       "question": "Docs and what to include when reporting",
-      "teaser": "Checklist docs in Announcements; include serial number (SN), versions, screenshot.",
+      "teaser": "Include SN, app/firmware versions, and a screenshot; check Announcements for checklists.",
       "answerHtml": "Announcements has <strong>Checklist.pdf</strong>, <strong>QuickStartGuide.pdf</strong>, and <strong>Checklist_revised.pdf</strong> after firmware pushes. Reports help most with repro steps, <strong>serial number (SN)</strong>, app + firmware versions, and a screenshot or short video.",
       "category": "feedback",
       "updatedAt": "2026-10-24",
