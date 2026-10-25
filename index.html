@@ -243,20 +243,15 @@ a:hover{text-decoration:underline;text-underline-offset:3px}
 }
 .theme-toggle:active{transform:none}
 .theme-toggle svg{width:14px;height:14px;display:block;flex:0 0 auto}
-.theme-toggle .tlabel{display:none;line-height:1}
+.theme-toggle .tlabel{display:none!important;line-height:1} /* icon-only; never show Light/Dark text */
 .theme-toggle .icon-sun{display:none}
 .theme-toggle .icon-moon{display:block}
-.theme-toggle .tlabel-light{display:none}
 @media (prefers-color-scheme: dark){
   :root:not([data-theme="light"]) .theme-toggle .icon-sun{display:block}
   :root:not([data-theme="light"]) .theme-toggle .icon-moon{display:none}
-  :root:not([data-theme="light"]) .theme-toggle .tlabel-dark{display:none}
-  :root:not([data-theme="light"]) .theme-toggle .tlabel-light{display:inline}
 }
 [data-theme="dark"] .theme-toggle .icon-sun{display:block}
 [data-theme="dark"] .theme-toggle .icon-moon{display:none}
-[data-theme="dark"] .theme-toggle .tlabel-dark{display:none}
-[data-theme="dark"] .theme-toggle .tlabel-light{display:inline}
 
 /* —— Hero: editorial air (8px rhythm) —— */
 .hero{
@@ -374,18 +369,30 @@ a:hover{text-decoration:underline;text-underline-offset:3px}
 }
 
 /* —— Cards —— */
-#list{display:flex;flex-wrap:wrap;gap:16px;align-items:flex-start}
+/* CSS columns: expand only pushes cards in the same column (not both). */
+#list{
+  display:block;
+  column-count:1;
+  column-gap:16px;
+}
 #list.is-filtering{opacity:.4;transition:opacity var(--dur) var(--ease)}
 .item{
-  flex:1 1 100%;
+  display:inline-block;
+  width:100%;
+  max-width:100%;
+  vertical-align:top;
+  margin:0 0 16px;
   border-radius:var(--r);border:1px solid var(--line);
   background:var(--surface);
   box-shadow:var(--shadow-md);
   overflow:hidden;
+  break-inside:avoid;
+  -webkit-column-break-inside:avoid;
+  page-break-inside:avoid;
   transition:border-color var(--dur) var(--ease), box-shadow var(--dur) var(--ease), transform var(--dur) var(--ease);
   animation:cardIn 200ms var(--ease) both;
 }
-@media (min-width:720px){.item{flex:1 1 calc(50% - 8px);max-width:calc(50% - 8px)}}
+@media (min-width:720px){#list{column-count:2}}
 .item:hover{
   border-color:var(--line2);
   box-shadow:var(--shadow-lg);
@@ -715,8 +722,8 @@ footer{
   .chips{gap:8px}
   .search{width:min(100%,320px)}
   .sec{margin:0 0 12px}
-  #list{gap:12px}
-  .item{border-radius:18px}
+  #list{column-gap:12px}
+  .item{border-radius:18px;margin-bottom:12px}
   .item summary{padding:20px 40px 18px 20px}
   .item summary::after{right:16px;top:24px}
   .item[open] summary::after{top:28px}
@@ -731,7 +738,7 @@ footer{
   <div class="aurora-crown"></div>
   <div class="aurora-blobs"></div>
 </div>
-<div class="fresh" role="status"><span><i aria-hidden="true"></i> Updated Oct 24, 2026</span></div>
+<div class="fresh" role="status"><span><i aria-hidden="true"></i> Updated Oct 25, 2026</span></div>
 <div class="shell">
   <div class="brand">
     <div class="brand-slot brand-slot-start" aria-hidden="true"></div>
@@ -743,8 +750,6 @@ footer{
       <button type="button" class="theme-toggle" id="themeToggle" aria-label="Switch to dark theme" title="Theme">
         <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 14.5A8.5 8.5 0 0 1 9.5 3 7 7 0 1 0 21 14.5z"/></svg>
         <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
-        <span class="tlabel tlabel-dark">Dark</span>
-        <span class="tlabel tlabel-light">Light</span>
       </button>
     </div>
   </div>
