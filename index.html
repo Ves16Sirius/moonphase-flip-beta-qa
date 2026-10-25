@@ -78,7 +78,7 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/geist-mono@5.2.5/index.min.css" />
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" />
 <style>
-/* Overhaul 2026-10-25 v10.36 — Ask modal: destination choice removed; single full-width "Copy & open WhatsApp" CTA (copy textarea, whatsapp:// on mobile). v10.35 textarea/Organise/85dvh sheet, v10.34 sheet/sort/island/theme untouched */
+/* Overhaul 2026-10-25 v10.37 — Ask modal: destination choice removed; single full-width "Copy & open WhatsApp" CTA (copy textarea, whatsapp:// on mobile). v10.35 textarea/Organise/85dvh sheet, v10.34 sheet/sort/island/theme untouched */
 :root{
   /* Surfaces */
   --bg:#F6F5FB;
@@ -1556,7 +1556,7 @@ footer{
   <div class="modal">
     <div class="modal-head">
       <h2 id="askTitle">Ask the beta team</h2>
-      <p class="hint">Write your question below — messy is fine (中文也行). <strong>Organise</strong> tidies it into a numbered message right in the box, then copy it into WhatsApp.</p>
+      <p class="hint">Write your question below — messy is fine. <strong>Organise</strong> tidies it into a numbered message right in the box, then copy it into WhatsApp.</p>
     </div>
     <div class="modal-body">
       <label id="askCatLabel">Topic</label>
@@ -1571,7 +1571,7 @@ footer{
       </div>
       <input type="hidden" id="askCat" value="Getting started" />
       <label for="askQ">Your question</label>
-      <textarea id="askQ" placeholder="What's happening? What did you try? Add SN / app build / firmware only if it's relevant — messy notes are fine (中文也行)." maxlength="4000"></textarea>
+      <textarea id="askQ" placeholder="What's happening? What did you try? Add SN / app build / firmware only if it's relevant — messy notes are fine." maxlength="4000"></textarea>
       <div class="ask-actions">
         <button type="button" class="btn" id="askOrganise">Organise</button>
         <button type="button" class="ask-undo" id="askUndo" hidden>Undo</button>
