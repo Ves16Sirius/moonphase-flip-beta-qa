@@ -76,7 +76,7 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/geist-mono@5.2.5/index.min.css" />
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600&display=swap" />
 <style>
-/* Overhaul 2026-10-25 v10.14 — fixed viewport aurora (original #5B66C4) · theme-color=--bg · title deeper/lighter split · submit copy */
+/* Overhaul 2026-10-25 v10.15 — aurora persist + theme-toggle repaint · title shade swap · #5B66C4 · theme-color=--bg · submit kept */
 :root{
   /* Surfaces */
   --bg:#F6F5FB;
@@ -167,7 +167,8 @@ body{
   position:relative;
 }
 /* FIXED top-curtain aurora — always paints VISUAL viewport top under Dynamic Island.
-   Absolute left a flat --bg gap (pixel proof y≈2..150). Soft mix from y=0 → transparent. */
+   Persist: fixed + will-change:transform; never opacity 0 / unmount / scroll-hide.
+   #aurora-sticky = thin backup wash if iOS Safari drops the fixed compositor layer. */
 .aurora{
   position:fixed;
   top:0;left:0;right:0;
@@ -178,6 +179,10 @@ body{
   z-index:0;
   overflow:hidden;
   isolation:isolate;
+  will-change:transform;
+  transform:translateZ(0);
+  -webkit-backface-visibility:hidden;
+  backface-visibility:hidden;
   /* Light default: soft lavender from physical top (no cream slab / purple cliff) */
   background:linear-gradient(180deg,
     color-mix(in srgb, #A898FF 28%, var(--bg)) 0%,
@@ -189,6 +194,23 @@ body{
   opacity:1;
   -webkit-mask-image:linear-gradient(180deg,#000 0%,#000 40%,rgba(0,0,0,.55) 70%,transparent 100%);
   mask-image:linear-gradient(180deg,#000 0%,#000 40%,rgba(0,0,0,.55) 70%,transparent 100%);
+}
+/* Thin always-on top wash under island — no mask; survives iOS fixed-bg unload */
+#aurora-sticky{
+  position:fixed;
+  top:0;left:0;right:0;
+  width:100%;
+  height:calc(env(safe-area-inset-top, 0px) + 96px);
+  margin:0;padding:0;
+  pointer-events:none;
+  z-index:0;
+  will-change:transform;
+  transform:translateZ(0);
+  background:linear-gradient(180deg,
+    color-mix(in srgb, #A898FF 22%, var(--bg)) 0%,
+    color-mix(in srgb, #A898FF 10%, var(--bg)) 55%,
+    var(--bg) 100%);
+  opacity:1;
 }
 .aurora-crown{
   display:none!important; /* gradient itself starts at y=0 — no solid slab crown */
@@ -455,13 +477,13 @@ a:hover{text-decoration:underline;text-underline-offset:3px}
   text-align:center;display:flex;flex-direction:column;align-items:center;
 }
 .hero h1{
-  /* Deeper shade on "Beta Q&A"; lighter on italic "Center" (both themes). */
+  /* v10.15 swap: lighter on "Beta Q&A"; deeper on italic "Center" (both themes). */
   margin:0 0 12px;
   font-family:var(--display);
   font-size:var(--fs-hero);
   font-weight:400;font-style:normal;
   letter-spacing:-.01em;line-height:1.1;
-  color:#4338CA; /* deeper violet — Q&A */
+  color:#7C74F0; /* lighter violet — Beta Q&A */
   text-shadow:none;
   text-wrap:balance;
 }
@@ -470,7 +492,7 @@ a:hover{text-decoration:underline;text-underline-offset:3px}
   font-style:italic;
   font-weight:400;
   letter-spacing:0;
-  color:#7C74F0; /* lighter violet — Center */
+  color:#4338CA; /* deeper violet — Center */
   text-shadow:none;
 }
 .hero .sub{
@@ -857,10 +879,10 @@ footer{
   color-scheme:light;
 }
 [data-theme="light"] .hero h1{
-  color:#4338CA; /* deeper violet — Q&A */
+  color:#7C74F0; /* lighter violet — Beta Q&A */
   text-shadow:none;
 }
-[data-theme="light"] .hero h1 em{color:#7C74F0;text-shadow:none} /* lighter — Center */
+[data-theme="light"] .hero h1 em{color:#4338CA;text-shadow:none} /* deeper — Center */
 /* Light mode card / control polish — cool clean surfaces (match violet wash) */
 [data-theme="light"] .item{
   background:#FFFFFF;
@@ -942,9 +964,15 @@ footer{
     -webkit-mask-image:linear-gradient(180deg,#000 0%,#000 40%,rgba(0,0,0,.55) 70%,transparent 100%);
     mask-image:linear-gradient(180deg,#000 0%,#000 40%,rgba(0,0,0,.55) 70%,transparent 100%);
   }
-  /* Dark: deeper gold on Q&A, lighter gold on Center */
-  :root:not([data-theme="light"]) .hero h1{color:#C4B46A;text-shadow:0 0 22px rgba(196,180,106,.16);filter:none}
-  :root:not([data-theme="light"]) .hero h1 em{color:#FFFBC1;text-shadow:0 0 28px rgba(255,251,193,.18);opacity:1}
+  :root:not([data-theme="light"]) #aurora-sticky{
+    background:linear-gradient(180deg,
+      color-mix(in srgb, #5B66C4 26%, var(--bg)) 0%,
+      color-mix(in srgb, #5B66C4 12%, var(--bg)) 55%,
+      var(--bg) 100%);
+  }
+  /* Dark v10.15: lighter gold on Beta Q&A / h1, deeper gold on Center (em) */
+  :root:not([data-theme="light"]) .hero h1{color:#FFFBC1;text-shadow:0 0 28px rgba(255,251,193,.18);filter:none}
+  :root:not([data-theme="light"]) .hero h1 em{color:#C4B46A;text-shadow:0 0 22px rgba(196,180,106,.16);opacity:1}
 }
 [data-theme="dark"] .aurora{
   background:linear-gradient(180deg,
@@ -957,6 +985,12 @@ footer{
   -webkit-mask-image:linear-gradient(180deg,#000 0%,#000 40%,rgba(0,0,0,.55) 70%,transparent 100%);
   mask-image:linear-gradient(180deg,#000 0%,#000 40%,rgba(0,0,0,.55) 70%,transparent 100%);
 }
+[data-theme="dark"] #aurora-sticky{
+  background:linear-gradient(180deg,
+    color-mix(in srgb, #5B66C4 26%, var(--bg)) 0%,
+    color-mix(in srgb, #5B66C4 12%, var(--bg)) 55%,
+    var(--bg) 100%);
+}
 [data-theme="light"] .aurora{
   background:linear-gradient(180deg,
     color-mix(in srgb, #A898FF 28%, var(--bg)) 0%,
@@ -968,14 +1002,20 @@ footer{
   -webkit-mask-image:linear-gradient(180deg,#000 0%,#000 40%,rgba(0,0,0,.55) 70%,transparent 100%);
   mask-image:linear-gradient(180deg,#000 0%,#000 40%,rgba(0,0,0,.55) 70%,transparent 100%);
 }
+[data-theme="light"] #aurora-sticky{
+  background:linear-gradient(180deg,
+    color-mix(in srgb, #A898FF 22%, var(--bg)) 0%,
+    color-mix(in srgb, #A898FF 10%, var(--bg)) 55%,
+    var(--bg) 100%);
+}
 [data-theme="light"]{
   --aurora-top:#F6F5FB;
 }
 [data-theme="dark"]{
   --aurora-top:#0E0F14;
 }
-[data-theme="dark"] .hero h1{color:#C4B46A;text-shadow:0 0 22px rgba(196,180,106,.16);filter:none}
-[data-theme="dark"] .hero h1 em{color:#FFFBC1;text-shadow:0 0 28px rgba(255,251,193,.18);opacity:1}
+[data-theme="dark"] .hero h1{color:#FFFBC1;text-shadow:0 0 28px rgba(255,251,193,.18);filter:none}
+[data-theme="dark"] .hero h1 em{color:#C4B46A;text-shadow:0 0 22px rgba(196,180,106,.16);opacity:1}
 [data-theme="dark"] .shell::after{opacity:.05;mix-blend-mode:screen}
 [data-theme="dark"] .fresh span{background:var(--control-bg);border-color:var(--line);color:var(--muted)}
 [data-theme="dark"] .fresh i{background:var(--ok);box-shadow:0 0 0 3px var(--ok-soft)}
@@ -1088,8 +1128,8 @@ footer{
     box-shadow:0 1px 2px rgba(0,0,0,.2);
   }
   :root:not([data-theme="light"]) ::selection{background:var(--accent-soft);color:var(--ink)}
-  :root:not([data-theme="light"]) .hero h1{color:#C4B46A;text-shadow:0 0 22px rgba(196,180,106,.16);filter:none}
-  :root:not([data-theme="light"]) .hero h1 em{color:#FFFBC1;text-shadow:0 0 28px rgba(255,251,193,.18);opacity:1}
+  :root:not([data-theme="light"]) .hero h1{color:#FFFBC1;text-shadow:0 0 28px rgba(255,251,193,.18);filter:none}
+  :root:not([data-theme="light"]) .hero h1 em{color:#C4B46A;text-shadow:0 0 22px rgba(196,180,106,.16);opacity:1}
 }
 
 /* —— Mobile rhythm —— */
@@ -1107,6 +1147,10 @@ footer{
   .aurora{
     top:0;left:0;right:0;
     height:calc(env(safe-area-inset-top, 0px) + min(260px, 38vh));
+    will-change:transform;
+  }
+  #aurora-sticky{
+    height:calc(env(safe-area-inset-top, 0px) + 88px);
   }
   .brand{margin:22px 0 24px;min-height:28px;padding:0;align-items:flex-start}
   .brand-slot{min-height:28px;align-items:flex-start}
@@ -1173,7 +1217,8 @@ footer{
 </style>
 </head>
 <body>
-<div class="aurora" aria-hidden="true">
+<div id="aurora-sticky" aria-hidden="true"></div>
+<div class="aurora" aria-hidden="true" id="aurora">
   <div class="aurora-crown"></div>
   <div class="aurora-blobs"></div>
 </div>
@@ -1393,10 +1438,33 @@ document.getElementById("askSubmit").addEventListener("click",()=>{
       btn.title=theme==='dark'?'Light':'Dark';
     }
   }
+  /* Force fixed aurora + sticky wash to repaint with new --bg (Safari compositor lag). */
+  function repaintAurora(){
+    const nodes=[document.getElementById('aurora'), document.getElementById('aurora-sticky')];
+    for(const el of nodes){
+      if(!el) continue;
+      try{
+        el.classList.remove('aurora-repaint');
+        void el.offsetHeight;
+        el.style.opacity='0.999';
+        void el.offsetHeight;
+        el.style.opacity='';
+        el.classList.add('aurora-repaint');
+        void el.offsetHeight;
+        el.classList.remove('aurora-repaint');
+        /* bounce transform to kick will-change layer */
+        const prev=el.style.transform;
+        el.style.transform='translateZ(0.1px)';
+        void el.offsetHeight;
+        el.style.transform=prev||'';
+      }catch(e){}
+    }
+  }
   function applyDefaultDark(){
     root.setAttribute('data-theme', 'dark');
     root.style.colorScheme='dark';
     setThemeColor('dark');
+    repaintAurora();
     /* do not persist — first visit only until user toggles */
   }
   function applyManual(theme){
@@ -1404,6 +1472,11 @@ document.getElementById("askSubmit").addEventListener("click",()=>{
     root.style.colorScheme=theme;
     try{localStorage.setItem(MANUAL, theme)}catch(e){}
     setThemeColor(theme);
+    /* double rAF: wait for CSS var/--bg cascade, then force layer redraw */
+    requestAnimationFrame(()=>{
+      repaintAurora();
+      requestAnimationFrame(repaintAurora);
+    });
   }
   const saved=manualPref();
   if(saved) applyManual(saved);
@@ -1411,6 +1484,18 @@ document.getElementById("askSubmit").addEventListener("click",()=>{
   if(btn) btn.addEventListener('click',()=>{
     applyManual(current()==='dark'?'light':'dark');
   });
+  /* Persist wash after bfcache / tab return / address-bar resize (iOS) */
+  window.addEventListener('pageshow',()=>{repaintAurora()});
+  document.addEventListener('visibilitychange',()=>{
+    if(document.visibilityState==='visible') repaintAurora();
+  });
+  if(window.visualViewport){
+    let vvT=null;
+    window.visualViewport.addEventListener('resize',()=>{
+      clearTimeout(vvT);
+      vvT=setTimeout(repaintAurora, 60);
+    });
+  }
 })();
 
 
