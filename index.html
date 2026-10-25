@@ -78,7 +78,7 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/geist-mono@5.2.5/index.min.css" />
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" />
 <style>
-/* Overhaul 2026-10-25 v10.35 — Ask modal reflow: one large textarea, in-place Organise (numbered, no placeholders, optional Details), single destination-aware Copy & open CTA, 85dvh sheet; v10.34 sheet/sort/island/theme untouched */
+/* Overhaul 2026-10-25 v10.36 — Ask modal: destination choice removed; single full-width "Copy & open WhatsApp" CTA (copy textarea, whatsapp:// on mobile). v10.35 textarea/Organise/85dvh sheet, v10.34 sheet/sort/island/theme untouched */
 :root{
   /* Surfaces */
   --bg:#F6F5FB;
@@ -881,8 +881,6 @@ footer{
   -webkit-tap-highlight-color:transparent;cursor:pointer;
 }
 .modal .ask-undo[hidden]{display:none}
-.modal .ask-dest-help{margin:6px 2px 4px;font-size:12px;color:var(--muted);line-height:1.45}
-.modal .ask-dest-help[hidden]{display:none}
 .modal .ask-foot-stack{display:flex;flex-direction:column;align-items:stretch;gap:6px}
 .modal .ask-foot-stack .btn.primary{width:100%;height:44px;min-height:44px;font-size:13.5px}
 .modal .ask-cancel{
@@ -916,67 +914,7 @@ footer{
   color:var(--accent-deep);
   box-shadow:none;
 }
-/* Ask destination — segmented glass thumb like .sort */
-.ask-dest{
-  --ask-dest-inset-x:2px;
-  --ask-dest-inset-y-top:1px;
-  --ask-dest-inset-y-bottom:3px;
-  position:relative;
-  box-sizing:border-box;
-  display:inline-flex;align-items:center;width:100%;
-  height:var(--control-h);
-  padding:var(--ask-dest-inset-y-top) var(--ask-dest-inset-x) var(--ask-dest-inset-y-bottom);
-  margin:0 0 4px;
-  border-radius:999px;border:1px solid var(--glass-rim);
-  background:var(--glass-fill);
-  backdrop-filter:blur(var(--glass-blur)) saturate(var(--glass-sat));
-  -webkit-backdrop-filter:blur(var(--glass-blur)) saturate(var(--glass-sat));
-  box-shadow:var(--glass-shadow), var(--glass-highlight);
-  isolation:isolate;overflow:hidden;
-}
-.ask-dest-thumb{
-  position:absolute;
-  top:var(--ask-dest-inset-y-top);bottom:var(--ask-dest-inset-y-bottom);left:var(--ask-dest-inset-x);
-  height:auto;width:50%;border-radius:999px;pointer-events:none;z-index:0;
-  background:color-mix(in srgb, var(--accent) 12%, #fff);
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.55);
-  transform:translateX(0);
-  transition:transform .32s var(--ease-spring), width .22s var(--ease), background .22s var(--ease);
-  will-change:transform;
-}
-.ask-dest button{
-  position:relative;z-index:1;flex:1 1 0;
-  box-sizing:border-box;
-  display:inline-flex;align-items:center;justify-content:center;
-  height:100%;padding:0 10px;border-radius:999px;
-  font-size:var(--fs-ui);font-weight:var(--fw-medium);letter-spacing:-.011em;color:var(--muted);
-  line-height:1;background:transparent;border:0;box-shadow:none;
-  transition:color var(--dur) var(--ease);
-  -webkit-tap-highlight-color:transparent;
-}
-.ask-dest button[aria-pressed="true"]{color:var(--accent-deep);background:transparent;box-shadow:none}
-[data-theme="light"] .ask-topic[aria-pressed="true"]{
-  background:color-mix(in srgb, var(--accent) 14%, #fff);
-  border-color:color-mix(in srgb, var(--accent) 28%, transparent);
-  color:var(--accent-deep);
-}
-[data-theme="light"] .ask-dest-thumb{
-  background:color-mix(in srgb, var(--accent) 14%, #fff);
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.78);
-}
-[data-theme="dark"] .ask-topic[aria-pressed="true"]{
-  background:color-mix(in srgb, var(--accent) 18%, var(--surface));
-  border-color:color-mix(in srgb, var(--accent) 36%, transparent);
-  color:var(--accent-deep);
-  box-shadow:none;
-}
-[data-theme="dark"] .ask-dest-thumb{
-  background:color-mix(in srgb, var(--accent) 18%, var(--surface));
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.12);
-}
-@media (prefers-reduced-motion: reduce){
-  .ask-dest-thumb{transition:none}
-}
+
 .btn{
   display:inline-flex;align-items:center;justify-content:center;
   height:36px;padding:0 15px;border-radius:999px;border:1px solid var(--line);
@@ -1385,10 +1323,6 @@ footer{
     color:var(--accent-deep);
     box-shadow:none;
   }
-  :root:not([data-theme="light"]) .ask-dest-thumb{
-    background:color-mix(in srgb, var(--accent) 18%, var(--surface));
-    box-shadow:inset 0 1px 0 rgba(255,255,255,.12);
-  }
   :root:not([data-theme="light"]) .ask-cta{
     background:var(--cta);color:var(--cta-ink);border-color:var(--cta-border);
     box-shadow:0 1px 2px rgba(0,0,0,.2);
@@ -1525,10 +1459,6 @@ footer{
   .ask-topic{
     flex:0 1 auto;min-height:44px;padding:10px 14px;font-size:13px;
   }
-  .ask-dest{
-    height:44px;min-height:44px;width:100%;margin:0 0 2px;
-  }
-  .ask-dest button{font-size:13.5px;min-height:100%}
   .modal-foot{
     padding:10px max(18px, env(safe-area-inset-right, 0px)) max(12px, env(safe-area-inset-bottom, 0px)) max(18px, env(safe-area-inset-left, 0px));
   }
@@ -1646,19 +1576,11 @@ footer{
         <button type="button" class="btn" id="askOrganise">Organise</button>
         <button type="button" class="ask-undo" id="askUndo" hidden>Undo</button>
       </div>
-      <label id="askDestLabel">Send to</label>
-      <div class="ask-dest" role="group" aria-labelledby="askDestLabel" id="askDestSeg" data-dest="general">
-        <span class="ask-dest-thumb" aria-hidden="true"></span>
-        <button type="button" data-dest="general" aria-pressed="true">General</button>
-        <button type="button" data-dest="beta" aria-pressed="false">My Beta Support</button>
-      </div>
-      <p class="ask-dest-help" id="askDestHelp" hidden>Each tester has a private Beta Support chat — we'll copy your message so you can paste it there.</p>
-      <input type="hidden" id="askDest" value="general" />
     </div>
     <div class="modal-foot">
       <p class="ask-note" id="askNote" hidden></p>
       <div class="ask-foot-stack">
-        <button type="button" class="btn primary" id="askSend">Copy &amp; open General</button>
+        <button type="button" class="btn primary" id="askSend">Copy &amp; open WhatsApp</button>
         <button type="button" class="ask-cancel" id="askCancel">Cancel</button>
       </div>
     </div>
@@ -1768,50 +1690,12 @@ requestAnimationFrame(syncSortThumb);
 qEl.addEventListener("input",()=>render());render();
 
 /* —— Ask modal v10.35: in-place organise + WhatsApp copy/jump (no GitHub Issues) —— */
-const WA_LINKS={
-  general:"", /* TODO: Invite link must be generated by a General group admin (Alex Guan or Tammy). Do not invent links. */
-  beta:""     /* Beta Support chats are private per tester — no shared link by design. */
-};
 const modal=document.getElementById("askModal");
 const askQ=document.getElementById("askQ");
 const askUndo=document.getElementById("askUndo");
 const askSend=document.getElementById("askSend");
-const askDestHelp=document.getElementById("askDestHelp");
 const askNote=document.getElementById("askNote");
-const askDest=document.getElementById("askDest");
 const askCat=document.getElementById("askCat");
-const askDestSeg=document.getElementById("askDestSeg");
-const askDestThumb=askDestSeg&&askDestSeg.querySelector(".ask-dest-thumb");
-function syncAskDestThumb(){
-  if(!askDestSeg||!askDestThumb) return;
-  const active=askDestSeg.querySelector('button[aria-pressed="true"]')||askDestSeg.querySelector("button");
-  if(!active) return;
-  const pad=parseFloat(getComputedStyle(askDestSeg).getPropertyValue("--ask-dest-inset-x"))||2;
-  const w=active.offsetWidth;
-  const x=Math.max(0, active.offsetLeft - pad);
-  askDestThumb.style.width=w+"px";
-  askDestThumb.style.transform="translateX("+x+"px)";
-}
-function setAskDest(key){
-  const k=key==="beta"?"beta":"general";
-  if(askDest) askDest.value=k;
-  if(askDestSeg){
-    askDestSeg.dataset.dest=k;
-    askDestSeg.querySelectorAll("button").forEach(b=>b.setAttribute("aria-pressed",b.dataset.dest===k?"true":"false"));
-    syncAskDestThumb();
-  }
-  if(askDestHelp) askDestHelp.hidden=(k!=="beta");
-  if(askSend) askSend.textContent=(k==="beta")?"Copy & open WhatsApp":"Copy & open General";
-  if(askNote){askNote.hidden=true;askNote.textContent=""}
-}
-if(askDestSeg){
-  askDestSeg.querySelectorAll("button").forEach(btn=>btn.addEventListener("click",()=>setAskDest(btn.dataset.dest)));
-  window.addEventListener("resize", syncAskDestThumb, {passive:true});
-  if(window.visualViewport){
-    window.visualViewport.addEventListener("resize", syncAskDestThumb, {passive:true});
-  }
-  if(document.fonts&&document.fonts.ready) document.fonts.ready.then(syncAskDestThumb).catch(function(){});
-}
 document.querySelectorAll(".ask-topic").forEach(btn=>btn.addEventListener("click",()=>{
   const t=btn.dataset.topic||"Other";
   if(askCat) askCat.value=t;
@@ -1824,9 +1708,6 @@ function openAsk(){
   document.body.style.overflow="hidden";
   requestAnimationFrame(()=>{
     modal.classList.add("open");
-    syncAskDestThumb();
-    /* second pass after sheet layout / font metrics */
-    requestAnimationFrame(syncAskDestThumb);
   });
   /* Delay focus slightly so iOS keyboard doesn't fight sheet slide */
   setTimeout(function(){try{askQ.focus({preventScroll:true})}catch(e){try{askQ.focus()}catch(_){}}}, 220);
@@ -1968,17 +1849,9 @@ function isMobileUA(){
 if(askSend) askSend.addEventListener("click",async()=>{
   const ok=await copyAskMessage();
   if(!ok) return;
-  const key=(askDest&&askDest.value)==="beta"?"beta":"general";
   askNote.hidden=false;
-  if(key==="general"){
-    askNote.textContent="Copied — paste it into the General group in WhatsApp.";
-    const link=(WA_LINKS.general||"").trim();
-    if(link){ window.open(link,"_blank","noopener,noreferrer"); }
-    else if(isMobileUA()){ window.location.href="whatsapp://"; }
-  }else{
-    askNote.textContent="Copied — open your own Beta Support chat in WhatsApp and paste.";
-    if(isMobileUA()) window.location.href="whatsapp://";
-  }
+  askNote.textContent="Copied — paste it into the right WhatsApp chat (General or your Beta Support group).";
+  if(isMobileUA()) window.location.href="whatsapp://";
 });
 /* fresh bar is non-sticky silk — no scroll hide */
 
