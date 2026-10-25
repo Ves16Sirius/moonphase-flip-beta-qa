@@ -72,13 +72,13 @@
 <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/geist-sans@5.2.5/index.min.css" />
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/geist-sans@5.2.5/500.min.css" />
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/geist-sans@5.2.5/600.min.css" />
+<link rel="preconnect" href="https://rsms.me/" crossorigin />
+<!-- v10.41 type system: Inter Variable (rsms, opsz + full wght axis) = UI/body; Instrument Serif = hero display; Geist Mono = badge/code -->
+<link rel="stylesheet" href="https://rsms.me/inter/inter.css" />
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/geist-mono@5.2.5/index.min.css" />
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&display=swap" />
 <style>
-/* Overhaul 2026-10-25 v10.40 — Ask modal: merged Feishu + WhatsApp kw phrasings into DATA kw; exact-substring kw hit for version strings (1.0.6.8, 1.1.46). v10.39 — Ask modal: smarter live matching (hidden per-entry kw EN+CJK, query synonyms, stemming, CJK bigrams; kw > title > body; topics = mild boost), multi-select topic chips, copy = "[Topic A, Topic B] · OS" + raw text, placeholder nudges page/screen + what you saw. v10.38 — Ask modal: auto-grow textarea, content-fit sheet (max 85dvh), Organise/Undo removed, live Q&A matching ("Might already be answered"), optional iOS | Android choice, copy = "[Topic] · OS" + raw text. v10.37 single WhatsApp CTA; island/sort/theme untouched */
+/* Overhaul 2026-10-25 v10.41 — Ask sheet: real drag-to-dismiss (grabber/head; body when scrolled to top), slide-up/down, scrim follows drag, × close, slim 44px footer (Cancel removed, "Copied ✓" swaps in-button, screenshots hint moved to body), visualViewport keyboard fit. Typography: Inter Variable (Linear-style 400/460/510/560), card titles 510 / -0.012em, body 15/1.6, sentence-case labels, CJK fallback (PingFang SC / Noto Sans SC). Colors/island/sort/chips/matching untouched. v10.40 — Ask modal: merged Feishu + WhatsApp kw phrasings into DATA kw; exact-substring kw hit for version strings (1.0.6.8, 1.1.46). v10.39 — Ask modal: smarter live matching (hidden per-entry kw EN+CJK, query synonyms, stemming, CJK bigrams; kw > title > body; topics = mild boost), multi-select topic chips, copy = "[Topic A, Topic B] · OS" + raw text, placeholder nudges page/screen + what you saw. v10.38 — Ask modal: auto-grow textarea, content-fit sheet (max 85dvh), Organise/Undo removed, live Q&A matching ("Might already be answered"), optional iOS | Android choice, copy = "[Topic] · OS" + raw text. v10.37 single WhatsApp CTA; island/sort/theme untouched */
 :root{
   /* Surfaces */
   --bg:#F6F5FB;
@@ -130,24 +130,26 @@
   --dur:180ms;
   --r:20px;
   /* Families */
-  --font:"Geist Sans",Geist,Inter,ui-sans-serif,system-ui,-apple-system,sans-serif;
-  --display:"Instrument Serif",Georgia,serif;
-  --mono:"Geist Mono",ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+  --font:InterVariable,Inter,-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Noto Sans SC","Microsoft YaHei",system-ui,sans-serif;
+  --display:"Instrument Serif",Georgia,"Songti SC","Noto Serif SC",serif;
+  --mono:"Geist Mono",ui-monospace,"SF Mono",Menlo,Consolas,"PingFang SC","Noto Sans SC",monospace;
   /* Type scale */
   --fs-hero:clamp(2.5rem,5.4vw,3.5rem);
-  --fs-title:16.5px; /* card Q — Geist Sans 600 (fontsource + Inter fallback) */
-  --fw-title:600;
-  --fs-body:14.5px;
+  --fs-title:16px; /* card Q — Inter 510 / -0.012em (Linear title-1 rhythm) */
+  --fw-title:510;
+  --fs-body:15px;
+  --fs-teaser:14px;
   --fs-ui:13.5px;
   --fs-meta:12.5px;
   --fs-tag:11.5px;
   --fs-mono:11px;
   --fw-regular:400;
-  --fw-medium:500;
-  --fw-semibold:600;
+  --fw-ui:460;      /* chips, sort, search — quiet controls */
+  --fw-medium:510;  /* CTA, buttons, tags, card titles */
+  --fw-semibold:560;/* modal title, inline emphasis — never 600+ */
   --lh-tight:1.2;
-  --lh-title:1.28;
-  --lh-body:1.62;
+  --lh-title:1.38;
+  --lh-body:1.6;
   --lh-ui:1.45;
   /* Controls / cards */
   --control-h:34px;
@@ -174,7 +176,8 @@ body{
   background-color:var(--bg);
   background:var(--bg);
   font-family:var(--font);font-size:15px;line-height:1.55;font-weight:var(--fw-regular);
-  letter-spacing:-.011em;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;
+  letter-spacing:-.011em;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;text-rendering:optimizeLegibility;
+  font-optical-sizing:auto;font-feature-settings:"cv01","ss03"; /* Inter: open 1, curly quotes (Linear) */
   width:100%;max-width:100%;
   position:relative;
 }
@@ -253,8 +256,8 @@ a:hover{text-decoration:underline;text-underline-offset:3px}
   backdrop-filter:blur(var(--glass-blur)) saturate(var(--glass-sat));
   -webkit-backdrop-filter:blur(var(--glass-blur)) saturate(var(--glass-sat));
   box-shadow:var(--glass-shadow), var(--glass-highlight);
-  font-family:var(--mono);font-size:var(--fs-mono);font-weight:var(--fw-medium);
-  letter-spacing:.02em;color:var(--muted);
+  font-family:var(--mono);font-size:var(--fs-mono);font-weight:400;
+  letter-spacing:.01em;color:var(--muted);
 }
 .fresh i{
   width:6px;height:6px;border-radius:50%;background:var(--ok);
@@ -506,8 +509,8 @@ a:hover{text-decoration:underline;text-underline-offset:3px}
   text-shadow:none;
 }
 .hero .sub{
-  margin:0 0 28px;font-size:16px;font-weight:var(--fw-regular);letter-spacing:-.012em;
-  line-height:1.5;color:var(--muted);max-width:400px;
+  margin:0 0 28px;font-size:16px;font-weight:var(--fw-regular);letter-spacing:-.011em;
+  line-height:1.55;color:var(--muted);max-width:400px;text-wrap:balance;
 }
 .ask-cta{
   display:inline-flex;align-items:center;justify-content:center;
@@ -545,7 +548,7 @@ a:hover{text-decoration:underline;text-underline-offset:3px}
   border:1px solid var(--glass-rim);background:var(--glass-fill);
   backdrop-filter:blur(var(--glass-blur)) saturate(var(--glass-sat));
   -webkit-backdrop-filter:blur(var(--glass-blur)) saturate(var(--glass-sat));
-  font-size:var(--fs-ui);font-weight:var(--fw-medium);letter-spacing:-.011em;color:var(--ink-soft);
+  font-size:var(--fs-ui);font-weight:var(--fw-ui);letter-spacing:-.008em;color:var(--ink-soft);
   white-space:nowrap;box-shadow:var(--glass-shadow), var(--glass-highlight);
   overflow:hidden;
   isolation:isolate;
@@ -587,7 +590,7 @@ a:hover{text-decoration:underline;text-underline-offset:3px}
 }
 .search input{
   width:var(--search-input-w, 48ch);height:100%;border:0;outline:0;background:transparent;
-  font-size:var(--fs-ui);font-weight:var(--fw-medium);letter-spacing:-.011em;color:var(--ink);
+  font-size:var(--fs-ui);font-weight:var(--fw-regular);letter-spacing:-.008em;color:var(--ink);
   min-width:0;max-width:none;
   field-sizing:fixed;
   overflow:visible;
@@ -635,7 +638,7 @@ a:hover{text-decoration:underline;text-underline-offset:3px}
   box-sizing:border-box;
   display:inline-flex;align-items:center;justify-content:center;
   height:100%;padding:0 14px;border-radius:999px;
-  font-size:var(--fs-ui);font-weight:var(--fw-medium);letter-spacing:-.011em;color:var(--muted);
+  font-size:var(--fs-ui);font-weight:var(--fw-ui);letter-spacing:-.008em;color:var(--muted);
   line-height:1;background:transparent;border:0;box-shadow:none;
   transition:color var(--dur) var(--ease);
   -webkit-tap-highlight-color:transparent;
@@ -650,8 +653,8 @@ a:hover{text-decoration:underline;text-underline-offset:3px}
 }
 
 .sec{
-  font-size:12.5px;font-weight:500;letter-spacing:-.008em;
-  color:var(--faint);margin:0 0 16px;text-align:center;
+  font-size:12.5px;font-weight:var(--fw-ui);letter-spacing:-.004em;
+  color:var(--faint);margin:0 0 16px;text-align:center;font-variant-numeric:tabular-nums;
   text-transform:none;font-family:var(--font);
 }
 
@@ -732,14 +735,15 @@ a:hover{text-decoration:underline;text-underline-offset:3px}
 }
 .item:hover summary::after{border-color:var(--muted)}
 .item .q{
-  /* v10.27: Geist Sans 600 (fontsource loaded) — Linear/Vercel card-title weight; Inter fallback */
-  font-family:"Geist Sans",Geist,Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  /* v10.41: Inter 510 / 16px / -0.012em / 1.38 — Linear title-1 (510) & OpenAI card h (500); was Geist 600 */
+  font-family:var(--font);
   font-size:var(--fs-title);
-  font-weight:600;
+  font-weight:var(--fw-title);
   font-style:normal;
   font-synthesis:none;
-  letter-spacing:-0.015em;
-  line-height:1.3;
+  letter-spacing:-0.012em;
+  line-height:var(--lh-title);
+  text-wrap:pretty;
   color:var(--ink);
   margin:0 0 10px;
   -webkit-font-smoothing:antialiased;
@@ -747,8 +751,8 @@ a:hover{text-decoration:underline;text-underline-offset:3px}
   text-rendering:optimizeLegibility;
 }
 .item .teaser{
-  margin:0 0 14px;font-size:var(--fs-ui);font-weight:var(--fw-regular);letter-spacing:-.01em;
-  line-height:var(--lh-ui);color:var(--muted);
+  margin:0 0 14px;font-size:var(--fs-teaser);font-weight:var(--fw-regular);letter-spacing:-.008em;
+  line-height:1.5;color:var(--muted);
   display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;line-clamp:2;
   overflow:hidden;
 }
@@ -769,8 +773,8 @@ a:hover{text-decoration:underline;text-underline-offset:3px}
   filter:none;
   backdrop-filter:blur(12px) saturate(150%);
   -webkit-backdrop-filter:blur(12px) saturate(150%);
-  font-family:var(--font);font-size:var(--fs-tag);font-weight:var(--fw-medium);
-  letter-spacing:-.01em;text-transform:none;
+  font-family:var(--font);font-size:var(--fs-tag);font-weight:var(--fw-ui);
+  letter-spacing:-.003em;text-transform:none;
   color:#4338CA;
   line-height:1;
   text-shadow:none;
@@ -791,10 +795,10 @@ a:hover{text-decoration:underline;text-underline-offset:3px}
   animation:bodyIn 180ms var(--ease) both;
 }
 @keyframes bodyIn{from{opacity:0;transform:translateY(2px)}to{opacity:1;transform:none}}
-.item .body p{margin:14px 0 0;font-size:var(--fs-body);letter-spacing:-.01em;line-height:var(--lh-body);color:var(--ink-soft)}
+.item .body p{margin:14px 0 0;font-size:var(--fs-body);letter-spacing:-.011em;line-height:var(--lh-body);color:var(--ink-soft);text-wrap:pretty}
 .item .body p:first-child{margin-top:14px}
 .item .body code{
-  font-family:var(--mono);font-size:var(--fs-meta);padding:1px 5px;border-radius:5px;
+  font-family:var(--mono);font-size:.84em;letter-spacing:0;padding:1px 5px;border-radius:5px;
   background:rgba(99,91,255,.07);border:1px solid rgba(99,91,255,.11);color:var(--accent-deep);
 }
 .item .body strong{font-weight:var(--fw-semibold);color:var(--ink)}
@@ -818,12 +822,20 @@ footer{
 .modal-backdrop{
   position:fixed;inset:0;z-index:100;display:flex;align-items:center;justify-content:center;
   padding:max(16px, env(safe-area-inset-top, 0px)) max(16px, env(safe-area-inset-right, 0px)) max(16px, env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px));
-  background:rgba(16,14,12,.36);
-  backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
   opacity:0;transition:opacity 200ms var(--ease);
 }
+/* v10.41 scrim on its own layer so its opacity can follow the sheet drag (same color/blur as before) */
+.modal-backdrop::before{
+  content:"";position:absolute;inset:0;z-index:0;
+  background:rgba(16,14,12,.36);
+  backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+  opacity:0;transition:opacity 260ms var(--ease);
+}
+.modal-backdrop.open::before{opacity:var(--scrim,1)}
+.modal-backdrop > .modal{position:relative;z-index:1}
 .modal-backdrop[hidden]{display:none}
 .modal-backdrop.open{opacity:1}
+.modal-backdrop.dragging::before,.modal-backdrop.dragging .modal{transition:none!important}
 .modal{
   display:flex;flex-direction:column;
   width:min(420px,100%);max-height:min(90dvh, 90svh, 720px);
@@ -838,9 +850,22 @@ footer{
 }
 .modal-backdrop.open .modal{transform:none}
 .modal-head{
-  flex:0 0 auto;
+  flex:0 0 auto;position:relative;
   padding:22px 24px 0;
 }
+.sheet-grabber{display:none}
+.modal-x{
+  position:absolute;top:16px;right:16px;
+  display:inline-flex;align-items:center;justify-content:center;
+  width:30px;height:30px;border-radius:999px;padding:0;
+  border:1px solid var(--glass-rim);background:var(--glass-fill);color:var(--muted);
+  -webkit-tap-highlight-color:transparent;
+  transition:color var(--dur) var(--ease), background var(--dur) var(--ease);
+}
+.modal-x::after{content:"";position:absolute;inset:-7px} /* 44px hit target */
+.modal-x:hover{color:var(--ink-soft);background:var(--glass-fill-strong)}
+.modal-x svg{width:12px;height:12px;display:block}
+.modal-head h2{padding-right:40px}
 .modal-body{
   flex:1 1 auto;min-height:0;
   overflow-x:hidden;overflow-y:auto;
@@ -850,15 +875,16 @@ footer{
 }
 .modal-foot{
   flex:0 0 auto;
-  padding:10px 24px max(18px, env(safe-area-inset-bottom, 0px));
+  padding:12px 24px max(14px, env(safe-area-inset-bottom, 0px));
   border-top:1px solid var(--line);
   background:color-mix(in srgb, var(--surface) 72%, transparent);
   backdrop-filter:blur(16px) saturate(150%);
   -webkit-backdrop-filter:blur(16px) saturate(150%);
 }
-.modal h2{margin:0 0 4px;font-size:18px;font-weight:600;letter-spacing:-.03em;color:var(--ink)}
-.modal .hint{margin:0;font-size:12.5px;color:var(--muted);line-height:1.45}
-.modal label{display:block;font-family:var(--mono);font-size:10px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:var(--faint);margin:0 0 6px}
+.modal h2{margin:0 0 4px;font-size:18px;font-weight:var(--fw-semibold);letter-spacing:-.018em;line-height:1.3;color:var(--ink)}
+.modal .hint{margin:0;font-size:13px;letter-spacing:-.006em;color:var(--muted);line-height:1.45;text-wrap:pretty}
+/* v10.41 labels: sentence-case Inter 510 (was 10px mono uppercase) — Linear/OpenAI form-label style */
+.modal label{display:block;font-family:var(--font);font-size:12.5px;font-weight:var(--fw-medium);letter-spacing:-.004em;text-transform:none;color:var(--faint);margin:0 0 7px}
 .modal select,.modal textarea{
   width:100%;margin:0 0 12px;padding:10px 12px;border-radius:11px;
   border:1px solid var(--glass-rim);background:var(--glass-fill);outline:0;
@@ -894,19 +920,13 @@ footer{
 }
 .ask-match:last-child{margin-bottom:0}
 .ask-match:hover{border-color:var(--line2);background:var(--glass-fill-strong)}
-.ask-match-q{display:block;font-size:13px;font-weight:600;letter-spacing:-.012em;color:var(--ink);line-height:1.35}
-.ask-match-a{display:block;margin-top:3px;font-size:12px;color:var(--muted);line-height:1.4}
+.ask-match-q{display:block;font-size:13.5px;font-weight:var(--fw-medium);letter-spacing:-.01em;color:var(--ink);line-height:1.35}
+.ask-match-a{display:block;margin-top:3px;font-size:12.5px;color:var(--muted);line-height:1.45}
 .modal .ask-os{margin:0 0 12px}
-.modal .ask-shots{margin:6px 0 0;font-size:11.5px;color:var(--faint);line-height:1.4;text-align:center}
-.modal .ask-foot-stack{display:flex;flex-direction:column;align-items:stretch;gap:6px}
-.modal .ask-foot-stack .btn.primary{width:100%;height:44px;min-height:44px;font-size:13.5px}
-.modal .ask-cancel{
-  align-self:center;height:32px;padding:0 12px;border:0;background:transparent;border-radius:999px;
-  font-size:12.5px;font-weight:500;color:var(--muted);-webkit-tap-highlight-color:transparent;cursor:pointer;
-}
-.modal .ask-cancel:hover{color:var(--ink-soft)}
-.modal .ask-note{margin:0 0 10px;font-size:12.5px;color:var(--muted);line-height:1.4}
-.modal .ask-note[hidden]{display:none}
+.modal .ask-shots{margin:2px 0 4px;font-size:12px;letter-spacing:-.003em;color:var(--faint);line-height:1.4}
+.modal-foot .btn.primary{width:100%;height:44px;min-height:44px;font-size:14px;font-weight:var(--fw-medium);letter-spacing:-.008em}
+/* Copy confirmation lives in an sr-only live region; the button label swaps visually */
+.modal .ask-note{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
 .modal .row{display:flex;justify-content:flex-end;flex-wrap:wrap;gap:8px;margin:0;align-items:center}
 /* Ask topic chips — same glass language as page .chip */
 .ask-topics{
@@ -917,7 +937,7 @@ footer{
   border:1px solid var(--glass-rim);background:var(--glass-fill);
   backdrop-filter:blur(var(--glass-blur)) saturate(var(--glass-sat));
   -webkit-backdrop-filter:blur(var(--glass-blur)) saturate(var(--glass-sat));
-  font-size:12.5px;font-weight:var(--fw-medium);letter-spacing:-.011em;color:var(--ink-soft);
+  font-size:12.5px;font-weight:var(--fw-ui);letter-spacing:-.006em;color:var(--ink-soft);
   white-space:nowrap;box-shadow:var(--glass-shadow), var(--glass-highlight);
   line-height:1.2;
   -webkit-tap-highlight-color:transparent;
@@ -934,7 +954,7 @@ footer{
 .btn{
   display:inline-flex;align-items:center;justify-content:center;
   height:36px;padding:0 15px;border-radius:999px;border:1px solid var(--line);
-  font-size:12.5px;font-weight:500;color:var(--ink-soft);background:transparent;
+  font-size:12.5px;font-weight:var(--fw-medium);letter-spacing:-.006em;color:var(--ink-soft);background:transparent;
   transition:background 150ms var(--ease), opacity 150ms var(--ease);
 }
 .btn:hover{background:rgba(10,10,10,.04)}
@@ -1120,17 +1140,17 @@ footer{
 [data-theme="light"] .item .body,
 [data-theme="light"] .item .body p{
   color:#5B5678;
-  font-family:"Geist Sans",Geist,Inter,ui-sans-serif,system-ui,-apple-system,sans-serif;
+  font-family:var(--font);
   font-weight:400;
 }
-[data-theme="light"] .item .body strong{color:var(--ink-soft);font-weight:600} /* #3F3A58 secondary emphasis */
+[data-theme="light"] .item .body strong{color:var(--ink-soft);font-weight:var(--fw-semibold)} /* #3F3A58 secondary emphasis */
 [data-theme="light"] .item .q{
-  /* v10.29: soft charcoal-violet title — Geist Sans 600 / 16.5px / -0.015em; never #000/#1A1917 */
-  font-family:"Geist Sans",Geist,Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  /* v10.41: soft charcoal-violet title — Inter 510 / 16px / -0.012em; never #000/#1A1917 */
+  font-family:var(--font);
   color:var(--ink); /* #2E2A42 */
-  font-weight:600;
-  font-size:var(--fs-title); /* 16.5px */
-  letter-spacing:-0.015em;
+  font-weight:var(--fw-title);
+  font-size:var(--fs-title);
+  letter-spacing:-0.012em;
 }
 
 /* Light toggle hover — brighter glass */
@@ -1420,7 +1440,7 @@ footer{
   .theme-toggle .tlabel{display:none!important}
   .hero{margin:0 auto 32px;padding:0}
   .hero h1{font-size:clamp(2rem,8.5vw,2.5rem);letter-spacing:-.01em;line-height:1.1;margin-bottom:10px}
-  .hero .sub{font-size:14.5px;max-width:320px;margin-bottom:24px}
+  .hero .sub{font-size:15px;line-height:1.5;max-width:320px;margin-bottom:24px}
   .controls{padding:0;margin:0 auto 28px;gap:12px}
   .chips{gap:8px}
   .search{width:auto;max-width:min(100%, 100vw - 36px);flex:0 0 auto;align-self:center;overflow:visible}
@@ -1444,24 +1464,37 @@ footer{
     padding:0;
     padding-top:env(safe-area-inset-top, 0px);
   }
+  /* v10.41 sheet: backdrop itself never fades on mobile — the scrim (::before) fades and the sheet slides.
+     The sheet extends 40px below the screen (padding + negative margin) so spring overshoot never shows a gap. */
+  .modal-backdrop{opacity:1;transition:none}
   .modal{
+    --sheet-over:40px;
     width:100%;max-width:100%;
     height:auto;
-    max-height:85vh;max-height:85dvh;
+    max-height:calc(85vh + var(--sheet-over));max-height:calc(85dvh + var(--sheet-over));
+    padding-bottom:var(--sheet-over);margin-bottom:calc(-1 * var(--sheet-over));
     border-radius:20px 20px 0 0;
     border-left:0;border-right:0;border-bottom:0;
-    transform:translateY(110%);
+    transform:translateY(100%);
+    transition:transform 260ms cubic-bezier(.32,0,.67,0); /* close: ease-in */
+    will-change:transform;
   }
-  .modal-backdrop.open .modal{transform:translateY(0)}
+  .modal-backdrop.open .modal{transform:translateY(0);transition:transform 420ms var(--ease)} /* open: decel */
+  .modal-backdrop.open.springing .modal{transition:transform 460ms var(--ease-spring)}
   .modal-head{
-    padding:14px max(18px, env(safe-area-inset-right, 0px)) 0 max(18px, env(safe-area-inset-left, 0px));
+    padding:8px max(18px, env(safe-area-inset-right, 0px)) 0 max(18px, env(safe-area-inset-left, 0px));
+    touch-action:none;cursor:grab;user-select:none;-webkit-user-select:none;
   }
-  .modal-head::before{
-    content:"";display:block;width:36px;height:4px;border-radius:999px;
-    background:var(--line2);margin:2px auto 12px;opacity:.85;
+  .modal-backdrop.dragging .modal-head{cursor:grabbing}
+  .sheet-grabber{
+    display:block;width:36px;height:5px;border-radius:999px;
+    background:var(--line2);margin:0 auto 12px;opacity:.85;
+    position:relative;
   }
+  .sheet-grabber::after{content:"";position:absolute;left:-40px;right:-40px;top:-10px;bottom:-10px}
+  .modal-x{top:14px;right:max(14px, env(safe-area-inset-right, 0px))}
   .modal h2{font-size:17px;margin:0 0 4px}
-  .modal .hint{font-size:12px;line-height:1.4;margin:0 0 2px}
+  .modal .hint{font-size:12.5px;line-height:1.4;margin:0 0 2px}
   .modal-body{
     padding:10px max(18px, env(safe-area-inset-right, 0px)) 6px max(18px, env(safe-area-inset-left, 0px));
   }
@@ -1475,11 +1508,13 @@ footer{
     flex:0 1 auto;min-height:44px;padding:10px 14px;font-size:13px;
   }
   .modal-foot{
-    padding:10px max(18px, env(safe-area-inset-right, 0px)) max(12px, env(safe-area-inset-bottom, 0px)) max(18px, env(safe-area-inset-left, 0px));
+    padding:10px max(18px, env(safe-area-inset-right, 0px)) calc(10px + env(safe-area-inset-bottom, 0px)) max(18px, env(safe-area-inset-left, 0px));
   }
-  .modal .ask-note{margin:0 0 8px;font-size:12px}
-  .modal .ask-foot-stack{gap:4px}
-  .modal .ask-cancel{height:36px;font-size:13px}
+  /* Keyboard open (visualViewport): backdrop is pinned to the visual viewport by JS; no home-indicator inset */
+  .modal-backdrop.kb-open{padding-top:0}
+  .modal-backdrop.kb-open .modal{max-height:calc(var(--vvh, 100dvh) - 8px + var(--sheet-over))}
+  .modal-backdrop.kb-open .modal-foot{padding-bottom:10px}
+  .modal-backdrop.kb-open .modal textarea#askQ{max-height:calc(var(--vvh, 100dvh) * .32)}
 }
 
 /* Desktop/web: search + Newest/Oldest MUST stay one horizontal row */
@@ -1568,8 +1603,10 @@ footer{
   </div>
 </div>
 <div class="modal-backdrop" id="askModal" role="dialog" aria-modal="true" aria-labelledby="askTitle" hidden>
-  <div class="modal">
-    <div class="modal-head">
+  <div class="modal" id="askSheet">
+    <div class="modal-head" id="askHead">
+      <div class="sheet-grabber" aria-hidden="true"></div>
+      <button type="button" class="modal-x" id="askClose" aria-label="Close"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><path d="M2.5 2.5l7 7M9.5 2.5l-7 7"/></svg></button>
       <h2 id="askTitle">Ask the beta team</h2>
       <p class="hint">Write your question below. We'll show matching answers first. If none help, copy it into WhatsApp.</p>
     </div>
@@ -1595,14 +1632,11 @@ footer{
         <button type="button" class="ask-topic" data-os="iOS" aria-pressed="false">iOS</button>
         <button type="button" class="ask-topic" data-os="Android" aria-pressed="false">Android</button>
       </div>
+      <p class="ask-shots">Screenshots help — attach them in WhatsApp.</p>
     </div>
     <div class="modal-foot">
-      <p class="ask-note" id="askNote" hidden></p>
-      <div class="ask-foot-stack">
-        <button type="button" class="btn primary" id="askSend">Copy &amp; open WhatsApp</button>
-        <button type="button" class="ask-cancel" id="askCancel">Cancel</button>
-      </div>
-      <p class="ask-shots">Screenshots help — attach them in WhatsApp.</p>
+      <p class="ask-note" id="askNote" role="status" aria-live="polite"></p>
+      <button type="button" class="btn primary" id="askSend"><span class="ask-send-label">Copy &amp; open WhatsApp</span></button>
     </div>
   </div>
 </div>
@@ -1740,27 +1774,145 @@ function growAsk(){
   askQ.style.height="auto";
   askQ.style.height=(askQ.scrollHeight+2)+"px";
 }
+const askSheet=document.getElementById("askSheet");
+const askHead=document.getElementById("askHead");
+const askBody=askSheet.querySelector(".modal-body");
+const askSendLabel=askSend?askSend.querySelector(".ask-send-label"):null;
+const ASK_SEND_TEXT="Copy & open WhatsApp";
+const sheetMQ=window.matchMedia("(max-width:719px)");
+const reduceMQ=window.matchMedia("(prefers-reduced-motion: reduce)");
+let askHideTimer=0, askCopiedTimer=0;
+function resetAskSend(){clearTimeout(askCopiedTimer);if(askSendLabel) askSendLabel.textContent=ASK_SEND_TEXT;if(askSend) askSend.classList.remove("is-copied")}
 function openAsk(){
-  if(askNote){askNote.hidden=true;askNote.textContent=""}
+  clearTimeout(askHideTimer);
+  if(askNote) askNote.textContent="";
+  resetAskSend();
+  askSheet.style.transform="";askSheet.style.transition="";
+  modal.style.removeProperty("--scrim");
+  modal.classList.remove("dragging","springing");
   modal.hidden=false;
   document.documentElement.style.overflow="hidden";
   document.body.style.overflow="hidden";
   growAsk();
   updateAskMatches();
+  syncAskViewport();
+  void modal.offsetHeight; /* commit closed state so the slide-up transition runs */
   requestAnimationFrame(()=>{
     modal.classList.add("open");
   });
-  /* Delay focus slightly so iOS keyboard doesn't fight sheet slide */
-  setTimeout(function(){try{askQ.focus({preventScroll:true})}catch(e){try{askQ.focus()}catch(_){}}}, 220);
+  /* Delay focus until the sheet has mostly slid in so the iOS keyboard doesn't fight it */
+  setTimeout(function(){if(!modal.classList.contains("open")) return;try{askQ.focus({preventScroll:true})}catch(e){try{askQ.focus()}catch(_){}}}, reduceMQ.matches?0:360);
 }
 function closeAsk(){
-  modal.classList.remove("open");
+  if(modal.hidden) return;
+  modal.classList.remove("open","dragging","springing");
+  /* clear drag inline styles in the same frame → CSS close transition runs from the current drag offset */
+  askSheet.style.transform="";askSheet.style.transition="";
+  modal.style.removeProperty("--scrim");
+  try{if(document.activeElement&&modal.contains(document.activeElement)) document.activeElement.blur()}catch(e){}
   document.documentElement.style.overflow="";
   document.body.style.overflow="";
-  setTimeout(()=>{modal.hidden=true},220);
+  clearTimeout(askHideTimer);
+  askHideTimer=setTimeout(()=>{modal.hidden=true;clearAskViewport()}, reduceMQ.matches?0:(sheetMQ.matches?280:220));
 }
 document.getElementById("askOpen").addEventListener("click",openAsk);
-document.getElementById("askCancel").addEventListener("click",closeAsk);
+document.getElementById("askClose").addEventListener("click",closeAsk);
+
+/* —— v10.41 Bottom-sheet drag-to-dismiss (mobile only) ——
+   Pointer drag on grabber/head; touch drag on body only when body is scrolled to top and the gesture starts downward
+   (never from the textarea). Up-drag has rubber-band resistance. Release: > 1/3 height or flick > 0.5px/ms → close;
+   else spring back with --ease-spring. Scrim opacity follows the offset. */
+const askDrag={on:false,id:null,y0:0,y:0,h:1,samples:[]};
+function dragStart(y){
+  askDrag.on=true;askDrag.y0=y;askDrag.y=y;askDrag.h=Math.max(1,askSheet.getBoundingClientRect().height-40);
+  askDrag.samples=[{y:y,t:performance.now()}];
+  modal.classList.remove("springing");
+  modal.classList.add("dragging");
+}
+function dragMove(y){
+  askDrag.y=y;
+  const now=performance.now();
+  askDrag.samples.push({y:y,t:now});
+  while(askDrag.samples.length>2&&now-askDrag.samples[0].t>100) askDrag.samples.shift();
+  let dy=y-askDrag.y0;
+  if(dy<0) dy=-Math.min(28, Math.pow(-dy,0.72)); /* resistance upward */
+  askSheet.style.transform="translateY("+dy.toFixed(1)+"px)";
+  modal.style.setProperty("--scrim", String(Math.max(0,Math.min(1,1-dy/askDrag.h))));
+}
+function dragEnd(cancelled){
+  if(!askDrag.on) return;
+  askDrag.on=false;
+  const dy=askDrag.y-askDrag.y0;
+  const s=askDrag.samples, a=s[0], b=s[s.length-1];
+  const v=(b&&a&&b.t>a.t)?(b.y-a.y)/(b.t-a.t):0; /* px/ms, + = down */
+  modal.classList.remove("dragging");
+  if(!cancelled&&dy>0&&(dy>askDrag.h/3||v>0.5)){closeAsk();return}
+  /* spring back */
+  modal.classList.add("springing");
+  askSheet.style.transform="";
+  modal.style.removeProperty("--scrim");
+  setTimeout(()=>modal.classList.remove("springing"),480);
+}
+askHead.addEventListener("pointerdown",e=>{
+  if(!sheetMQ.matches||!modal.classList.contains("open")) return;
+  if(e.button!==0||e.target.closest(".modal-x")) return;
+  askDrag.id=e.pointerId;
+  try{askHead.setPointerCapture(e.pointerId)}catch(_){}
+  dragStart(e.clientY);
+});
+askHead.addEventListener("pointermove",e=>{if(askDrag.on&&e.pointerId===askDrag.id){e.preventDefault();dragMove(e.clientY)}});
+askHead.addEventListener("pointerup",e=>{if(e.pointerId===askDrag.id) dragEnd(false)});
+askHead.addEventListener("pointercancel",e=>{if(e.pointerId===askDrag.id) dragEnd(true)});
+/* Body: pull-down-to-dismiss only from scrollTop 0, starting downward, vertical, not inside textarea */
+const bodyTouch={track:false,x0:0,y0:0,decided:false};
+askBody.addEventListener("touchstart",e=>{
+  bodyTouch.track=false;bodyTouch.decided=false;
+  if(!sheetMQ.matches||!modal.classList.contains("open")||e.touches.length!==1) return;
+  if(e.target.closest("textarea,input,select")) return;
+  if(askBody.scrollTop>0) return;
+  bodyTouch.track=true;bodyTouch.x0=e.touches[0].clientX;bodyTouch.y0=e.touches[0].clientY;
+},{passive:true});
+askBody.addEventListener("touchmove",e=>{
+  if(!bodyTouch.track) return;
+  const t=e.touches[0], dx=t.clientX-bodyTouch.x0, dy=t.clientY-bodyTouch.y0;
+  if(!bodyTouch.decided){
+    if(Math.abs(dx)<6&&Math.abs(dy)<6) return;
+    bodyTouch.decided=true;
+    if(dy<=0||Math.abs(dx)>Math.abs(dy)||askBody.scrollTop>0){bodyTouch.track=false;return}
+    dragStart(bodyTouch.y0);
+  }
+  if(askDrag.on){e.preventDefault();dragMove(t.clientY)}
+},{passive:false});
+askBody.addEventListener("touchend",()=>{if(bodyTouch.track&&askDrag.on) dragEnd(false);bodyTouch.track=false},{passive:true});
+askBody.addEventListener("touchcancel",()=>{if(bodyTouch.track&&askDrag.on) dragEnd(true);bodyTouch.track=false},{passive:true});
+
+/* —— v10.41 Keyboard fit: pin the backdrop to the visual viewport while the on-screen keyboard is up,
+   so the footer sits right above the keyboard and the focused textarea stays visible above it. —— */
+const vv=window.visualViewport||null;
+function clearAskViewport(){
+  modal.classList.remove("kb-open");
+  modal.style.top="";modal.style.height="";modal.style.bottom="";
+  modal.style.removeProperty("--vvh");
+}
+function syncAskViewport(){
+  if(!vv||modal.hidden||!sheetMQ.matches){clearAskViewport();return}
+  const kb=window.innerHeight-vv.height-vv.offsetTop;
+  if(kb>80){
+    modal.classList.add("kb-open");
+    modal.style.top=vv.offsetTop+"px";modal.style.bottom="auto";modal.style.height=vv.height+"px";
+    modal.style.setProperty("--vvh", vv.height+"px");
+    if(document.activeElement===askQ){
+      requestAnimationFrame(()=>{
+        const br=askBody.getBoundingClientRect(), tr=askQ.getBoundingClientRect();
+        if(tr.bottom>br.bottom) askBody.scrollTop+=Math.min(tr.bottom-br.bottom+8, tr.top-br.top-4);
+        else if(tr.top<br.top) askBody.scrollTop-=(br.top-tr.top+4);
+      });
+    }
+  }else clearAskViewport();
+}
+if(vv){vv.addEventListener("resize",syncAskViewport);vv.addEventListener("scroll",syncAskViewport)}
+askQ.addEventListener("focus",()=>setTimeout(syncAskViewport,300));
+sheetMQ.addEventListener&&sheetMQ.addEventListener("change",()=>{askSheet.style.transform="";syncAskViewport()});
 modal.addEventListener("click",e=>{if(e.target===modal)closeAsk()});
 document.addEventListener("keydown",e=>{if(e.key==="Escape"&&modal.classList.contains("open"))closeAsk()});
 
@@ -1924,7 +2076,7 @@ askMatchList.addEventListener("click",e=>{
 let askMatchTimer=0;
 askQ.addEventListener("input",()=>{
   growAsk();
-  if(askNote&&!askNote.hidden){askNote.hidden=true;askNote.textContent=""}
+  if(askNote&&askNote.textContent){askNote.textContent=""}
   clearTimeout(askMatchTimer);
   askMatchTimer=setTimeout(updateAskMatches,150);
 });
@@ -1966,8 +2118,12 @@ function isMobileUA(){
 if(askSend) askSend.addEventListener("click",async()=>{
   const ok=await copyAskMessage();
   if(!ok) return;
-  askNote.hidden=false;
+  /* v10.41: transient in-button confirmation (2s) + sr-only live note */
   askNote.textContent="Copied — paste it into the right WhatsApp chat (General or your Beta Support group).";
+  clearTimeout(askCopiedTimer);
+  if(askSendLabel) askSendLabel.textContent="Copied \u2713";
+  askSend.classList.add("is-copied");
+  askCopiedTimer=setTimeout(()=>{resetAskSend();askNote.textContent=""},2000);
   if(isMobileUA()) window.location.href="whatsapp://";
 });
 /* fresh bar is non-sticky silk — no scroll hide */
