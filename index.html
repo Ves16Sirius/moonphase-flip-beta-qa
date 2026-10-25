@@ -46,9 +46,14 @@
         if(metaL) metaL.setAttribute('content', LIGHT_TC);
         if(metaD) metaD.setAttribute('content', DARK_TC);
       }
-      /* Paint --bg (same hex as theme-color). Fixed aurora washes on top from viewport y=0. */
-      document.documentElement.style.backgroundColor=bg;
-      try{if(document.body) document.body.style.backgroundColor=bg}catch(e){}
+      /* Paint --bg (same hex as theme-color) BEFORE first paint; dual-layer aurora fades by opacity. */
+      try{
+        document.documentElement.style.setProperty('--bg', bg);
+        document.documentElement.style.setProperty('--aurora-top', bg);
+        document.documentElement.style.backgroundColor=bg;
+        document.documentElement.style.background=bg;
+      }catch(e){}
+      try{if(document.body){document.body.style.backgroundColor=bg;document.body.style.background=bg}}catch(e){}
     }
     if(saved){
       document.documentElement.setAttribute('data-theme', saved);
@@ -76,7 +81,7 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/geist-mono@5.2.5/index.min.css" />
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600&display=swap" />
 <style>
-/* Overhaul 2026-10-25 v10.17 — brand+toggle under island · Updated below · aurora theme-sync · quiet glass toggle · sharper card titles */
+/* Overhaul 2026-10-25 v10.19 — v10.17 header kept · dual-layer aurora crossfade · premium glass · same-tick theme-color */
 :root{
   /* Surfaces */
   --bg:#F6F5FB;
@@ -112,8 +117,18 @@
     0 2px 4px rgba(40,28,12,.04),
     0 10px 24px rgba(40,28,12,.06),
     0 24px 48px rgba(40,28,12,.055);
-  --control-bg:rgba(255,255,255,.88);
+  --control-bg:rgba(255,255,255,.72);
+  /* Premium glass — Linear/Vercel/AI splash: soft fill, quiet rim, blur+saturate */
+  --glass-blur:20px;
+  --glass-sat:160%;
+  --glass-fill:rgba(255,255,255,.68);
+  --glass-fill-strong:rgba(255,255,255,.78);
+  --glass-rim:rgba(50,40,90,.10);
+  --glass-rim-soft:rgba(50,40,90,.07);
+  --glass-highlight:inset 0 1px 0 rgba(255,255,255,.72);
+  --glass-shadow:0 1px 2px rgba(40,28,12,.04), 0 4px 14px rgba(60,50,120,.05);
   --ease:cubic-bezier(.22,1,.36,1);
+  --aurora-xfade:200ms;
   /* Premium spring (stiffness~500, damping~20) — slight overshoot then settle */
   --ease-spring:linear(0, 0.041, 0.145, 0.284, 0.438, 0.589, 0.728, 0.847, 0.942, 1.014, 1.063, 1.093, 1.106, 1.108, 1.1, 1.087, 1.071, 1.055, 1.039, 1.024, 1.012, 1.003, 0.996, 0.992, 0.989, 0.988, 0.989, 0.99, 0.991, 0.993, 0.995, 0.996, 1);
   --dur:180ms;
@@ -166,10 +181,10 @@ body{
   width:100%;max-width:100%;
   position:relative;
 }
-/* FIXED top-curtain aurora — always paints VISUAL viewport top under Dynamic Island.
-   Persist: fixed + will-change:transform; never opacity 0 / unmount / scroll-hide.
+/* FIXED dual-layer aurora — baked-hex washes (no var(--bg) lag).
+   Outgoing fades out / incoming fades in (~200ms) so island never flashes wrong then snaps.
    #aurora-sticky = thin backup wash if iOS Safari drops the fixed compositor layer. */
-.aurora{
+.aurora,.aurora-stack{
   position:fixed;
   top:0;left:0;right:0;
   width:100%;
@@ -179,23 +194,11 @@ body{
   z-index:0;
   overflow:hidden;
   isolation:isolate;
-  will-change:transform;
   transform:translateZ(0);
   -webkit-backface-visibility:hidden;
   backface-visibility:hidden;
-  /* Light default: soft lavender from physical top (no cream slab / purple cliff) */
-  background:linear-gradient(180deg,
-    color-mix(in srgb, #A898FF 28%, var(--bg)) 0%,
-    color-mix(in srgb, #A898FF 18%, var(--bg)) 22%,
-    color-mix(in srgb, #B8A8FF 10%, var(--bg)) 48%,
-    color-mix(in srgb, #C8BCFF 4%, var(--bg)) 72%,
-    transparent 100%);
-  filter:none;
-  opacity:1;
-  -webkit-mask-image:linear-gradient(180deg,#000 0%,#000 40%,rgba(0,0,0,.55) 70%,transparent 100%);
-  mask-image:linear-gradient(180deg,#000 0%,#000 40%,rgba(0,0,0,.55) 70%,transparent 100%);
+  background:transparent;
 }
-/* Thin always-on top wash under island — no mask; survives iOS fixed-bg unload */
 #aurora-sticky{
   position:fixed;
   top:0;left:0;right:0;
@@ -204,20 +207,71 @@ body{
   margin:0;padding:0;
   pointer-events:none;
   z-index:0;
-  will-change:transform;
   transform:translateZ(0);
+  background:transparent;
+  overflow:hidden;
+}
+/* Per-theme wash layers — hard hex mix so opacity crossfade is the only change */
+.aurora-layer{
+  position:absolute;inset:0;
+  pointer-events:none;
+  opacity:0;
+  will-change:opacity;
+  transition:opacity var(--aurora-xfade, 200ms) cubic-bezier(.22,1,.36,1);
+  transform:translateZ(0);
+}
+.aurora-layer.is-active{opacity:1}
+/* Main aurora (masked fade to transparent) */
+.aurora > .aurora-layer{
+  -webkit-mask-image:linear-gradient(180deg,#000 0%,#000 40%,rgba(0,0,0,.55) 70%,transparent 100%);
+  mask-image:linear-gradient(180deg,#000 0%,#000 40%,rgba(0,0,0,.55) 70%,transparent 100%);
+}
+.aurora > .aurora-layer.layer-light{
   background:linear-gradient(180deg,
-    color-mix(in srgb, #A898FF 22%, var(--bg)) 0%,
-    color-mix(in srgb, #A898FF 10%, var(--bg)) 55%,
-    var(--bg) 100%);
-  opacity:1;
+    color-mix(in srgb, #A898FF 28%, #F6F5FB) 0%,
+    color-mix(in srgb, #A898FF 18%, #F6F5FB) 22%,
+    color-mix(in srgb, #B8A8FF 10%, #F6F5FB) 48%,
+    color-mix(in srgb, #C8BCFF 4%, #F6F5FB) 72%,
+    transparent 100%);
 }
-.aurora-crown{
-  display:none!important; /* gradient itself starts at y=0 — no solid slab crown */
+.aurora > .aurora-layer.layer-dark{
+  /* Keep dark #5B66C4 aurora */
+  background:linear-gradient(180deg,
+    color-mix(in srgb, #5B66C4 32%, #0E0F14) 0%,
+    color-mix(in srgb, #5B66C4 22%, #0E0F14) 20%,
+    color-mix(in srgb, #6B78E8 12%, #0E0F14) 42%,
+    color-mix(in srgb, #4A54B0 5%, #0E0F14) 68%,
+    transparent 100%);
 }
+/* Sticky thin wash (no mask; solid to --bg hex) */
+#aurora-sticky > .aurora-layer.layer-light{
+  background:linear-gradient(180deg,
+    color-mix(in srgb, #A898FF 22%, #F6F5FB) 0%,
+    color-mix(in srgb, #A898FF 10%, #F6F5FB) 55%,
+    #F6F5FB 100%);
+}
+#aurora-sticky > .aurora-layer.layer-dark{
+  background:linear-gradient(180deg,
+    color-mix(in srgb, #5B66C4 26%, #0E0F14) 0%,
+    color-mix(in srgb, #5B66C4 12%, #0E0F14) 55%,
+    #0E0F14 100%);
+}
+/* Default (no attr yet / dark-first): dark layers on */
+.aurora > .aurora-layer.layer-dark,
+#aurora-sticky > .aurora-layer.layer-dark{opacity:1}
+[data-theme="light"] .aurora > .aurora-layer.layer-dark,
+[data-theme="light"] #aurora-sticky > .aurora-layer.layer-dark{opacity:0}
+[data-theme="light"] .aurora > .aurora-layer.layer-light,
+[data-theme="light"] #aurora-sticky > .aurora-layer.layer-light{opacity:1}
+[data-theme="dark"] .aurora > .aurora-layer.layer-light,
+[data-theme="dark"] #aurora-sticky > .aurora-layer.layer-light{opacity:0}
+[data-theme="dark"] .aurora > .aurora-layer.layer-dark,
+[data-theme="dark"] #aurora-sticky > .aurora-layer.layer-dark{opacity:1}
+.aurora-crown{display:none!important}
 .aurora-blobs{display:none!important}
-/* Toggle class kicks Safari to recompute fixed-layer gradients after theme change */
-.aurora.aurora-repaint,#aurora-sticky.aurora-repaint{opacity:.999;will-change:transform,opacity}
+@media (prefers-reduced-motion:reduce){
+  .aurora-layer{transition:none!important}
+}
 .fresh,.shell,.modal-backdrop{position:relative;z-index:1}
 .modal-backdrop{z-index:100}
 button,input,select,textarea{font:inherit;color:inherit}
@@ -236,11 +290,11 @@ a:hover{text-decoration:underline;text-underline-offset:3px}
 .fresh span{
   display:inline-flex;align-items:center;gap:8px;
   padding:6px 12px;border-radius:999px;
-  background:var(--control-bg);
-  border:1px solid var(--line);
-  backdrop-filter:blur(16px) saturate(140%);
-  -webkit-backdrop-filter:blur(16px) saturate(140%);
-  box-shadow:var(--shadow-sm);
+  background:var(--glass-fill);
+  border:1px solid var(--glass-rim);
+  backdrop-filter:blur(var(--glass-blur)) saturate(var(--glass-sat));
+  -webkit-backdrop-filter:blur(var(--glass-blur)) saturate(var(--glass-sat));
+  box-shadow:var(--glass-shadow), var(--glass-highlight);
   font-family:var(--mono);font-size:var(--fs-mono);font-weight:var(--fw-medium);
   letter-spacing:.02em;color:var(--muted);
 }
@@ -307,8 +361,8 @@ a:hover{text-decoration:underline;text-underline-offset:3px}
   border:1px solid rgba(255,255,255,.14);
   background:
     linear-gradient(180deg, rgba(255,255,255,.12) 0%, rgba(255,255,255,.05) 55%, rgba(255,255,255,.03) 100%);
-  backdrop-filter:blur(20px) saturate(160%);
-  -webkit-backdrop-filter:blur(20px) saturate(160%);
+  backdrop-filter:blur(var(--glass-blur)) saturate(var(--glass-sat));
+  -webkit-backdrop-filter:blur(var(--glass-blur)) saturate(var(--glass-sat));
   box-shadow:
     0 1px 2px rgba(0,0,0,.22),
     0 4px 12px rgba(0,0,0,.12),
@@ -441,8 +495,8 @@ a:hover{text-decoration:underline;text-underline-offset:3px}
   border-color:rgba(40,30,80,.14);
   background:
     linear-gradient(180deg, rgba(255,255,255,.72) 0%, rgba(255,255,255,.48) 55%, rgba(246,245,251,.42) 100%);
-  backdrop-filter:blur(18px) saturate(150%);
-  -webkit-backdrop-filter:blur(18px) saturate(150%);
+  backdrop-filter:blur(var(--glass-blur)) saturate(var(--glass-sat));
+  -webkit-backdrop-filter:blur(var(--glass-blur)) saturate(var(--glass-sat));
   box-shadow:
     0 1px 2px rgba(40,30,80,.06),
     0 4px 12px rgba(60,50,120,.05),
@@ -504,8 +558,9 @@ a:hover{text-decoration:underline;text-underline-offset:3px}
   background:var(--cta);color:var(--cta-ink);
   font-size:var(--fs-ui);font-weight:var(--fw-medium);letter-spacing:-.014em;
   border:1px solid var(--cta-border);
-  box-shadow:0 1px 2px rgba(24,18,12,.03);
-  backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+  box-shadow:0 1px 2px rgba(24,18,12,.03), var(--glass-highlight);
+  backdrop-filter:blur(var(--glass-blur)) saturate(var(--glass-sat));
+  -webkit-backdrop-filter:blur(var(--glass-blur)) saturate(var(--glass-sat));
   transition:transform var(--dur) var(--ease), box-shadow var(--dur) var(--ease), background var(--dur) var(--ease), border-color var(--dur) var(--ease);
 }
 .ask-cta:hover{
@@ -529,16 +584,17 @@ a:hover{text-decoration:underline;text-underline-offset:3px}
 }
 .chip{
   flex:0 0 auto;height:var(--control-h);padding:0 16px;border-radius:999px;
-  border:1px solid var(--line);background:var(--control-bg);
-  backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+  border:1px solid var(--glass-rim);background:var(--glass-fill);
+  backdrop-filter:blur(var(--glass-blur)) saturate(var(--glass-sat));
+  -webkit-backdrop-filter:blur(var(--glass-blur)) saturate(var(--glass-sat));
   font-size:var(--fs-ui);font-weight:var(--fw-medium);letter-spacing:-.011em;color:var(--ink-soft);
-  white-space:nowrap;box-shadow:var(--shadow-sm);
+  white-space:nowrap;box-shadow:var(--glass-shadow), var(--glass-highlight);
   overflow:hidden;
   isolation:isolate;
   clip-path:inset(0 round 999px);
   transition:background var(--dur) var(--ease), border-color var(--dur) var(--ease), color var(--dur) var(--ease), box-shadow var(--dur) var(--ease), transform var(--dur) var(--ease);
 }
-.chip:hover{border-color:var(--line2);background:#fff;transform:translateY(-.5px)}
+.chip:hover{border-color:var(--line2);background:var(--glass-fill-strong);transform:translateY(-.5px)}
 .chip[aria-selected="true"]{
   background:color-mix(in srgb, var(--accent) 12%, #fff);
   border-color:color-mix(in srgb, var(--accent) 28%, transparent);
@@ -555,10 +611,11 @@ a:hover{text-decoration:underline;text-underline-offset:3px}
 .search{
   position:relative;display:inline-flex;align-items:center;
   width:auto;height:var(--control-h);padding:0 14px 0 36px;
-  border-radius:999px;border:1px solid var(--line);
-  background:var(--control-bg);
-  backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
-  box-shadow:var(--shadow-sm);
+  border-radius:999px;border:1px solid var(--glass-rim);
+  background:var(--glass-fill);
+  backdrop-filter:blur(var(--glass-blur)) saturate(var(--glass-sat));
+  -webkit-backdrop-filter:blur(var(--glass-blur)) saturate(var(--glass-sat));
+  box-shadow:var(--glass-shadow), var(--glass-highlight);
   transition:border-color var(--dur) var(--ease), box-shadow var(--dur) var(--ease);
   flex:0 0 auto;max-width:100%;min-width:0;
   overflow:visible;
@@ -584,10 +641,11 @@ a:hover{text-decoration:underline;text-underline-offset:3px}
 
 .sort{
   display:inline-flex;align-items:center;height:var(--control-h);padding:3px;
-  border-radius:999px;border:1px solid var(--line);
-  background:var(--control-bg);
-  backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
-  box-shadow:var(--shadow-sm);
+  border-radius:999px;border:1px solid var(--glass-rim);
+  background:var(--glass-fill);
+  backdrop-filter:blur(var(--glass-blur)) saturate(var(--glass-sat));
+  -webkit-backdrop-filter:blur(var(--glass-blur)) saturate(var(--glass-sat));
+  box-shadow:var(--glass-shadow), var(--glass-highlight);
   flex:0 0 auto;
 }
 .sort button{
@@ -631,11 +689,13 @@ a:hover{text-decoration:underline;text-underline-offset:3px}
   width:100%;
   max-width:100%;
   margin:0;
-  border-radius:var(--r);border:1px solid var(--line);
-  background:var(--surface);
-  box-shadow:var(--shadow-md);
+  border-radius:var(--r);border:1px solid var(--glass-rim-soft);
+  background:color-mix(in srgb, var(--surface) 82%, transparent);
+  backdrop-filter:blur(18px) saturate(150%);
+  -webkit-backdrop-filter:blur(18px) saturate(150%);
+  box-shadow:var(--shadow-md), var(--glass-highlight);
   overflow:hidden;
-  transition:border-color var(--dur) var(--ease), box-shadow var(--dur) var(--ease), transform var(--dur) var(--ease);
+  transition:border-color var(--dur) var(--ease), box-shadow var(--dur) var(--ease), transform var(--dur) var(--ease), background var(--dur) var(--ease);
   animation:cardIn 200ms var(--ease) both;
 }
 .item:hover{
@@ -706,11 +766,12 @@ a:hover{text-decoration:underline;text-underline-offset:3px}
   display:inline-flex;align-items:center;gap:6px;
   height:22px;padding:0 9px 0 8px;
   border-radius:999px;
-  border:1px solid rgba(99,91,255,.14);
-  background:rgba(99,91,255,.08);
-  box-shadow:0 0 0 1px rgba(255,255,255,.6) inset;
+  border:1px solid rgba(99,91,255,.16);
+  background:rgba(99,91,255,.10);
+  box-shadow:0 0 0 1px rgba(255,255,255,.55) inset;
   filter:none;
-  backdrop-filter:none;-webkit-backdrop-filter:none;
+  backdrop-filter:blur(12px) saturate(150%);
+  -webkit-backdrop-filter:blur(12px) saturate(150%);
   font-family:var(--font);font-size:var(--fs-tag);font-weight:var(--fw-medium);
   letter-spacing:-.01em;text-transform:none;
   color:#4338CA;
@@ -767,8 +828,11 @@ footer{
 .modal-backdrop.open{opacity:1}
 .modal{
   width:min(420px,100%);padding:26px;border-radius:20px;
-  background:var(--surface);border:1px solid var(--line);
-  box-shadow:var(--shadow-lg);
+  background:color-mix(in srgb, var(--surface) 86%, transparent);
+  border:1px solid var(--glass-rim);
+  backdrop-filter:blur(24px) saturate(160%);
+  -webkit-backdrop-filter:blur(24px) saturate(160%);
+  box-shadow:var(--shadow-lg), var(--glass-highlight);
   transform:translateY(5px);transition:transform 200ms var(--ease);
 }
 .modal-backdrop.open .modal{transform:none}
@@ -793,7 +857,7 @@ footer{
   transition:background 150ms var(--ease), opacity 150ms var(--ease);
 }
 .btn:hover{background:rgba(10,10,10,.04)}
-.btn.primary{background:var(--cta);color:var(--cta-ink);border-color:var(--cta-border);box-shadow:0 1px 2px rgba(24,18,12,.03)}
+.btn.primary{background:var(--cta);color:var(--cta-ink);border-color:var(--cta-border);box-shadow:0 1px 2px rgba(24,18,12,.03), var(--glass-highlight);backdrop-filter:blur(14px) saturate(150%);-webkit-backdrop-filter:blur(14px) saturate(150%)}
 .btn.primary:hover{opacity:.92}
 
 @media (prefers-reduced-motion:reduce){
@@ -831,7 +895,13 @@ footer{
     --cta-ink:#C4BFFF;
     --cta-border:rgba(139,132,255,.28);
     --cta-hover:rgba(139,132,255,.22);
-    --control-bg:rgba(23,24,34,.78);
+    --control-bg:rgba(23,24,34,.55);
+    --glass-fill:rgba(23,24,34,.52);
+    --glass-fill-strong:rgba(28,30,42,.68);
+    --glass-rim:rgba(255,255,255,.10);
+    --glass-rim-soft:rgba(255,255,255,.07);
+    --glass-highlight:inset 0 1px 0 rgba(255,255,255,.10);
+    --glass-shadow:0 1px 2px rgba(0,0,0,.28), 0 6px 18px rgba(0,0,0,.22);
     --ok:#3DB87A;
     --ok-soft:rgba(61,184,122,.2);
     color-scheme:dark;
@@ -863,7 +933,13 @@ footer{
   --cta-ink:#C4BFFF;
   --cta-border:rgba(139,132,255,.28);
   --cta-hover:rgba(139,132,255,.22);
-  --control-bg:rgba(23,24,34,.78);
+  --control-bg:rgba(23,24,34,.55);
+  --glass-fill:rgba(23,24,34,.52);
+  --glass-fill-strong:rgba(28,30,42,.68);
+  --glass-rim:rgba(255,255,255,.10);
+  --glass-rim-soft:rgba(255,255,255,.07);
+  --glass-highlight:inset 0 1px 0 rgba(255,255,255,.10);
+  --glass-shadow:0 1px 2px rgba(0,0,0,.28), 0 6px 18px rgba(0,0,0,.22);
   --ok:#3DB87A;
   --ok-soft:rgba(61,184,122,.2);
   color-scheme:dark;
@@ -877,6 +953,12 @@ footer{
 }
 [data-theme="light"]{
   color-scheme:light;
+  --glass-fill:rgba(255,255,255,.68);
+  --glass-fill-strong:rgba(255,255,255,.82);
+  --glass-rim:rgba(50,40,90,.10);
+  --glass-rim-soft:rgba(50,40,90,.07);
+  --glass-highlight:inset 0 1px 0 rgba(255,255,255,.78);
+  --glass-shadow:0 1px 2px rgba(40,28,12,.04), 0 4px 14px rgba(60,50,120,.05);
 }
 [data-theme="light"] .hero h1{
   color:#7C74F0; /* lighter violet — Beta Q&A */
@@ -885,12 +967,15 @@ footer{
 [data-theme="light"] .hero h1 em{color:#4338CA;text-shadow:none} /* deeper — Center */
 /* Light mode card / control polish — cool clean surfaces (match violet wash) */
 [data-theme="light"] .item{
-  background:#FFFFFF;
-  border-color:rgba(60,50,120,.08);
+  background:rgba(255,255,255,.78);
+  border-color:var(--glass-rim-soft);
+  backdrop-filter:blur(18px) saturate(150%);
+  -webkit-backdrop-filter:blur(18px) saturate(150%);
   box-shadow:
     0 1px 2px rgba(40,30,80,.03),
     0 4px 14px rgba(60,50,120,.045),
-    0 16px 36px rgba(60,50,120,.035);
+    0 16px 36px rgba(60,50,120,.035),
+    inset 0 1px 0 rgba(255,255,255,.85);
 }
 [data-theme="light"] .item:hover{
   border-color:rgba(99,91,255,.18);
@@ -904,9 +989,11 @@ footer{
 [data-theme="light"] .search,
 [data-theme="light"] .sort,
 [data-theme="light"] .fresh span{
-  background:rgba(255,255,255,.94);
-  border-color:rgba(60,50,120,.10);
-  box-shadow:0 1px 2px rgba(40,30,80,.03), 0 2px 10px rgba(99,91,255,.05);
+  background:var(--glass-fill-strong);
+  border-color:var(--glass-rim);
+  box-shadow:var(--glass-shadow), var(--glass-highlight);
+  backdrop-filter:blur(var(--glass-blur)) saturate(var(--glass-sat));
+  -webkit-backdrop-filter:blur(var(--glass-blur)) saturate(var(--glass-sat));
 }
 [data-theme="light"] .chip:hover{
   background:#fff;
@@ -957,62 +1044,12 @@ footer{
 [data-theme="light"] .pill::before{background:#635BFF;box-shadow:0 0 6px rgba(99,91,255,.45)}
 [data-theme="light"] .pill:hover{background:rgba(99,91,255,.14);color:#3730A3}
 
-/* Dark aurora — original #5B66C4 / #6B78E8 soft wash from physical top (no --aurora-top slab) */
+/* Dual-layer aurora washes are baked in .aurora-layer (no var(--bg) cascade lag).
+   Title colors preserved (dark gold / light violet). */
 @media (prefers-color-scheme: dark){
-  :root:not([data-theme="light"]) .aurora{
-    background:linear-gradient(180deg,
-      color-mix(in srgb, #5B66C4 32%, var(--bg)) 0%,
-      color-mix(in srgb, #5B66C4 22%, var(--bg)) 20%,
-      color-mix(in srgb, #6B78E8 12%, var(--bg)) 42%,
-      color-mix(in srgb, #4A54B0 5%, var(--bg)) 68%,
-      transparent 100%);
-    filter:none;opacity:1;
-    -webkit-mask-image:linear-gradient(180deg,#000 0%,#000 40%,rgba(0,0,0,.55) 70%,transparent 100%);
-    mask-image:linear-gradient(180deg,#000 0%,#000 40%,rgba(0,0,0,.55) 70%,transparent 100%);
-  }
-  :root:not([data-theme="light"]) #aurora-sticky{
-    background:linear-gradient(180deg,
-      color-mix(in srgb, #5B66C4 26%, var(--bg)) 0%,
-      color-mix(in srgb, #5B66C4 12%, var(--bg)) 55%,
-      var(--bg) 100%);
-  }
   /* Dark v10.15: lighter gold on Beta Q&A / h1, deeper gold on Center (em) */
   :root:not([data-theme="light"]) .hero h1{color:#FFFBC1;text-shadow:0 0 28px rgba(255,251,193,.18);filter:none}
   :root:not([data-theme="light"]) .hero h1 em{color:#C4B46A;text-shadow:0 0 22px rgba(196,180,106,.16);opacity:1}
-}
-[data-theme="dark"] .aurora{
-  background:linear-gradient(180deg,
-    color-mix(in srgb, #5B66C4 32%, var(--bg)) 0%,
-    color-mix(in srgb, #5B66C4 22%, var(--bg)) 20%,
-    color-mix(in srgb, #6B78E8 12%, var(--bg)) 42%,
-    color-mix(in srgb, #4A54B0 5%, var(--bg)) 68%,
-    transparent 100%);
-  filter:none;opacity:1;
-  -webkit-mask-image:linear-gradient(180deg,#000 0%,#000 40%,rgba(0,0,0,.55) 70%,transparent 100%);
-  mask-image:linear-gradient(180deg,#000 0%,#000 40%,rgba(0,0,0,.55) 70%,transparent 100%);
-}
-[data-theme="dark"] #aurora-sticky{
-  background:linear-gradient(180deg,
-    color-mix(in srgb, #5B66C4 26%, var(--bg)) 0%,
-    color-mix(in srgb, #5B66C4 12%, var(--bg)) 55%,
-    var(--bg) 100%);
-}
-[data-theme="light"] .aurora{
-  background:linear-gradient(180deg,
-    color-mix(in srgb, #A898FF 28%, var(--bg)) 0%,
-    color-mix(in srgb, #A898FF 18%, var(--bg)) 22%,
-    color-mix(in srgb, #B8A8FF 10%, var(--bg)) 48%,
-    color-mix(in srgb, #C8BCFF 4%, var(--bg)) 72%,
-    transparent 100%);
-  filter:none;opacity:1;
-  -webkit-mask-image:linear-gradient(180deg,#000 0%,#000 40%,rgba(0,0,0,.55) 70%,transparent 100%);
-  mask-image:linear-gradient(180deg,#000 0%,#000 40%,rgba(0,0,0,.55) 70%,transparent 100%);
-}
-[data-theme="light"] #aurora-sticky{
-  background:linear-gradient(180deg,
-    color-mix(in srgb, #A898FF 22%, var(--bg)) 0%,
-    color-mix(in srgb, #A898FF 10%, var(--bg)) 55%,
-    var(--bg) 100%);
 }
 [data-theme="light"]{
   --aurora-top:#F6F5FB;
@@ -1023,7 +1060,7 @@ footer{
 [data-theme="dark"] .hero h1{color:#FFFBC1;text-shadow:0 0 28px rgba(255,251,193,.18);filter:none}
 [data-theme="dark"] .hero h1 em{color:#C4B46A;text-shadow:0 0 22px rgba(196,180,106,.16);opacity:1}
 [data-theme="dark"] .shell::after{opacity:.05;mix-blend-mode:screen}
-[data-theme="dark"] .fresh span{background:var(--control-bg);border-color:var(--line);color:var(--muted)}
+[data-theme="dark"] .fresh span{background:var(--glass-fill);border-color:var(--glass-rim);color:var(--muted);box-shadow:var(--glass-shadow), var(--glass-highlight)}
 [data-theme="dark"] .fresh i{background:var(--ok);box-shadow:0 0 0 3px var(--ok-soft)}
 [data-theme="dark"] .theme-toggle{
   color:var(--muted);
@@ -1035,8 +1072,8 @@ footer{
   border-color:rgba(255,255,255,.22);
   background:linear-gradient(180deg, rgba(255,255,255,.16) 0%, rgba(255,255,255,.07) 55%, rgba(255,255,255,.04) 100%);
 }
-[data-theme="dark"] .chip{background:var(--control-bg);color:var(--ink-soft)}
-[data-theme="dark"] .chip:hover{background:var(--surface)}
+[data-theme="dark"] .chip{background:var(--glass-fill);border-color:var(--glass-rim);color:var(--ink-soft);box-shadow:var(--glass-shadow), var(--glass-highlight)}
+[data-theme="dark"] .chip:hover{background:var(--glass-fill-strong)}
 [data-theme="dark"] .chip[aria-selected="true"]{
   background:color-mix(in srgb, var(--accent) 18%, var(--surface));
   border-color:color-mix(in srgb, var(--accent) 36%, transparent);
@@ -1044,7 +1081,7 @@ footer{
   box-shadow:none;
 }
 [data-theme="dark"] .search,
-[data-theme="dark"] .sort{background:var(--control-bg)}
+[data-theme="dark"] .sort{background:var(--glass-fill);border-color:var(--glass-rim);box-shadow:var(--glass-shadow), var(--glass-highlight)}
 [data-theme="dark"] .sort button[aria-pressed="true"]{
   background:color-mix(in srgb, var(--accent) 18%, var(--surface));
   color:var(--accent-deep);
@@ -1054,14 +1091,16 @@ footer{
   background:var(--cta);color:var(--cta-ink);border-color:var(--cta-border);
   box-shadow:0 1px 2px rgba(0,0,0,.2);
 }
-[data-theme="dark"] .item{background:var(--surface);border-color:var(--line)}
+[data-theme="dark"] .item{background:color-mix(in srgb, var(--surface) 78%, transparent);border-color:var(--glass-rim-soft);backdrop-filter:blur(18px) saturate(150%);-webkit-backdrop-filter:blur(18px) saturate(150%);box-shadow:var(--shadow-md), var(--glass-highlight)}
 [data-theme="dark"] .item summary::after{border-color:var(--faint)}
 [data-theme="dark"] .item[open] summary::after{border-color:var(--muted)}
 [data-theme="dark"] .pill{
   background:rgba(46,160,67,.16);color:#3FB950;
   border:1px solid rgba(63,185,80,.22);
-  box-shadow:none;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.06);
   filter:none;
+  backdrop-filter:blur(12px) saturate(150%);
+  -webkit-backdrop-filter:blur(12px) saturate(150%);
 }
 [data-theme="dark"] .pill::before{background:#3FB950;box-shadow:none;filter:none}
 [data-theme="dark"] .pill:hover{background:rgba(46,160,67,.24);color:#56D364;box-shadow:none}
@@ -1069,7 +1108,7 @@ footer{
   background:rgba(139,132,255,.12);border-color:rgba(139,132,255,.2);color:var(--accent-deep);
 }
 [data-theme="dark"] .empty{background:rgba(23,24,34,.55)}
-[data-theme="dark"] .modal{background:var(--surface)}
+[data-theme="dark"] .modal{background:color-mix(in srgb, var(--surface) 82%, transparent);border-color:var(--glass-rim);backdrop-filter:blur(24px) saturate(160%);-webkit-backdrop-filter:blur(24px) saturate(160%)}
 [data-theme="dark"] .modal select,
 [data-theme="dark"] .modal textarea{background:var(--bg-deep);color:var(--ink-soft)}
 [data-theme="dark"] .btn.primary{
@@ -1227,8 +1266,13 @@ footer{
 </style>
 </head>
 <body>
-<div id="aurora-sticky" aria-hidden="true"></div>
+<div id="aurora-sticky" aria-hidden="true">
+  <div class="aurora-layer layer-dark is-active" data-aurora="dark"></div>
+  <div class="aurora-layer layer-light" data-aurora="light"></div>
+</div>
 <div class="aurora" aria-hidden="true" id="aurora">
+  <div class="aurora-layer layer-dark is-active" data-aurora="dark"></div>
+  <div class="aurora-layer layer-light" data-aurora="light"></div>
   <div class="aurora-crown"></div>
   <div class="aurora-blobs"></div>
 </div>
@@ -1408,21 +1452,21 @@ document.getElementById("askSubmit").addEventListener("click",()=>{
 });
 /* fresh bar is non-sticky silk — no scroll hide */
 
-/* Theme toggle v8 — first visit defaults to DARK (manual-v8).
-   Toggle persists light/dark. Prior keys wiped (incl v7). */
+/* Theme toggle v10.19 — dual-layer aurora crossfade + same-tick --bg/theme-color.
+   First visit defaults to DARK (manual-v8). Toggle persists light/dark. */
 (function(){
   const MANUAL='flip-beta-qa-theme-manual-v8';
   const STALE=['flip-beta-qa-theme','flip-beta-qa-theme-v1','flip-beta-qa-theme-v2','flip-beta-qa-theme-manual','flip-beta-qa-theme-v3','flip-beta-qa-theme-manual-v4','flip-beta-qa-theme-manual-v5','flip-beta-qa-theme-manual-v6','flip-beta-qa-theme-manual-v7'];
   const root=document.documentElement;
   const btn=document.getElementById('themeToggle');
-  const meta=document.getElementById('themeColorMeta');
-  const metaL=document.getElementById('themeColorMetaLight');
-  const metaD=document.getElementById('themeColorMetaDark');
   const LIGHT_TC='#F6F5FB'; /* theme-color = --bg */
   const DARK_TC='#0E0F14';
   const LIGHT_BG='#F6F5FB';
   const DARK_BG='#0E0F14';
   for(const k of STALE){try{localStorage.removeItem(k)}catch(e){}}
+  function metaEl(){return document.getElementById('themeColorMeta')}
+  function metaLEl(){return document.getElementById('themeColorMetaLight')}
+  function metaDEl(){return document.getElementById('themeColorMetaDark')}
   function manualPref(){
     try{
       const s=localStorage.getItem(MANUAL);
@@ -1432,17 +1476,24 @@ document.getElementById("askSubmit").addEventListener("click",()=>{
   function current(){
     const a=root.getAttribute('data-theme');
     if(a==='dark'||a==='light') return a;
-    return 'dark'; /* default */
+    return 'dark';
   }
-  function setThemeColor(theme){
-    const tc=theme==='dark'?DARK_TC:LIGHT_TC;
-    const bg=theme==='dark'?DARK_BG:LIGHT_BG;
-    /* Sync ALL theme-color metas so iOS Safari chrome matches --bg immediately */
-    if(meta) meta.setAttribute('content', tc);
-    if(metaL) metaL.setAttribute('content', tc);
-    if(metaD) metaD.setAttribute('content', tc);
+  /* Sync dual-layer aurora: outgoing fades out, incoming fades in via CSS opacity (~200ms). */
+  function syncAuroraLayers(theme){
+    const t=theme==='light'?'light':'dark';
+    document.querySelectorAll('.aurora-layer').forEach(function(layer){
+      const on=layer.getAttribute('data-aurora')===t;
+      layer.classList.toggle('is-active', on);
+    });
+  }
+  /* SAME TICK: --bg + html/body + ALL theme-color metas + aurora layer classes. */
+  function paintTheme(theme){
+    const t=theme==='light'?'light':'dark';
+    const tc=t==='dark'?DARK_TC:LIGHT_TC;
+    const bg=t==='dark'?DARK_BG:LIGHT_BG;
     try{
-      /* Force html/body paint to --bg; clear any stale cascade locks */
+      root.style.setProperty('--bg', bg);
+      root.style.setProperty('--aurora-top', bg);
       root.style.setProperty('background-color', bg);
       root.style.setProperty('background', bg);
       if(document.body){
@@ -1450,89 +1501,53 @@ document.getElementById("askSubmit").addEventListener("click",()=>{
         document.body.style.setProperty('background', bg);
       }
     }catch(e){}
-    if(btn){
-      btn.setAttribute('aria-label', theme==='dark'?'Switch to light theme':'Switch to dark theme');
-      btn.title=theme==='dark'?'Light':'Dark';
-    }
-  }
-  /* Strip inline styles that can freeze aurora/sticky on the previous theme (iOS Safari). */
-  function clearAuroraInline(el){
-    if(!el||!el.style) return;
+    let meta=metaEl(), metaL=metaLEl(), metaD=metaDEl();
+    if(meta) meta.setAttribute('content', tc);
+    if(metaL) metaL.setAttribute('content', tc);
+    if(metaD) metaD.setAttribute('content', tc);
+    /* Bounce theme-color metas so iOS Safari chrome updates same frame */
     try{
-      el.style.removeProperty('opacity');
-      el.style.removeProperty('transform');
-      el.style.removeProperty('background');
-      el.style.removeProperty('background-image');
-      el.style.removeProperty('filter');
-      el.style.removeProperty('will-change');
-      el.classList.remove('aurora-repaint');
+      ['themeColorMeta','themeColorMetaLight','themeColorMetaDark'].forEach(function(id){
+        const el=document.getElementById(id);
+        if(!el||!el.parentNode) return;
+        const next=el.cloneNode(true);
+        next.setAttribute('content', tc);
+        el.parentNode.replaceChild(next, el);
+      });
     }catch(e){}
-  }
-  /* Force fixed aurora + sticky wash to repaint with new --bg (Safari compositor lag).
-     Strengthened: clear stale inlines → cloneNode replace → class toggle + double rAF. */
-  function repaintAurora(){
-    const ids=['aurora','aurora-sticky'];
-    for(const id of ids){
-      let el=document.getElementById(id);
-      if(!el||!el.parentNode) continue;
-      try{
-        clearAuroraInline(el);
-        /* Clone replace rebuilds the compositor layer with current CSS (data-theme / --bg) */
-        const clone=el.cloneNode(true);
-        clearAuroraInline(clone);
-        el.parentNode.replaceChild(clone, el);
-        el=clone;
-        void el.offsetHeight;
-        el.classList.add('aurora-repaint');
-        void el.offsetHeight;
-        el.classList.remove('aurora-repaint');
-        /* Tiny transform bounce to re-promote will-change layer */
-        el.style.transform='translateZ(0.1px)';
-        void el.offsetHeight;
-        el.style.removeProperty('transform');
-      }catch(e){}
+    syncAuroraLayers(t);
+    if(btn){
+      btn.setAttribute('aria-label', t==='dark'?'Switch to light theme':'Switch to dark theme');
+      btn.title=t==='dark'?'Light':'Dark';
     }
   }
   function applyDefaultDark(){
     root.setAttribute('data-theme', 'dark');
     root.style.colorScheme='dark';
-    setThemeColor('dark');
-    repaintAurora();
-    /* do not persist — first visit only until user toggles */
+    paintTheme('dark');
   }
   function applyManual(theme){
-    root.setAttribute('data-theme', theme);
-    root.style.colorScheme=theme;
-    try{localStorage.setItem(MANUAL, theme)}catch(e){}
-    setThemeColor(theme);
-    /* double rAF: wait for CSS var/--bg cascade, then force full aurora rebuild */
-    requestAnimationFrame(()=>{
-      repaintAurora();
-      requestAnimationFrame(()=>{
-        repaintAurora();
-        /* third tick: re-sync theme-color after Safari settles chrome */
-        setThemeColor(theme);
-      });
-    });
+    const t=theme==='light'?'light':'dark';
+    /* data-theme + paint in one synchronous turn — body & island share the frame */
+    root.setAttribute('data-theme', t);
+    root.style.colorScheme=t;
+    try{localStorage.setItem(MANUAL, t)}catch(e){}
+    paintTheme(t);
+    /* one follow-up rAF: re-assert theme-color if Safari deferred chrome */
+    requestAnimationFrame(function(){ paintTheme(t); });
   }
   const saved=manualPref();
   if(saved) applyManual(saved);
   else applyDefaultDark();
-  if(btn) btn.addEventListener('click',()=>{
+  if(btn) btn.addEventListener('click',function(){
     applyManual(current()==='dark'?'light':'dark');
   });
-  /* Persist wash after bfcache / tab return / address-bar resize (iOS) */
-  window.addEventListener('pageshow',()=>{repaintAurora()});
-  document.addEventListener('visibilitychange',()=>{
-    if(document.visibilityState==='visible') repaintAurora();
+  /* Re-sync layers after bfcache / tab return (do not rebuild — opacity classes only) */
+  function resync(){ syncAuroraLayers(current()); paintTheme(current()); }
+  window.addEventListener('pageshow', resync);
+  document.addEventListener('visibilitychange', function(){
+    if(document.visibilityState==='visible') resync();
   });
-  if(window.visualViewport){
-    let vvT=null;
-    window.visualViewport.addEventListener('resize',()=>{
-      clearTimeout(vvT);
-      vvT=setTimeout(repaintAurora, 60);
-    });
-  }
 })();
 
 
