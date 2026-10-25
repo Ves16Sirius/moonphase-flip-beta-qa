@@ -77,7 +77,8 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/geist-mono@5.2.5/index.min.css" />
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&display=swap" />
 <style>
-/* Overhaul 2026-10-25 v10.45 — Ask sheet: (1) head/body boundary — .modal-head gets 14px (desktop) / 16px (mobile) bottom padding (body top padding trimmed so the resting gap is ~unchanged); while .modal-body is scrolled (scrollTop>0 → .is-scrolled on the sheet) a --line hairline shows under the head and the top 12px of the scroll area fades, so content clips cleanly instead of butting into the subtitle. (2) Single scroller — #askQ has no max-height and overflow:hidden; it autogrows to full content height and only .modal-body scrolls (overscroll-behavior:contain). While typing, the body nudges (instant, only when needed) to keep the caret line visible above the keyboard/visualViewport. Colors, fonts, drag-dismiss rules, matching, opaque bottom, ids unchanged. */
+/* Overhaul 2026-10-25 v10.46 — Ask sheet underfill (mobile ≤719): stop relying on clipped box-shadow fill (overflow:hidden killed the v10.42 60vh surface shadow). Raise --sheet-over to min(70vh,560px) so the sheet's own solid --surface physically extends far below the viewport (padding-bottom + negative margin-bottom); box-shadow is elevation only. Force solid --surface + no backdrop-filter on .modal / .modal-head / .modal-foot (all themes) so Safari dark glass never peeks; stronger warm scrim with deeper bottom overflow. Head stays opaque while body scrolls. Desktop ≥720 modal unchanged. Also: light-mode theme-toggle sun face/icon → bright #FFD84D (was muted #8A6410); dark-mode moon unchanged. Colors otherwise, fonts, drag, matching, ids unchanged. */
+/* v10.45 — Ask sheet: (1) head/body boundary — .modal-head gets 14px (desktop) / 16px (mobile) bottom padding (body top padding trimmed so the resting gap is ~unchanged); while .modal-body is scrolled (scrollTop>0 → .is-scrolled on the sheet) a --line hairline shows under the head and the top 12px of the scroll area fades, so content clips cleanly instead of butting into the subtitle. (2) Single scroller — #askQ has no max-height and overflow:hidden; it autogrows to full content height and only .modal-body scrolls (overscroll-behavior:contain). While typing, the body nudges (instant, only when needed) to keep the caret line visible above the keyboard/visualViewport. Colors, fonts, drag-dismiss rules, matching, opaque bottom, ids unchanged. */
 /* v10.44 — Entry ids: FB-xxx → readable kebab-case slugs (e.g. first-steps, ios-build); #slug / ?id=slug deep links open + scroll to the card; legacy #FB-xxx / ?id=FB-xxx resolve via LEGACY_IDS. Mobile Ask sheet loosened (spacing only): 22px sides, ~24px section rhythm, 10px label gap, 34px/14px topic + phone chips, textarea 14/16 padding at 1.5 line-height, 44px Cancel target, body scrolls instead of squeezing. Colors, fonts, aurora, sort thumb, page chips, Ask behavior unchanged. */
 :root{
   /* Surfaces */
@@ -414,7 +415,7 @@ a:hover{text-decoration:underline;text-underline-offset:3px}
   width:12px;height:12px;display:block;
 }
 .theme-toggle .tt-face-moon{color:#FFF8D0;opacity:1} /* dark-first default until theme attrs apply */
-.theme-toggle .tt-face-sun{color:#8A6410;opacity:0}
+.theme-toggle .tt-face-sun{color:#FFD84D;opacity:0}
 /* Dark (default): thumb left, moon face on; sun stays visible on track right */
 @media (prefers-color-scheme: dark){
   :root:not([data-theme="light"]) .theme-toggle .tt-thumb{
@@ -447,9 +448,9 @@ a:hover{text-decoration:underline;text-underline-offset:3px}
     0 4px 10px rgba(40,28,12,.14),
     inset 0 1px 0 rgba(255,255,255,1);
 }
-[data-theme="light"] .theme-toggle .tt-face-sun{opacity:1;color:#8A6410}
+[data-theme="light"] .theme-toggle .tt-face-sun{opacity:1;color:#FFD84D}
 [data-theme="light"] .theme-toggle .tt-face-moon{opacity:0}
-[data-theme="light"] .theme-toggle .icon-sun{opacity:0}
+[data-theme="light"] .theme-toggle .icon-sun{opacity:0;color:#FFD84D}
 [data-theme="light"] .theme-toggle .icon-moon{opacity:.92;color:#2A2640}
 [data-theme="light"] .theme-toggle{
   /* Soft clear glass — icons readable, not washed out / muddy */
@@ -1482,10 +1483,11 @@ footer{
     padding-top:env(safe-area-inset-top, 0px);
   }
   /* v10.41 sheet: backdrop itself never fades on mobile — the scrim (::before) fades and the sheet slides.
-     The sheet extends 40px below the screen (padding + negative margin) so spring overshoot never shows a gap. */
+     v10.46: sheet extends far below the screen via large --sheet-over (padding + negative margin) so Safari chrome never shows page cards. */
   .modal-backdrop{opacity:1;transition:none}
   .modal{
-    --sheet-over:40px;
+    /* v10.46: large solid extension below the fold (Safari chrome / home indicator). Foot sits above via padding-bottom. */
+    --sheet-over:min(70vh, 560px);
     width:100%;max-width:100%;
     height:auto;
     max-height:calc(85vh + var(--sheet-over));max-height:calc(85dvh + var(--sheet-over));
@@ -1532,18 +1534,29 @@ footer{
   .modal textarea#askQ{max-height:none} /* v10.45: was 40dvh — no nested scroller */
   /* v10.42: typed text stays 16px (iOS zoom guard); placeholder is quieter at 14px */
   .modal textarea#askQ::placeholder{font-size:14px;letter-spacing:-.006em}
-  /* v10.42 opaque sheet: solid --surface (same color, no translucency/blur) so nothing behind shows through.
-     A solid offset shadow paints the same color far below the sheet's bottom edge (under the home indicator and
-     Safari's floating toolbar); the scrim also overflows the viewport bottom so the page is covered everywhere. */
-  .modal-backdrop::before{top:-120px;bottom:-240px}
+  /* v10.46 opaque sheet: solid --surface on sheet/head/foot (beats dark glass rules). Under-fill is the
+     sheet's own background via large --sheet-over — NOT a box-shadow (overflow:hidden clipped that).
+     Elevation shadow only. Stronger warm scrim + deeper bottom overflow so page cards can't read through. */
+  .modal-backdrop::before{
+    top:-120px;bottom:-320px;
+    background:rgba(16,14,12,.58);
+  }
+  .modal,
+  .modal-head,
+  .modal-foot,
+  :root:not([data-theme="light"]) .modal,
+  :root:not([data-theme="light"]) .modal-head,
+  :root:not([data-theme="light"]) .modal-foot,
+  [data-theme="dark"] .modal,[data-theme="dark"] .modal-head,[data-theme="dark"] .modal-foot,
+  [data-theme="light"] .modal,[data-theme="light"] .modal-head,[data-theme="light"] .modal-foot{
+    background:var(--surface) !important;
+    backdrop-filter:none !important;-webkit-backdrop-filter:none !important;
+  }
   .modal,
   :root:not([data-theme="light"]) .modal,
   [data-theme="dark"] .modal,[data-theme="light"] .modal{
-    background:var(--surface);
-    backdrop-filter:none;-webkit-backdrop-filter:none;
-    box-shadow:0 60vh 0 0 var(--surface), var(--shadow-lg), var(--glass-highlight);
+    box-shadow:var(--shadow-lg), var(--glass-highlight);
   }
-  .modal-foot{background:var(--surface);backdrop-filter:none;-webkit-backdrop-filter:none}
   .modal .ask-os{margin:0 0 10px}
   .ask-topics{gap:8px;margin:0 0 10px}
   .ask-topic{
