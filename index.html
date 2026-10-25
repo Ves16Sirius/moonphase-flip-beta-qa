@@ -47,13 +47,8 @@
         if(metaD) metaD.setAttribute('content', DARK_TC);
       }
       /* Paint --bg (same hex as theme-color). Fixed aurora washes on top from viewport y=0. */
-      try{
-        document.documentElement.style.setProperty('--bg', bg);
-        document.documentElement.style.setProperty('--aurora-top', bg);
-        document.documentElement.style.backgroundColor=bg;
-        document.documentElement.style.background=bg;
-      }catch(e){}
-      try{if(document.body){document.body.style.backgroundColor=bg;document.body.style.background=bg}}catch(e){}
+      document.documentElement.style.backgroundColor=bg;
+      try{if(document.body) document.body.style.backgroundColor=bg}catch(e){}
     }
     if(saved){
       document.documentElement.setAttribute('data-theme', saved);
@@ -81,7 +76,7 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/geist-mono@5.2.5/index.min.css" />
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600&display=swap" />
 <style>
-/* Overhaul 2026-10-25 v10.18 — golden chrome bar (Moonphase | Updated+toggle) · hero below · same-frame top theme paint */
+/* Overhaul 2026-10-25 v10.17 — brand+toggle under island · Updated below · aurora theme-sync · quiet glass toggle · sharper card titles */
 :root{
   /* Surfaces */
   --bg:#F6F5FB;
@@ -231,30 +226,28 @@ a{color:var(--accent-deep);text-decoration:none}
 a:hover{text-decoration:underline;text-underline-offset:3px}
 ::selection{background:var(--accent-soft);color:var(--ink)}
 
-/* —— Updated chip —— lives IN golden chrome bar (right of logo, left of toggle) —— */
+/* —— Updated chip —— sits BELOW brand row (centered), no island inset —— */
 .fresh{
-  display:inline-flex;justify-content:flex-end;align-items:center;
-  padding:0;margin:0;
+  display:flex;justify-content:center;align-items:center;
+  padding:0 18px;
+  margin:0 0 22px;
   background:transparent;border:0;box-shadow:none;
-  flex:0 0 auto;
 }
 .fresh span{
-  display:inline-flex;align-items:center;gap:6px;
-  height:28px;padding:0 10px;border-radius:999px;
+  display:inline-flex;align-items:center;gap:8px;
+  padding:6px 12px;border-radius:999px;
   background:var(--control-bg);
   border:1px solid var(--line);
   backdrop-filter:blur(16px) saturate(140%);
   -webkit-backdrop-filter:blur(16px) saturate(140%);
   box-shadow:var(--shadow-sm);
-  font-family:var(--mono);font-size:11px;font-weight:var(--fw-medium);
+  font-family:var(--mono);font-size:var(--fs-mono);font-weight:var(--fw-medium);
   letter-spacing:.02em;color:var(--muted);
-  white-space:nowrap;line-height:1;
-  box-sizing:border-box;
 }
 .fresh i{
-  width:5px;height:5px;border-radius:50%;background:var(--ok);
+  width:6px;height:6px;border-radius:50%;background:var(--ok);
   display:inline-block;flex:0 0 auto;
-  box-shadow:0 0 0 2.5px var(--ok-soft); /* soft ring only — no scatter glow */
+  box-shadow:0 0 0 3px var(--ok-soft); /* soft ring only — no scatter glow */
   animation:none;
 }
 @media (prefers-reduced-motion:reduce){
@@ -278,25 +271,23 @@ a:hover{text-decoration:underline;text-underline-offset:3px}
 }
 .shell > *{position:relative;z-index:1}
 
-/* —— Golden chrome bar —— v10.18: ONE premium top under island.
-   Left small Moonphase · Right Updated chip + theme toggle · Hero BELOW. */
+/* —— Brand row —— v10.17: TOP under island = Moonphase left + theme toggle right.
+   Updated badge is BELOW this row (centered). Hero stays the headline. */
 .brand{
-  display:flex;align-items:center;justify-content:space-between;gap:10px;
-  margin:0 0 18px;padding:calc(env(safe-area-inset-top, 0px) + 10px) 0 0;
-  position:relative;min-height:28px;
+  display:flex;align-items:flex-start;justify-content:space-between;gap:8px;
+  /* Island / notch clearance lives here now (was on .fresh) */
+  margin:0 0 12px;padding:calc(env(safe-area-inset-top, 0px) + 14px) 0 0;
+  position:relative;min-height:22px;
 }
 .brand-slot{
-  display:flex;align-items:center;min-width:0;min-height:28px;
+  flex:1 1 0;display:flex;align-items:flex-start;min-width:0;min-height:22px;
 }
-.brand-slot-start{flex:1 1 auto;justify-content:flex-start}
-.brand-slot-end{
-  flex:0 0 auto;justify-content:flex-end;align-items:center;
-  gap:8px; /* Updated ↔ toggle */
-}
+.brand-slot-start{justify-content:flex-start}
+.brand-slot-end{justify-content:flex-end}
 .brand-mark{
-  flex:0 0 auto;display:flex;align-items:center;justify-content:flex-start;
+  flex:0 0 auto;display:flex;align-items:flex-start;justify-content:flex-start;
 }
-.brand .wm{height:18px;width:auto;display:block}
+.brand .wm{height:21px;width:auto;display:block}
 /* Quiet premium glass moon|sun switch — Linear/Vercel/Apple: soft rim, readable icons, no neon chrome
    Dims: --tt-w/--tt-h track, --tt-pad inset, --tt-thumb size, --tt-travel = w - 2*pad - thumb */
 .theme-toggle{
@@ -306,8 +297,8 @@ a:hover{text-decoration:underline;text-underline-offset:3px}
   --tt-thumb:22px;
   --tt-travel:calc(var(--tt-w) - (var(--tt-pad) * 2) - var(--tt-thumb));
   position:relative;transform:none;isolation:isolate;
-  align-self:center;
-  margin-top:0;
+  align-self:flex-start;
+  margin-top:-2px; /* optical flush with MOONPHASE glyph tops */
   height:var(--tt-h);min-height:var(--tt-h);
   width:var(--tt-w);min-width:var(--tt-w);
   padding:0;border-radius:999px;gap:0;
@@ -478,9 +469,9 @@ a:hover{text-decoration:underline;text-underline-offset:3px}
   .theme-toggle .tt-icon,.theme-toggle .tt-thumb-face{transition:opacity .12s ease, color .12s ease}
 }
 
-/* —— Hero: BELOW golden chrome bar (editorial, tighter top) —— */
+/* —— Hero: editorial air (8px rhythm) —— */
 .hero{
-  margin:0 auto 36px;max-width:640px;
+  margin:0 auto 40px;max-width:640px;
   text-align:center;display:flex;flex-direction:column;align-items:center;
 }
 .hero h1{
@@ -1149,8 +1140,10 @@ footer{
 
 /* —— Mobile rhythm —— */
 @media (max-width:719px){
-  .fresh{padding:0;margin:0}
-  .fresh span{height:26px;padding:0 9px;font-size:10.5px;gap:5px}
+  .fresh{
+    padding:0 max(18px, env(safe-area-inset-right, 0px)) 0 max(18px, env(safe-area-inset-left, 0px));
+    margin:0 0 18px;
+  }
   .shell{
     width:100%;max-width:100%;margin:0;
     padding-top:0;
@@ -1167,22 +1160,23 @@ footer{
     height:calc(env(safe-area-inset-top, 0px) + 88px);
   }
   .brand{
-    margin:0 0 14px;min-height:26px;align-items:center;
-    padding:calc(env(safe-area-inset-top, 0px) + 8px) 0 0;
-    gap:8px;
+    margin:0 0 10px;min-height:20px;align-items:flex-start;
+    padding:calc(env(safe-area-inset-top, 0px) + 12px) 0 0;
   }
-  .brand-slot{min-height:26px;align-items:center}
-  .brand-slot-end{gap:6px}
-  .brand .wm{height:16px}
+  .brand-slot{min-height:20px;align-items:flex-start}
+  .brand .wm{height:20px}
   .theme-toggle{
-    --tt-w:54px;
-    --tt-h:26px;
+    /* Outer height matches Updated badge; travel = 58 - 2*3 - 22 = 30 */
+    --tt-w:58px;
+    --tt-h:28px;
     --tt-pad:3px;
-    --tt-thumb:20px;
+    --tt-thumb:22px;
     --tt-travel:calc(var(--tt-w) - (var(--tt-pad) * 2) - var(--tt-thumb));
     height:var(--tt-h);min-height:var(--tt-h);
     width:var(--tt-w);min-width:var(--tt-w);
-    padding:0;gap:0;margin-top:0;
+    padding:0;gap:0;
+    /* Optical: pill top = MOONPHASE glyph top (SVG ink sits slightly below box top) */
+    margin-top:-3px;
   }
   .theme-toggle .tt-icon svg,
   .theme-toggle .tt-thumb-face svg{width:12px;height:12px}
@@ -1239,15 +1233,14 @@ footer{
   <div class="aurora-blobs"></div>
 </div>
 <div class="shell">
-  <div class="brand" aria-label="Site chrome">
+  <div class="brand">
     <div class="brand-slot brand-slot-start">
       <div class="brand-mark">
-        <img class="wm wm-light" src="wordmark-flip.svg" width="133" height="18" alt="Moonphase Flip" decoding="async" />
-        <img class="wm wm-dark" src="wordmark-flip-white.svg" width="133" height="18" alt="Moonphase Flip" decoding="async" />
+        <img class="wm wm-light" src="wordmark-flip.svg" width="155" height="21" alt="Moonphase Flip" decoding="async" />
+        <img class="wm wm-dark" src="wordmark-flip-white.svg" width="155" height="21" alt="Moonphase Flip" decoding="async" />
       </div>
     </div>
     <div class="brand-slot brand-slot-end">
-      <div class="fresh" role="status"><span><i aria-hidden="true"></i> Updated Oct 25, 2026</span></div>
       <button type="button" class="theme-toggle" id="themeToggle" aria-label="Switch to dark theme" title="Theme">
         <span class="tt-track" aria-hidden="true">
           <span class="tt-icon icon-moon"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M21 14.5A8.5 8.5 0 0 1 9.5 3 7 7 0 1 0 21 14.5z"/></svg></span>
@@ -1260,6 +1253,7 @@ footer{
       </button>
     </div>
   </div>
+  <div class="fresh" role="status"><span><i aria-hidden="true"></i> Updated Oct 25, 2026</span></div>
   <div class="hero">
     <h1>Beta Q&amp;A <em>Center</em></h1>
     <p class="sub">Answers for Flip beta testers — search a topic, or open a card.</p>
@@ -1421,9 +1415,9 @@ document.getElementById("askSubmit").addEventListener("click",()=>{
   const STALE=['flip-beta-qa-theme','flip-beta-qa-theme-v1','flip-beta-qa-theme-v2','flip-beta-qa-theme-manual','flip-beta-qa-theme-v3','flip-beta-qa-theme-manual-v4','flip-beta-qa-theme-manual-v5','flip-beta-qa-theme-manual-v6','flip-beta-qa-theme-manual-v7'];
   const root=document.documentElement;
   const btn=document.getElementById('themeToggle');
-  function metaEl(){return document.getElementById('themeColorMeta')}
-  function metaLEl(){return document.getElementById('themeColorMetaLight')}
-  function metaDEl(){return document.getElementById('themeColorMetaDark')}
+  const meta=document.getElementById('themeColorMeta');
+  const metaL=document.getElementById('themeColorMetaLight');
+  const metaD=document.getElementById('themeColorMetaDark');
   const LIGHT_TC='#F6F5FB'; /* theme-color = --bg */
   const DARK_TC='#0E0F14';
   const LIGHT_BG='#F6F5FB';
@@ -1440,43 +1434,15 @@ document.getElementById("askSubmit").addEventListener("click",()=>{
     if(a==='dark'||a==='light') return a;
     return 'dark'; /* default */
   }
-  /* Explicit aurora gradients (resolved --bg hex) — set as INLINE so top matches body same frame.
-     Avoid relying on CSS cascade / color-mix(var(--bg)) which lag on iOS fixed layers. */
-  function auroraWash(theme, kind){
-    const bg=theme==='dark'?DARK_BG:LIGHT_BG;
-    if(theme==='dark'){
-      if(kind==='sticky'){
-        return 'linear-gradient(180deg, color-mix(in srgb, #5B66C4 26%, '+bg+') 0%, color-mix(in srgb, #5B66C4 12%, '+bg+') 55%, '+bg+' 100%)';
-      }
-      return 'linear-gradient(180deg, color-mix(in srgb, #5B66C4 32%, '+bg+') 0%, color-mix(in srgb, #5B66C4 22%, '+bg+') 20%, color-mix(in srgb, #6B78E8 12%, '+bg+') 42%, color-mix(in srgb, #4A54B0 5%, '+bg+') 68%, transparent 100%)';
-    }
-    if(kind==='sticky'){
-      return 'linear-gradient(180deg, color-mix(in srgb, #A898FF 22%, '+bg+') 0%, color-mix(in srgb, #A898FF 10%, '+bg+') 55%, '+bg+' 100%)';
-    }
-    return 'linear-gradient(180deg, color-mix(in srgb, #A898FF 28%, '+bg+') 0%, color-mix(in srgb, #A898FF 18%, '+bg+') 22%, color-mix(in srgb, #B8A8FF 10%, '+bg+') 48%, color-mix(in srgb, #C8BCFF 4%, '+bg+') 72%, transparent 100%)';
-  }
   function setThemeColor(theme){
     const tc=theme==='dark'?DARK_TC:LIGHT_TC;
     const bg=theme==='dark'?DARK_BG:LIGHT_BG;
-    let meta=metaEl(), metaL=metaLEl(), metaD=metaDEl();
     /* Sync ALL theme-color metas so iOS Safari chrome matches --bg immediately */
     if(meta) meta.setAttribute('content', tc);
     if(metaL) metaL.setAttribute('content', tc);
     if(metaD) metaD.setAttribute('content', tc);
-    /* iOS sometimes ignores content mutations — bounce ALL theme-color metas */
     try{
-      ['themeColorMeta','themeColorMetaLight','themeColorMetaDark'].forEach(function(id){
-        const el=document.getElementById(id);
-        if(!el||!el.parentNode) return;
-        const next=el.cloneNode(true);
-        next.setAttribute('content', tc);
-        el.parentNode.replaceChild(next, el);
-      });
-    }catch(e){}
-    try{
-      /* Force --bg + html/body paint in the SAME frame as data-theme */
-      root.style.setProperty('--bg', bg);
-      root.style.setProperty('--aurora-top', bg);
+      /* Force html/body paint to --bg; clear any stale cascade locks */
       root.style.setProperty('background-color', bg);
       root.style.setProperty('background', bg);
       if(document.body){
@@ -1489,48 +1455,64 @@ document.getElementById("askSubmit").addEventListener("click",()=>{
       btn.title=theme==='dark'?'Light':'Dark';
     }
   }
-  /* Paint .aurora + #aurora-sticky INLINE for current theme — top must match bottom same frame. */
-  function paintTopChrome(theme){
-    const t=theme==='light'?'light':'dark';
-    setThemeColor(t);
-    const aurora=document.getElementById('aurora');
-    const sticky=document.getElementById('aurora-sticky');
+  /* Strip inline styles that can freeze aurora/sticky on the previous theme (iOS Safari). */
+  function clearAuroraInline(el){
+    if(!el||!el.style) return;
     try{
-      if(aurora){
-        aurora.style.setProperty('background', auroraWash(t, 'main'));
-        aurora.style.setProperty('opacity', '1');
-        aurora.style.setProperty('filter', 'none');
-        aurora.style.setProperty('transform', 'translateZ(0)');
-        aurora.classList.remove('aurora-repaint');
-        void aurora.offsetHeight;
-      }
-      if(sticky){
-        sticky.style.setProperty('background', auroraWash(t, 'sticky'));
-        sticky.style.setProperty('opacity', '1');
-        sticky.style.setProperty('transform', 'translateZ(0)');
-        sticky.classList.remove('aurora-repaint');
-        void sticky.offsetHeight;
-      }
+      el.style.removeProperty('opacity');
+      el.style.removeProperty('transform');
+      el.style.removeProperty('background');
+      el.style.removeProperty('background-image');
+      el.style.removeProperty('filter');
+      el.style.removeProperty('will-change');
+      el.classList.remove('aurora-repaint');
     }catch(e){}
   }
+  /* Force fixed aurora + sticky wash to repaint with new --bg (Safari compositor lag).
+     Strengthened: clear stale inlines → cloneNode replace → class toggle + double rAF. */
   function repaintAurora(){
-    paintTopChrome(current());
+    const ids=['aurora','aurora-sticky'];
+    for(const id of ids){
+      let el=document.getElementById(id);
+      if(!el||!el.parentNode) continue;
+      try{
+        clearAuroraInline(el);
+        /* Clone replace rebuilds the compositor layer with current CSS (data-theme / --bg) */
+        const clone=el.cloneNode(true);
+        clearAuroraInline(clone);
+        el.parentNode.replaceChild(clone, el);
+        el=clone;
+        void el.offsetHeight;
+        el.classList.add('aurora-repaint');
+        void el.offsetHeight;
+        el.classList.remove('aurora-repaint');
+        /* Tiny transform bounce to re-promote will-change layer */
+        el.style.transform='translateZ(0.1px)';
+        void el.offsetHeight;
+        el.style.removeProperty('transform');
+      }catch(e){}
+    }
   }
   function applyDefaultDark(){
     root.setAttribute('data-theme', 'dark');
     root.style.colorScheme='dark';
-    paintTopChrome('dark');
+    setThemeColor('dark');
+    repaintAurora();
     /* do not persist — first visit only until user toggles */
   }
   function applyManual(theme){
     root.setAttribute('data-theme', theme);
     root.style.colorScheme=theme;
     try{localStorage.setItem(MANUAL, theme)}catch(e){}
-    /* SAME FRAME: data-theme + --bg + theme-color + aurora/sticky inlines */
-    paintTopChrome(theme);
-    /* one follow-up rAF in case Safari deferred theme-color; keep inlines (do not clear) */
+    setThemeColor(theme);
+    /* double rAF: wait for CSS var/--bg cascade, then force full aurora rebuild */
     requestAnimationFrame(()=>{
-      paintTopChrome(theme);
+      repaintAurora();
+      requestAnimationFrame(()=>{
+        repaintAurora();
+        /* third tick: re-sync theme-color after Safari settles chrome */
+        setThemeColor(theme);
+      });
     });
   }
   const saved=manualPref();
