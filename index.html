@@ -41,12 +41,13 @@
       if(manual){
         if(metaL) metaL.setAttribute('content', tc);
         if(metaD) metaD.setAttribute('content', tc);
-        document.documentElement.style.backgroundColor=tc;
       }else{
         if(metaL) metaL.setAttribute('content', LIGHT_TC);
         if(metaD) metaD.setAttribute('content', DARK_TC);
-        document.documentElement.style.backgroundColor='';
       }
+      /* Always paint html/body so iOS status / Dynamic Island never flash black in light */
+      document.documentElement.style.backgroundColor=tc;
+      try{if(document.body) document.body.style.backgroundColor=tc}catch(e){}
     }
     if(saved){
       document.documentElement.setAttribute('data-theme', saved);
@@ -72,7 +73,7 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/geist-mono@5.2.5/index.min.css" />
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600&display=swap" />
 <style>
-/* Overhaul 2026-10-25 v10.1 — v10 + snug search width · global search across tabs */
+/* Overhaul 2026-10-25 v10.2 — scroll aurora · light status wash · chip clip · no dark 炫光 · title contrast */
 :root{
   /* Surfaces */
   --bg:#F6F5FB;
@@ -151,10 +152,33 @@ html::before{
   content:"";
   position:fixed;
   top:0;left:0;right:0;
-  height:calc(env(safe-area-inset-top, 0px) + 1px);
+  height:calc(env(safe-area-inset-top, 0px) + 2px);
   background:var(--bg);
+  background-color:var(--bg);
   pointer-events:none;
-  z-index:2;
+  z-index:50;
+}
+/* Light: force cream/soft wash into status / Dynamic Island — never black */
+html[data-theme="light"]::before{
+  background:#F6F5FB !important;
+  background-color:#F6F5FB !important;
+}
+@media (prefers-color-scheme: light){
+  :root:not([data-theme="dark"])::before{
+    background:#F6F5FB;
+    background-color:#F6F5FB;
+  }
+}
+[data-theme="light"],
+[data-theme="light"] body{
+  background:#F6F5FB !important;
+  background-color:#F6F5FB !important;
+}
+@media (prefers-color-scheme: light){
+  :root:not([data-theme="dark"]),
+  :root:not([data-theme="dark"]) body{
+    background-color:#F6F5FB;
+  }
 }
 body{
   margin:0;min-height:100vh;min-height:100dvh;color:var(--ink-soft);
@@ -169,7 +193,8 @@ body{
    Anchored at top-center only; fades downward. NO side/edge frame wash.
    Soft gradient stops — no container blur (blur bleeds to all 4 edges). */
 .aurora{
-  position:fixed;
+  /* Static page decoration (Moonphase web): scrolls away with content — NOT viewport-fixed */
+  position:absolute;
   top:0;left:0;right:0;
   width:100%;
   height:calc(env(safe-area-inset-top, 0px) + min(360px, 46vh));
@@ -178,7 +203,7 @@ body{
   z-index:0;
   overflow:hidden;
   isolation:isolate;
-  /* Light: soft violet / iris TOP curtain (Linear/Cursor) — clean, not cream-dirty */
+  /* Light: soft violet / iris TOP curtain from document top (under Dynamic Island / status) */
   background:
     radial-gradient(ellipse 110% 85% at 50% -10%, rgba(124,110,255,.22) 0%, transparent 58%),
     radial-gradient(ellipse 70% 55% at 50% 0%, rgba(168,148,255,.14) 0%, transparent 55%),
@@ -365,6 +390,9 @@ a:hover{text-decoration:underline;text-underline-offset:3px}
   backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
   font-size:var(--fs-ui);font-weight:var(--fw-medium);letter-spacing:-.011em;color:var(--ink-soft);
   white-space:nowrap;box-shadow:var(--shadow-sm);
+  overflow:hidden;
+  isolation:isolate;
+  clip-path:inset(0 round 999px);
   transition:background var(--dur) var(--ease), border-color var(--dur) var(--ease), color var(--dur) var(--ease), box-shadow var(--dur) var(--ease), transform var(--dur) var(--ease);
 }
 .chip:hover{border-color:var(--line2);background:#fff;transform:translateY(-.5px)}
@@ -372,7 +400,8 @@ a:hover{text-decoration:underline;text-underline-offset:3px}
   background:color-mix(in srgb, var(--accent) 12%, #fff);
   border-color:color-mix(in srgb, var(--accent) 28%, transparent);
   color:var(--accent-deep);
-  box-shadow:0 1px 2px rgba(99,91,255,.06), 0 4px 12px rgba(99,91,255,.08);
+  /* No outward purple glow — fill stays inside the pill */
+  box-shadow:none;
 }
 
 .toolbar{
@@ -735,9 +764,12 @@ footer{
 }
 [data-theme="light"] .chip[aria-selected="true"]{
   background:color-mix(in srgb, var(--accent) 14%, #fff);
-  border-color:color-mix(in srgb, var(--accent) 32%, transparent);
+  /* White pill border only — purple fill clipped inside (no outer glow/outline) */
+  border:1.5px solid #FFFFFF;
+  outline:none;
   color:var(--accent-deep);
-  box-shadow:0 0 0 3px rgba(99,91,255,.10), 0 4px 14px rgba(99,91,255,.12);
+  box-shadow:inset 0 0 0 1px color-mix(in srgb, var(--accent) 18%, transparent);
+  overflow:hidden;
 }
 [data-theme="light"] .sort button[aria-pressed="true"]{
   background:color-mix(in srgb, var(--accent) 14%, #fff);
@@ -756,10 +788,10 @@ footer{
 @media (prefers-color-scheme: dark){
   :root:not([data-theme="light"]) .aurora{
     background:
-      radial-gradient(ellipse 95% 75% at 50% -6%, rgba(110,118,220,.34) 0%, transparent 64%),
-      radial-gradient(ellipse 60% 50% at 50% 0%, rgba(72,80,170,.20) 0%, transparent 58%);
+      radial-gradient(ellipse 95% 70% at 50% -8%, rgba(110,118,220,.18) 0%, transparent 62%),
+      radial-gradient(ellipse 55% 45% at 50% 0%, rgba(72,80,170,.10) 0%, transparent 55%);
     filter:none;
-    opacity:.92;
+    opacity:.72;
   }
   :root:not([data-theme="light"]) .aurora-crown{
     background:linear-gradient(
@@ -771,15 +803,15 @@ footer{
     opacity:1;
   }
   /* Dark title: unified brand yellow from hellomoonphase / Flip */
-  :root:not([data-theme="light"]) .hero h1{color:#FFFBC1;text-shadow:0 0 32px rgba(255,251,193,.22)}
-  :root:not([data-theme="light"]) .hero h1 em{color:#D9D4A0;text-shadow:none}
+  :root:not([data-theme="light"]) .hero h1{color:#FFFBC1;text-shadow:none;filter:none}
+  :root:not([data-theme="light"]) .hero h1 em{color:#8A8250;text-shadow:none;opacity:1}
 }
 [data-theme="dark"] .aurora{
   background:
-    radial-gradient(ellipse 95% 75% at 50% -6%, rgba(110,118,220,.34) 0%, transparent 64%),
-    radial-gradient(ellipse 60% 50% at 50% 0%, rgba(72,80,170,.20) 0%, transparent 58%);
+    radial-gradient(ellipse 95% 70% at 50% -8%, rgba(110,118,220,.18) 0%, transparent 62%),
+    radial-gradient(ellipse 55% 45% at 50% 0%, rgba(72,80,170,.10) 0%, transparent 55%);
   filter:none;
-  opacity:.92;
+  opacity:.72;
 }
 [data-theme="dark"] .aurora-crown{
   background:linear-gradient(
@@ -808,8 +840,8 @@ footer{
   );
   opacity:1;
 }
-[data-theme="dark"] .hero h1{color:#FFFBC1;text-shadow:0 0 32px rgba(255,251,193,.22)}
-[data-theme="dark"] .hero h1 em{color:#D9D4A0;text-shadow:none}
+[data-theme="dark"] .hero h1{color:#FFFBC1;text-shadow:none;filter:none}
+[data-theme="dark"] .hero h1 em{color:#8A8250;text-shadow:none;opacity:1}
 [data-theme="dark"] .shell::after{opacity:.05;mix-blend-mode:screen}
 [data-theme="dark"] .fresh span{background:var(--control-bg);border-color:var(--line);color:var(--muted)}
 [data-theme="dark"] .fresh i{background:var(--ok);box-shadow:0 0 0 3px var(--ok-soft)}
@@ -821,7 +853,7 @@ footer{
   background:color-mix(in srgb, var(--accent) 18%, var(--surface));
   border-color:color-mix(in srgb, var(--accent) 36%, transparent);
   color:var(--accent-deep);
-  box-shadow:0 4px 16px rgba(99,91,255,.14);
+  box-shadow:none;
 }
 [data-theme="dark"] .search,
 [data-theme="dark"] .sort{background:var(--control-bg)}
@@ -839,11 +871,11 @@ footer{
 [data-theme="dark"] .pill{
   background:rgba(46,160,67,.16);color:#3FB950;
   border:1px solid rgba(63,185,80,.22);
-  box-shadow:0 0 12px rgba(63,185,80,.18);
+  box-shadow:none;
   filter:none;
 }
-[data-theme="dark"] .pill::before{background:#3FB950;box-shadow:0 0 8px rgba(63,185,80,.65);filter:none}
-[data-theme="dark"] .pill:hover{background:rgba(46,160,67,.24);color:#56D364;box-shadow:0 0 16px rgba(63,185,80,.28)}
+[data-theme="dark"] .pill::before{background:#3FB950;box-shadow:none;filter:none}
+[data-theme="dark"] .pill:hover{background:rgba(46,160,67,.24);color:#56D364;box-shadow:none}
 [data-theme="dark"] .item .body code{
   background:rgba(139,132,255,.12);border-color:rgba(139,132,255,.2);color:var(--accent-deep);
 }
@@ -869,7 +901,7 @@ footer{
     background:color-mix(in srgb, var(--accent) 18%, var(--surface));
     border-color:color-mix(in srgb, var(--accent) 36%, transparent);
     color:var(--accent-deep);
-    box-shadow:0 4px 16px rgba(99,91,255,.14);
+    box-shadow:none;
   }
   :root:not([data-theme="light"]) .search,
   :root:not([data-theme="light"]) .sort{background:var(--control-bg)}
@@ -887,11 +919,11 @@ footer{
   :root:not([data-theme="light"]) .pill{
     background:rgba(46,160,67,.16);color:#3FB950;
     border:1px solid rgba(63,185,80,.22);
-    box-shadow:0 0 12px rgba(63,185,80,.18);
+    box-shadow:none;
     filter:none;
   }
-  :root:not([data-theme="light"]) .pill::before{background:#3FB950;box-shadow:0 0 8px rgba(63,185,80,.65);filter:none}
-  :root:not([data-theme="light"]) .pill:hover{background:rgba(46,160,67,.24);color:#56D364;box-shadow:0 0 16px rgba(63,185,80,.28)}
+  :root:not([data-theme="light"]) .pill::before{background:#3FB950;box-shadow:none;filter:none}
+  :root:not([data-theme="light"]) .pill:hover{background:rgba(46,160,67,.24);color:#56D364;box-shadow:none}
   :root:not([data-theme="light"]) .item .body code{
     background:rgba(139,132,255,.12);border-color:rgba(139,132,255,.2);color:var(--accent-deep);
   }
@@ -904,8 +936,8 @@ footer{
     box-shadow:0 1px 2px rgba(0,0,0,.2);
   }
   :root:not([data-theme="light"]) ::selection{background:var(--accent-soft);color:var(--ink)}
-  :root:not([data-theme="light"]) .hero h1{color:#FFFBC1;text-shadow:0 0 32px rgba(255,251,193,.22)}
-  :root:not([data-theme="light"]) .hero h1 em{color:#D9D4A0;text-shadow:none}
+  :root:not([data-theme="light"]) .hero h1{color:#FFFBC1;text-shadow:none;filter:none}
+  :root:not([data-theme="light"]) .hero h1 em{color:#8A8250;text-shadow:none;opacity:1}
 }
 
 /* —— Mobile rhythm —— */
@@ -934,18 +966,18 @@ footer{
   @media (prefers-color-scheme: dark){
     :root:not([data-theme="light"]) .aurora{
       background:
-        radial-gradient(ellipse 100% 80% at 50% -4%, rgba(110,118,220,.30) 0%, transparent 64%),
-        radial-gradient(ellipse 55% 45% at 50% 0%, rgba(72,80,170,.16) 0%, transparent 56%);
+        radial-gradient(ellipse 100% 75% at 50% -6%, rgba(110,118,220,.16) 0%, transparent 62%),
+        radial-gradient(ellipse 50% 40% at 50% 0%, rgba(72,80,170,.08) 0%, transparent 55%);
       filter:none;
-      opacity:.92;
+      opacity:.70;
     }
   }
   [data-theme="dark"] .aurora{
     background:
-      radial-gradient(ellipse 100% 80% at 50% -4%, rgba(110,118,220,.30) 0%, transparent 64%),
-      radial-gradient(ellipse 55% 45% at 50% 0%, rgba(72,80,170,.16) 0%, transparent 56%);
+      radial-gradient(ellipse 100% 75% at 50% -6%, rgba(110,118,220,.16) 0%, transparent 62%),
+      radial-gradient(ellipse 50% 40% at 50% 0%, rgba(72,80,170,.08) 0%, transparent 55%);
     filter:none;
-    opacity:.92;
+    opacity:.70;
   }
   [data-theme="light"] .aurora{
     background:
@@ -1208,19 +1240,15 @@ document.getElementById("askSubmit").addEventListener("click",()=>{
     if(manual){
       if(metaL) metaL.setAttribute('content', tc);
       if(metaD) metaD.setAttribute('content', tc);
-      try{
-        root.style.backgroundColor=tc;
-        if(document.body) document.body.style.backgroundColor=tc;
-      }catch(e){}
     }else{
       if(metaL) metaL.setAttribute('content', LIGHT_TC);
       if(metaD) metaD.setAttribute('content', DARK_TC);
-      /* Clear inline bg so CSS @media + var(--bg) drive the page */
-      try{
-        root.style.backgroundColor='';
-        if(document.body) document.body.style.backgroundColor='';
-      }catch(e){}
     }
+    /* Always paint html/body — light = cream wash for status / Dynamic Island (never black) */
+    try{
+      root.style.backgroundColor=tc;
+      if(document.body) document.body.style.backgroundColor=tc;
+    }catch(e){}
     if(btn){
       btn.setAttribute('aria-label', theme==='dark'?'Switch to light theme':'Switch to dark theme');
       btn.title=theme==='dark'?'Light':'Dark';
