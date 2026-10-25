@@ -4,7 +4,7 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 <meta name="color-scheme" content="light dark" />
-<!-- theme-color = soft page wash (matches --bg). No purple/black slab. -->
+<!-- theme-color MUST match page --bg wash (light #F6F5FB / dark #0E0F14). Never black chrome on light or vice versa. -->
 <meta name="theme-color" content="#F6F5FB" media="(prefers-color-scheme: light)" id="themeColorMetaLight" />
 <meta name="theme-color" content="#0E0F14" media="(prefers-color-scheme: dark)" id="themeColorMetaDark" />
 <meta name="theme-color" content="#0E0F14" id="themeColorMeta" />
@@ -74,7 +74,7 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/geist-mono@5.2.5/index.min.css" />
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600&display=swap" />
 <style>
-/* Overhaul 2026-10-25 v10.7 — liquid-glass toggle · Moonphase-letter height · spring slide · light purple titles */
+/* Overhaul 2026-10-25 v10.8 — island continuous --bg (no black veil) · liquid-glass toggle · light purple titles · deeper Center gold */
 :root{
   /* Surfaces */
   --bg:#F6F5FB;
@@ -144,47 +144,19 @@
 html{
   scroll-behavior:smooth;overflow-x:hidden;width:100%;max-width:100%;
   color-scheme:light dark;
-  /* Paint --bg into Dynamic Island / status safe-area (viewport-fit=cover) */
+  /* Continuous --bg through safe-area-inset-top (viewport-fit=cover) — no black gap under island */
   background-color:var(--bg);
   background:var(--bg);
   min-height:100%;
   min-height:100dvh;
+  /* Extend paint into notch / Dynamic Island */
+  padding:0;
+  margin:0;
 }
 html,body{-webkit-overflow-scrolling:touch;overscroll-behavior-y:none}
-/* Fixed safe-area wash: solid --bg under Dynamic Island / status.
-   Continuous with theme-color + html/body + aurora crown — never white/black strip. */
-html::before{
-  content:"";
-  position:fixed;
-  top:0;left:0;right:0;
-  /* Island strip + 2px seam — solid --bg continuous with theme-color */
-  height:calc(env(safe-area-inset-top, 0px) + 2px);
-  min-height:calc(env(safe-area-inset-top, 0px) + 2px);
-  background:var(--bg);
-  background-color:var(--bg);
-  pointer-events:none;
-  z-index:3;
-}
-html[data-theme="light"]::before{
-  background:#F6F5FB !important;
-  background-color:#F6F5FB !important;
-}
-html[data-theme="dark"]::before{
-  background:#0E0F14 !important;
-  background-color:#0E0F14 !important;
-}
-@media (prefers-color-scheme: light){
-  :root:not([data-theme="dark"])::before{
-    background:#F6F5FB !important;
-    background-color:#F6F5FB !important;
-  }
-}
-@media (prefers-color-scheme: dark){
-  :root:not([data-theme="light"])::before{
-    background:#0E0F14 !important;
-    background-color:#0E0F14 !important;
-  }
-}
+/* NO html::before island veil — a solid fixed strip under Dynamic Island
+   reads as a black/broken slab. Continuity comes from:
+   theme-color + html/body/--bg + html::after underlay + aurora gradient from --bg. */
 /* Full-viewport fixed underlay — overscroll / rubber-band always shows --bg (never white/black gap) */
 html::after{
   content:"";
@@ -228,9 +200,9 @@ body{
   position:relative;
 }
 /* FIXED horizontal top-curtain aurora (Moonphase-style).
-   Hangs from Dynamic Island / visible top as a CLEAN horizontal band.
-   --bg solid through island (matches theme-color); soft wash fades downward.
-   NO radial blob / side frame — linear curtain only. */
+   Starts at EXACT --bg at the visible top (under Dynamic Island) and gradients
+   downward — seamless blend with theme-color + html/body. No hard black band,
+   no fixed veil, no mask dissolve at the crown. */
 .aurora{
   position:fixed;
   top:0;left:0;right:0;
@@ -240,31 +212,31 @@ body{
   pointer-events:none;
   z-index:0;
   overflow:hidden;
-  isolation:isolate;
-  /* Pure horizontal curtain: --bg crown → soft violet sheet → transparent */
+  /* Exact --bg at y=0 → soft wash → transparent. No mask (mask looked dissolved). */
   background:linear-gradient(180deg,
     var(--bg) 0%,
-    var(--bg) env(safe-area-inset-top, 0px),
-    color-mix(in srgb, #A898FF 20%, var(--bg)) calc(env(safe-area-inset-top, 0px) + 6px),
-    color-mix(in srgb, #B8A8FF 12%, var(--bg)) calc(env(safe-area-inset-top, 0px) + 64px),
-    color-mix(in srgb, #C8BCFF 5%, var(--bg)) calc(env(safe-area-inset-top, 0px) + 150px),
+    var(--bg) max(env(safe-area-inset-top, 0px), 1px),
+    color-mix(in srgb, #A898FF 18%, var(--bg)) calc(env(safe-area-inset-top, 0px) + 28px),
+    color-mix(in srgb, #B8A8FF 10%, var(--bg)) calc(env(safe-area-inset-top, 0px) + 90px),
+    color-mix(in srgb, #C8BCFF 4%, var(--bg)) calc(env(safe-area-inset-top, 0px) + 170px),
     transparent 100%);
   filter:none;
   opacity:1;
-  -webkit-mask-image:linear-gradient(180deg,#000 0%,#000 42%,rgba(0,0,0,.5) 72%,transparent 100%);
-  mask-image:linear-gradient(180deg,#000 0%,#000 42%,rgba(0,0,0,.5) 72%,transparent 100%);
+  -webkit-mask-image:none;
+  mask-image:none;
 }
-/* Crown: solid --bg through safe-area — continuous with html::before + theme-color */
+/* Soft crown reinforce — still --bg at top, fades; never a hard slab */
 .aurora-crown{
   display:block!important;
   position:absolute;
   left:0;right:0;top:0;
-  height:calc(env(safe-area-inset-top, 0px) + 32px);
+  height:calc(env(safe-area-inset-top, 0px) + 48px);
   margin:0;padding:0;
   pointer-events:none;
   background:linear-gradient(180deg,
     var(--bg) 0%,
-    var(--bg) calc(env(safe-area-inset-top, 0px) + 2px),
+    var(--bg) max(env(safe-area-inset-top, 0px), 1px),
+    color-mix(in srgb, var(--bg) 70%, transparent) calc(env(safe-area-inset-top, 0px) + 24px),
     transparent 100%);
   filter:none;
   opacity:1;
@@ -976,18 +948,21 @@ html[data-theme="dark"] body,
   :root:not([data-theme="light"]) .aurora{
     background:linear-gradient(180deg,
       var(--bg) 0%,
-      var(--bg) env(safe-area-inset-top, 0px),
-      color-mix(in srgb, #5B66C4 20%, var(--bg)) calc(env(safe-area-inset-top, 0px) + 6px),
-      color-mix(in srgb, #4A54B0 10%, var(--bg)) calc(env(safe-area-inset-top, 0px) + 72px),
-      color-mix(in srgb, #3A4470 4%, var(--bg)) calc(env(safe-area-inset-top, 0px) + 150px),
+      var(--bg) max(env(safe-area-inset-top, 0px), 1px),
+      color-mix(in srgb, #5B66C4 16%, var(--bg)) calc(env(safe-area-inset-top, 0px) + 28px),
+      color-mix(in srgb, #4A54B0 8%, var(--bg)) calc(env(safe-area-inset-top, 0px) + 90px),
+      color-mix(in srgb, #3A4470 3%, var(--bg)) calc(env(safe-area-inset-top, 0px) + 170px),
       transparent 100%);
     filter:none;
     opacity:1;
+    -webkit-mask-image:none;
+    mask-image:none;
   }
   :root:not([data-theme="light"]) .aurora-crown{
     background:linear-gradient(180deg,
       var(--bg) 0%,
-      var(--bg) calc(env(safe-area-inset-top, 0px) + 2px),
+      var(--bg) max(env(safe-area-inset-top, 0px), 1px),
+      color-mix(in srgb, var(--bg) 70%, transparent) calc(env(safe-area-inset-top, 0px) + 24px),
       transparent 100%);
     opacity:1;
   }
@@ -998,18 +973,21 @@ html[data-theme="dark"] body,
 [data-theme="dark"] .aurora{
   background:linear-gradient(180deg,
     var(--bg) 0%,
-    var(--bg) env(safe-area-inset-top, 0px),
-    color-mix(in srgb, #5B66C4 20%, var(--bg)) calc(env(safe-area-inset-top, 0px) + 6px),
-    color-mix(in srgb, #4A54B0 10%, var(--bg)) calc(env(safe-area-inset-top, 0px) + 72px),
-    color-mix(in srgb, #3A4470 4%, var(--bg)) calc(env(safe-area-inset-top, 0px) + 150px),
+    var(--bg) max(env(safe-area-inset-top, 0px), 1px),
+    color-mix(in srgb, #5B66C4 16%, var(--bg)) calc(env(safe-area-inset-top, 0px) + 28px),
+    color-mix(in srgb, #4A54B0 8%, var(--bg)) calc(env(safe-area-inset-top, 0px) + 90px),
+    color-mix(in srgb, #3A4470 3%, var(--bg)) calc(env(safe-area-inset-top, 0px) + 170px),
     transparent 100%);
   filter:none;
   opacity:1;
+  -webkit-mask-image:none;
+  mask-image:none;
 }
 [data-theme="dark"] .aurora-crown{
   background:linear-gradient(180deg,
     var(--bg) 0%,
-    var(--bg) calc(env(safe-area-inset-top, 0px) + 2px),
+    var(--bg) max(env(safe-area-inset-top, 0px), 1px),
+    color-mix(in srgb, var(--bg) 70%, transparent) calc(env(safe-area-inset-top, 0px) + 24px),
     transparent 100%);
   opacity:1;
 }
@@ -1017,18 +995,21 @@ html[data-theme="dark"] body,
 [data-theme="light"] .aurora{
   background:linear-gradient(180deg,
     var(--bg) 0%,
-    var(--bg) env(safe-area-inset-top, 0px),
-    color-mix(in srgb, #A898FF 20%, var(--bg)) calc(env(safe-area-inset-top, 0px) + 6px),
-    color-mix(in srgb, #B8A8FF 12%, var(--bg)) calc(env(safe-area-inset-top, 0px) + 64px),
-    color-mix(in srgb, #C8BCFF 5%, var(--bg)) calc(env(safe-area-inset-top, 0px) + 150px),
+    var(--bg) max(env(safe-area-inset-top, 0px), 1px),
+    color-mix(in srgb, #A898FF 18%, var(--bg)) calc(env(safe-area-inset-top, 0px) + 28px),
+    color-mix(in srgb, #B8A8FF 10%, var(--bg)) calc(env(safe-area-inset-top, 0px) + 90px),
+    color-mix(in srgb, #C8BCFF 4%, var(--bg)) calc(env(safe-area-inset-top, 0px) + 170px),
     transparent 100%);
   filter:none;
   opacity:1;
+  -webkit-mask-image:none;
+  mask-image:none;
 }
 [data-theme="light"] .aurora-crown{
   background:linear-gradient(180deg,
     var(--bg) 0%,
-    var(--bg) calc(env(safe-area-inset-top, 0px) + 2px),
+    var(--bg) max(env(safe-area-inset-top, 0px), 1px),
+    color-mix(in srgb, var(--bg) 70%, transparent) calc(env(safe-area-inset-top, 0px) + 24px),
     transparent 100%);
   opacity:1;
 }
