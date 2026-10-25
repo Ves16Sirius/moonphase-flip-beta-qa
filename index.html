@@ -46,7 +46,7 @@
         if(metaL) metaL.setAttribute('content', LIGHT_TC);
         if(metaD) metaD.setAttribute('content', DARK_TC);
       }
-      /* Paint --bg (same hex as theme-color) BEFORE first paint; aurora/sticky painted sync on theme apply. */
+      /* Paint --bg (same hex as theme-color) BEFORE first paint; dual-layer aurora fades by CSS opacity. */
       try{
         document.documentElement.style.setProperty('--bg', bg);
         document.documentElement.style.setProperty('--aurora-top', bg);
@@ -83,7 +83,7 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/geist-mono@5.2.5/index.min.css" />
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:opsz,wght@14..32,400;14..32,500;14..32,560;14..32,600&display=swap" />
 <style>
-/* Overhaul 2026-10-25 v10.21 — Inter 560/600 titles · light muted #5B5678 (teaser+body) · hex-only island wash (iOS) */
+/* Overhaul 2026-10-25 v10.22 — continuous island aurora (dual-layer hex) · theme sync · keep Inter 560 + light #5B5678 */
 :root{
   /* Surfaces */
   --bg:#F6F5FB;
@@ -184,9 +184,10 @@ body{
   width:100%;max-width:100%;
   position:relative;
 }
-/* FIXED aurora + sticky — sync-painted on theme toggle (v10.21).
-   Hex-only gradients (no color-mix) so iOS Safari island wash updates without reload.
-   JS paints inline same tick as data-theme / --bg / theme-color. */
+/* FIXED dual-layer aurora — PRECOMPUTED hex washes (no color-mix; iOS Safari safe).
+   Sticky + main share the SAME purple family so island→content is one continuous silk.
+   Theme flip = CSS opacity crossfade on BOTH stacks from the same data-theme (~200ms).
+   #aurora-sticky = thin backup wash if iOS Safari drops the fixed compositor layer. */
 .aurora,.aurora-stack{
   position:fixed;
   top:0;left:0;right:0;
@@ -197,20 +198,10 @@ body{
   z-index:0;
   overflow:hidden;
   isolation:isolate;
-  will-change:transform;
   transform:translateZ(0);
   -webkit-backface-visibility:hidden;
   backface-visibility:hidden;
-  /* Dark-first CSS fallback until JS paints inline */
-  background:linear-gradient(180deg,
-    #272B4C 0%,
-    #1F223B 20%,
-    #191C2D 42%,
-    #11121C 68%,
-    transparent 100%);
-  opacity:1;
-  -webkit-mask-image:linear-gradient(180deg,#000 0%,#000 40%,rgba(0,0,0,.55) 70%,transparent 100%);
-  mask-image:linear-gradient(180deg,#000 0%,#000 40%,rgba(0,0,0,.55) 70%,transparent 100%);
+  background:transparent;
 }
 #aurora-sticky{
   position:fixed;
@@ -220,16 +211,27 @@ body{
   margin:0;padding:0;
   pointer-events:none;
   z-index:0;
-  will-change:transform;
   transform:translateZ(0);
+  background:transparent;
   overflow:hidden;
-  background:linear-gradient(180deg,
-    #222642 0%,
-    #171929 55%,
-    #0E0F14 100%);
-  opacity:1;
 }
-[data-theme="light"] .aurora{
+/* Per-theme wash layers — hard hex sRGB mixes; opacity crossfade is the only change */
+.aurora-layer{
+  position:absolute;inset:0;
+  pointer-events:none;
+  opacity:0;
+  will-change:opacity;
+  transition:opacity var(--aurora-xfade, 200ms) cubic-bezier(.22,1,.36,1);
+  transform:translateZ(0);
+}
+.aurora-layer.is-active{opacity:1}
+/* Main aurora (masked fade to transparent) — v10.17 stops as precomputed hex */
+.aurora > .aurora-layer{
+  -webkit-mask-image:linear-gradient(180deg,#000 0%,#000 40%,rgba(0,0,0,.55) 70%,transparent 100%);
+  mask-image:linear-gradient(180deg,#000 0%,#000 40%,rgba(0,0,0,.55) 70%,transparent 100%);
+}
+.aurora > .aurora-layer.layer-light{
+  /* 28/18/10/4% #A898FF/#B8A8FF/#C8BCFF → #F6F5FB */
   background:linear-gradient(180deg,
     #E0DBFC 0%,
     #E8E4FC 22%,
@@ -237,13 +239,8 @@ body{
     #F4F3FB 72%,
     transparent 100%);
 }
-[data-theme="light"] #aurora-sticky{
-  background:linear-gradient(180deg,
-    #E5E1FC 0%,
-    #EEECFB 55%,
-    #F6F5FB 100%);
-}
-[data-theme="dark"] .aurora{
+.aurora > .aurora-layer.layer-dark{
+  /* 32/22/12/5% #5B66C4/#6B78E8/#4A54B0 → #0E0F14 */
   background:linear-gradient(180deg,
     #272B4C 0%,
     #1F223B 20%,
@@ -251,17 +248,37 @@ body{
     #11121C 68%,
     transparent 100%);
 }
-[data-theme="dark"] #aurora-sticky{
+/* Sticky thin wash (NO mask; bottom stop = solid bg hex — no hard cliff) */
+#aurora-sticky > .aurora-layer.layer-light{
+  /* ~22% then ~10% #A898FF → #F6F5FB */
+  background:linear-gradient(180deg,
+    #E5E1FC 0%,
+    #EEECFB 55%,
+    #F6F5FB 100%);
+}
+#aurora-sticky > .aurora-layer.layer-dark{
+  /* ~26% then ~12% #5B66C4 → #0E0F14 — same purple family as main top */
   background:linear-gradient(180deg,
     #222642 0%,
     #171929 55%,
     #0E0F14 100%);
 }
-/* Layers unused for paint (containers hold wash); hide to avoid stale opacity stuck under island */
-.aurora-layer{display:none!important}
+/* Default (no attr yet / dark-first): dark layers on — sticky+main locked */
+.aurora > .aurora-layer.layer-dark,
+#aurora-sticky > .aurora-layer.layer-dark{opacity:1}
+[data-theme="light"] .aurora > .aurora-layer.layer-dark,
+[data-theme="light"] #aurora-sticky > .aurora-layer.layer-dark{opacity:0}
+[data-theme="light"] .aurora > .aurora-layer.layer-light,
+[data-theme="light"] #aurora-sticky > .aurora-layer.layer-light{opacity:1}
+[data-theme="dark"] .aurora > .aurora-layer.layer-light,
+[data-theme="dark"] #aurora-sticky > .aurora-layer.layer-light{opacity:0}
+[data-theme="dark"] .aurora > .aurora-layer.layer-dark,
+[data-theme="dark"] #aurora-sticky > .aurora-layer.layer-dark{opacity:1}
 .aurora-crown{display:none!important}
 .aurora-blobs{display:none!important}
-.aurora.aurora-repaint,#aurora-sticky.aurora-repaint{opacity:.999;will-change:transform,opacity}
+@media (prefers-reduced-motion:reduce){
+  .aurora-layer{transition:none!important}
+}
 .fresh,.shell,.modal-backdrop{position:relative;z-index:1}
 .modal-backdrop{z-index:100}
 button,input,select,textarea{font:inherit;color:inherit}
@@ -1065,7 +1082,7 @@ footer{
 [data-theme="light"] .pill::before{background:#635BFF;box-shadow:0 0 6px rgba(99,91,255,.45)}
 [data-theme="light"] .pill:hover{background:rgba(99,91,255,.14);color:#3730A3}
 
-/* Aurora containers sync-painted on theme toggle (v10.21).
+/* Dual-layer aurora washes baked as hex on .aurora-layer (v10.22).
    Title colors preserved (dark gold / light violet). */
 @media (prefers-color-scheme: dark){
   /* Dark v10.15: lighter gold on Beta Q&A / h1, deeper gold on Center (em) */
@@ -1473,9 +1490,9 @@ document.getElementById("askSubmit").addEventListener("click",()=>{
 });
 /* fresh bar is non-sticky silk — no scroll hide */
 
-/* Theme toggle v10.21 — hex-only island wash (no color-mix in JS; iOS Safari safe).
-   Set data-theme THEN paint aurora+#aurora-sticky backgrounds same tick as theme-color.
-   First visit defaults to DARK (manual-v8). Toggle persists light/dark. */
+/* Theme toggle v10.22 — dual-layer hex aurora; pure CSS [data-theme] opacity sync.
+   Set data-theme + --bg + theme-color same tick. No inline aurora background mutation,
+   no sticky opacity flash. Sticky + main layers flip together from data-theme. */
 (function(){
   const MANUAL='flip-beta-qa-theme-manual-v8';
   const STALE=['flip-beta-qa-theme','flip-beta-qa-theme-v1','flip-beta-qa-theme-v2','flip-beta-qa-theme-manual','flip-beta-qa-theme-v3','flip-beta-qa-theme-manual-v4','flip-beta-qa-theme-manual-v5','flip-beta-qa-theme-manual-v6','flip-beta-qa-theme-manual-v7'];
@@ -1500,31 +1517,30 @@ document.getElementById("askSubmit").addEventListener("click",()=>{
     if(a==='dark'||a==='light') return a;
     return 'dark';
   }
-  /* PRECOMPUTED hex-only washes — color-mix() in INLINE styles stalls/fails on iOS Safari. */
-  function auroraWash(theme, kind){
-    if(theme==='dark'){
-      if(kind==='sticky'){
-        return 'linear-gradient(180deg, #222642 0%, #171929 55%, #0E0F14 100%)';
-      }
-      return 'linear-gradient(180deg, #272B4C 0%, #1F223B 20%, #191C2D 42%, #11121C 68%, transparent 100%)';
-    }
-    if(kind==='sticky'){
-      return 'linear-gradient(180deg, #E5E1FC 0%, #EEECFB 55%, #F6F5FB 100%)';
-    }
-    return 'linear-gradient(180deg, #E0DBFC 0%, #E8E4FC 22%, #F0EDFB 48%, #F4F3FB 72%, transparent 100%)';
+  /* Optional class mirror — CSS [data-theme] rules already drive opacity on sticky+main. */
+  function syncAuroraLayers(theme){
+    const t=theme==='light'?'light':'dark';
+    document.querySelectorAll('.aurora-layer').forEach(function(layer){
+      try{
+        layer.style.cssText='';
+        layer.classList.toggle('is-active', layer.getAttribute('data-aurora')===t);
+      }catch(e){}
+    });
+    /* Clear any leftover v10.21 inline washes on containers */
+    ['aurora','aurora-sticky'].forEach(function(id){
+      const el=document.getElementById(id);
+      if(!el||!el.style) return;
+      try{
+        el.style.removeProperty('background');
+        el.style.removeProperty('background-image');
+        el.style.removeProperty('opacity');
+        el.style.removeProperty('filter');
+        el.style.removeProperty('will-change');
+        el.classList.remove('aurora-repaint');
+      }catch(e){}
+    });
   }
-  function clearStaleInline(el){
-    if(!el||!el.style) return;
-    try{
-      el.style.removeProperty('filter');
-      el.style.removeProperty('will-change');
-      el.style.removeProperty('background-image');
-      el.style.removeProperty('background');
-      el.style.removeProperty('opacity');
-      el.classList.remove('aurora-repaint');
-    }catch(e){}
-  }
-  /* SAME TICK: --bg + html/body + theme-color + BOTH aurora + #aurora-sticky washes. */
+  /* SAME TICK: --bg + html/body + theme-color. Aurora follows via CSS data-theme. */
   function paintTheme(theme){
     const t=theme==='light'?'light':'dark';
     const tc=t==='dark'?DARK_TC:LIGHT_TC;
@@ -1552,39 +1568,7 @@ document.getElementById("askSubmit").addEventListener("click",()=>{
         el.parentNode.replaceChild(next, el);
       });
     }catch(e){}
-    const aurora=document.getElementById('aurora');
-    const sticky=document.getElementById('aurora-sticky');
-    try{
-      if(aurora){
-        clearStaleInline(aurora);
-        aurora.style.removeProperty('background');
-        aurora.style.setProperty('background', auroraWash(t, 'main'));
-        aurora.style.setProperty('opacity', '1');
-        aurora.style.setProperty('visibility', 'visible');
-        aurora.style.setProperty('display', 'block');
-        aurora.style.setProperty('transform', 'translateZ(0)');
-        void aurora.offsetHeight;
-      }
-      if(sticky){
-        clearStaleInline(sticky);
-        sticky.style.removeProperty('background');
-        /* brief opacity silk without wrong-color flash (hex wash already set) */
-        sticky.style.setProperty('opacity', '0.001');
-        sticky.style.setProperty('background', auroraWash(t, 'sticky'));
-        sticky.style.setProperty('visibility', 'visible');
-        sticky.style.setProperty('display', 'block');
-        sticky.style.setProperty('transform', 'translateZ(0)');
-        void sticky.offsetHeight;
-        sticky.style.setProperty('opacity', '1');
-      }
-      /* Clear any stale layer inlines from v10.19 */
-      document.querySelectorAll('.aurora-layer').forEach(function(layer){
-        try{
-          layer.style.cssText='';
-          layer.classList.toggle('is-active', layer.getAttribute('data-aurora')===t);
-        }catch(e){}
-      });
-    }catch(e){}
+    syncAuroraLayers(t);
     if(btn){
       btn.setAttribute('aria-label', t==='dark'?'Switch to light theme':'Switch to dark theme');
       btn.title=t==='dark'?'Light':'Dark';
@@ -1614,13 +1598,6 @@ document.getElementById("askSubmit").addEventListener("click",()=>{
   document.addEventListener('visibilitychange', function(){
     if(document.visibilityState==='visible') resync();
   });
-  if(window.visualViewport){
-    let vvT=null;
-    window.visualViewport.addEventListener('resize', function(){
-      clearTimeout(vvT);
-      vvT=setTimeout(resync, 60);
-    });
-  }
 })();
 
 
