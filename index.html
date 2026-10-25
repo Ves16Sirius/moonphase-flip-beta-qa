@@ -77,6 +77,7 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/geist-mono@5.2.5/index.min.css" />
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&display=swap" />
 <style>
+/* Overhaul 2026-10-25 v10.47 — Copy-only: hero .sub → “Common beta questions, answered. Search, browse, or ask the team.”; Ask .ask-shots → General/Beta Support preference + screenshots. No colors, layout, fonts, behavior. */
 /* Overhaul 2026-10-25 v10.46 — Ask sheet underfill (mobile ≤719): stop relying on clipped box-shadow fill (overflow:hidden killed the v10.42 60vh surface shadow). Raise --sheet-over to min(70vh,560px) so the sheet's own solid --surface physically extends far below the viewport (padding-bottom + negative margin-bottom); box-shadow is elevation only. Force solid --surface + no backdrop-filter on .modal / .modal-head / .modal-foot (all themes) so Safari dark glass never peeks; stronger warm scrim with deeper bottom overflow. Head stays opaque while body scrolls. Desktop ≥720 modal unchanged. Also: light-mode theme-toggle sun face/icon → bright #FFD84D (was muted #8A6410); dark-mode moon unchanged. Colors otherwise, fonts, drag, matching, ids unchanged. */
 /* v10.45 — Ask sheet: (1) head/body boundary — .modal-head gets 14px (desktop) / 16px (mobile) bottom padding (body top padding trimmed so the resting gap is ~unchanged); while .modal-body is scrolled (scrollTop>0 → .is-scrolled on the sheet) a --line hairline shows under the head and the top 12px of the scroll area fades, so content clips cleanly instead of butting into the subtitle. (2) Single scroller — #askQ has no max-height and overflow:hidden; it autogrows to full content height and only .modal-body scrolls (overscroll-behavior:contain). While typing, the body nudges (instant, only when needed) to keep the caret line visible above the keyboard/visualViewport. Colors, fonts, drag-dismiss rules, matching, opaque bottom, ids unchanged. */
 /* v10.44 — Entry ids: FB-xxx → readable kebab-case slugs (e.g. first-steps, ios-build); #slug / ?id=slug deep links open + scroll to the card; legacy #FB-xxx / ?id=FB-xxx resolve via LEGACY_IDS. Mobile Ask sheet loosened (spacing only): 22px sides, ~24px section rhythm, 10px label gap, 34px/14px topic + phone chips, textarea 14/16 padding at 1.5 line-height, 44px Cancel target, body scrolls instead of squeezing. Colors, fonts, aurora, sort thumb, page chips, Ask behavior unchanged. */
@@ -1646,7 +1647,7 @@ footer{
   <div class="fresh" role="status"><span><i aria-hidden="true"></i> Updated Oct 25, 2026</span></div>
   <div class="hero">
     <h1>Beta Q&amp;A <em>Center</em></h1>
-    <p class="sub">Answers for Flip beta testers — search a topic, or open a card.</p>
+    <p class="sub">Common beta questions, answered. Search, browse, or ask the team.</p>
     <button type="button" class="ask-cta" id="askOpen">Ask a question…</button>
   </div>
   <div class="layout">
@@ -1712,7 +1713,7 @@ footer{
         <button type="button" class="ask-topic" data-os="iOS" aria-pressed="false">iOS</button>
         <button type="button" class="ask-topic" data-os="Android" aria-pressed="false">Android</button>
       </div>
-      <p class="ask-shots">Screenshots help — attach them in WhatsApp.</p>
+      <p class="ask-shots">Prefer General so others can chime in — or your Beta Support group if you’d rather keep it private.<br>Screenshots help either way.</p>
     </div>
     <div class="modal-foot">
       <p class="ask-note" id="askNote" role="status" aria-live="polite"></p>
