@@ -4,27 +4,37 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 <meta name="color-scheme" content="light dark" />
-<meta name="theme-color" content="#F8F6F3" id="themeColorMeta" />
+<meta name="theme-color" content="#F7F5F1" id="themeColorMeta" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 <title>Moonphase Flip — Beta Q&amp;A Center</title>
 <script>
-/* Theme bootstrap — prefers-color-scheme by default; persist only after explicit toggle.
-   Clears legacy stuck key so prior visits cannot force light/dark forever. */
+/* Theme bootstrap v3 — ALWAYS follow OS prefers-color-scheme until the user
+   explicitly clicks the toggle. Clears EVERY prior theme key (legacy + v2)
+   so a stuck "light" from earlier builds cannot block system follow. */
 (function(){
+  var MANUAL='flip-beta-qa-theme-manual';
+  var STALE=['flip-beta-qa-theme','flip-beta-qa-theme-v2','flip-beta-qa-theme-v1'];
+  function systemTheme(){
+    try{return window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'}
+    catch(e){return 'light'}
+  }
   try{
-    try{localStorage.removeItem('flip-beta-qa-theme')}catch(e){}
-    var k='flip-beta-qa-theme-v2';
-    var saved=localStorage.getItem(k);
-    var theme;
-    if(saved==='light'||saved==='dark'){
-      theme=saved;
-    }else{
-      theme=window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';
+    for(var i=0;i<STALE.length;i++){
+      try{localStorage.removeItem(STALE[i])}catch(e){}
     }
+    var saved=null;
+    try{
+      var s=localStorage.getItem(MANUAL);
+      if(s==='light'||s==='dark') saved=s;
+    }catch(e){}
+    var theme=saved||systemTheme();
     document.documentElement.setAttribute('data-theme', theme);
     document.documentElement.style.colorScheme=theme;
   }catch(e){
-    var d=window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';
+    var d=systemTheme();
     document.documentElement.setAttribute('data-theme', d);
+    try{document.documentElement.style.colorScheme=d}catch(_){}
   }
 })();
 </script>
@@ -37,8 +47,8 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600&display=swap" />
 <style>
 /* Blank-slate v4 — luminous chromatic + voice polish
-   System theme default · Instrument Serif title · soft-ink · soft iris CTA · fixed aurora at viewport y=0
-   Tight mobile safe-area · Flip wordmark · gallery cards */
+   System theme v3 (manual key only after toggle) · Instrument Serif · soft iris CTA
+   Aurora bleeds under status bar · Flip wordmark-matched toggle · gallery cards */
 :root{
   --bg:#F7F5F1;
   --bg-deep:#EFEBE4;
@@ -91,25 +101,29 @@ body{
    Hotspots sit at/above the top edge so the glow is strongest at the phone crown —
    not a mid-band between Updated and the wordmark. */
 .aurora{
+  /* Bleed UNDER the phone status bar (time/battery): negative top into
+     safe-area + extra headroom so blur still paints at visual y=0. */
   position:fixed;
-  top:0;left:0;right:0;
+  top:calc(-1 * env(safe-area-inset-top, 0px) - 56px);
+  left:0;right:0;
   width:100vw;
-  height:min(520px, 70dvh);
+  height:calc(min(560px, 74dvh) + env(safe-area-inset-top, 0px) + 56px);
   margin:0;padding:0;
   pointer-events:none;
   z-index:0;
   overflow:visible;
   background:
-    /* primary wash anchored ABOVE the fold so blur blooms onto y=0 */
-    radial-gradient(ellipse 90% 70% at 50% -8%, rgba(168,145,255,.42), transparent 72%),
-    radial-gradient(ellipse 70% 60% at 12% 0%, rgba(255,160,195,.30), transparent 70%),
-    radial-gradient(ellipse 65% 55% at 88% 0%, rgba(255,200,160,.26), transparent 68%),
-    radial-gradient(ellipse 55% 50% at 70% 4%, rgba(255,230,190,.20), transparent 65%),
-    radial-gradient(ellipse 50% 45% at 30% 2%, rgba(170,205,255,.20), transparent 68%);
-  filter:blur(56px) saturate(112%);
-  opacity:.85;
-  mask-image:linear-gradient(180deg,#000 0%,#000 55%,transparent 100%);
-  -webkit-mask-image:linear-gradient(180deg,#000 0%,#000 55%,transparent 100%);
+    /* solid-ish crown wash so status-bar region isn't empty cream/ink */
+    linear-gradient(180deg, rgba(168,145,255,.22) 0%, rgba(168,145,255,.10) 18%, transparent 42%),
+    radial-gradient(ellipse 110% 85% at 50% -22%, rgba(168,145,255,.52), transparent 70%),
+    radial-gradient(ellipse 80% 70% at 8% -10%, rgba(255,160,195,.34), transparent 68%),
+    radial-gradient(ellipse 75% 65% at 92% -8%, rgba(255,200,160,.30), transparent 66%),
+    radial-gradient(ellipse 60% 55% at 72% -2%, rgba(255,230,190,.22), transparent 62%),
+    radial-gradient(ellipse 55% 50% at 28% -4%, rgba(170,205,255,.24), transparent 66%);
+  filter:blur(52px) saturate(114%);
+  opacity:.9;
+  mask-image:linear-gradient(180deg,#000 0%,#000 58%,transparent 100%);
+  -webkit-mask-image:linear-gradient(180deg,#000 0%,#000 58%,transparent 100%);
 }
 /* Content above the fixed aurora */
 .fresh,.shell,.modal-backdrop{position:relative;z-index:1}
@@ -181,7 +195,11 @@ a:hover{text-decoration:underline;text-underline-offset:3px}
     padding-left:max(20px, env(safe-area-inset-left, 0px));
     padding-right:max(20px, env(safe-area-inset-right, 0px));
   }
-  .aurora{height:min(460px, 62dvh);filter:blur(48px) saturate(112%);opacity:.88}
+  .aurora{
+    height:calc(min(500px, 68dvh) + env(safe-area-inset-top, 0px) + 56px);
+    filter:blur(44px) saturate(114%);
+    opacity:.92;
+  }
   /* shell already insets — avoid double padding on brand/hero/controls */
   .brand{padding:0}
   .hero{padding:0;margin:0 auto 14px}
@@ -201,10 +219,10 @@ a:hover{text-decoration:underline;text-underline-offset:3px}
 /* Brand row — Flip wordmark + theme toggle on ONE horizontally aligned row */
 .brand{
   display:flex;align-items:center;justify-content:space-between;gap:8px;
-  margin:6px 0 28px;position:relative;min-height:40px;
+  margin:6px 0 28px;position:relative;min-height:30px;
 }
 .brand-slot{
-  flex:1 1 0;display:flex;align-items:center;min-width:0;min-height:36px;
+  flex:1 1 0;display:flex;align-items:center;min-width:0;min-height:30px;
 }
 .brand-slot-start{justify-content:flex-start}
 .brand-slot-end{justify-content:flex-end}
@@ -214,22 +232,23 @@ a:hover{text-decoration:underline;text-underline-offset:3px}
 .brand .wm{height:30px;width:auto;display:block}
 .theme-toggle{
   position:static;transform:none;
-  height:36px;padding:0 12px 0 10px;border-radius:999px;gap:6px;
+  /* Match Flip wordmark height (30px desktop / 24px mobile) */
+  height:30px;min-height:30px;padding:0 10px 0 8px;border-radius:999px;gap:5px;
   display:inline-flex;align-items:center;justify-content:center;
   border:1px solid var(--line);
   background:var(--control-bg);
   backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
   box-shadow:var(--shadow-sm);
   color:var(--muted);
-  font-size:11px;font-weight:500;letter-spacing:-.01em;
-  transition:background var(--dur) var(--ease), border-color var(--dur) var(--ease), color var(--dur) var(--ease), box-shadow var(--dur) var(--ease), transform var(--dur) var(--ease);
+  font-size:10px;font-weight:500;letter-spacing:-.01em;
+  transition:background var(--dur) var(--ease), border-color var(--dur) var(--ease), color var(--dur) var(--ease), box-shadow var(--dur) var(--ease);
 }
 .theme-toggle:hover{
   color:var(--ink);border-color:var(--line2);background:#fff;
-  box-shadow:var(--shadow-md);transform:scale(1.02);
+  box-shadow:var(--shadow-md);
 }
 .theme-toggle:active{transform:none}
-.theme-toggle svg{width:15px;height:15px;display:block;flex:0 0 auto}
+.theme-toggle svg{width:13px;height:13px;display:block;flex:0 0 auto}
 .theme-toggle .tlabel{display:inline-block;line-height:1}
 .theme-toggle .icon-sun{display:none}
 .theme-toggle .icon-moon{display:block}
@@ -239,10 +258,11 @@ a:hover{text-decoration:underline;text-underline-offset:3px}
 [data-theme="dark"] .theme-toggle .tlabel-light{display:inline}
 .theme-toggle .tlabel-light{display:none}
 @media (max-width:719px){
-  .brand{margin:4px 0 18px;min-height:36px}
-  .brand-slot{min-height:32px}
+  .brand{margin:4px 0 18px;min-height:24px}
+  .brand-slot{min-height:24px}
   .brand .wm{height:24px}
-  .theme-toggle{height:32px;min-width:32px;padding:0 9px;gap:0}
+  .theme-toggle{height:24px;min-height:24px;min-width:24px;padding:0 6px;gap:0}
+  .theme-toggle svg{width:12px;height:12px}
   .theme-toggle .tlabel{display:none!important}
 }
 
@@ -561,13 +581,14 @@ footer{
 [data-theme="dark"] body{background:var(--bg)}
 [data-theme="dark"] .aurora{
   background:
-    radial-gradient(ellipse 90% 70% at 50% -8%, rgba(120,105,255,.46), transparent 72%),
-    radial-gradient(ellipse 70% 60% at 12% 0%, rgba(210,100,165,.28), transparent 70%),
-    radial-gradient(ellipse 65% 55% at 88% 0%, rgba(255,160,110,.16), transparent 68%),
-    radial-gradient(ellipse 55% 50% at 70% 4%, rgba(255,200,130,.12), transparent 65%),
-    radial-gradient(ellipse 50% 45% at 30% 2%, rgba(110,160,255,.18), transparent 68%);
-  filter:blur(60px) saturate(118%);
-  opacity:.8;
+    linear-gradient(180deg, rgba(120,105,255,.28) 0%, rgba(120,105,255,.12) 18%, transparent 42%),
+    radial-gradient(ellipse 110% 85% at 50% -22%, rgba(120,105,255,.56), transparent 70%),
+    radial-gradient(ellipse 80% 70% at 8% -10%, rgba(210,100,165,.32), transparent 68%),
+    radial-gradient(ellipse 75% 65% at 92% -8%, rgba(255,160,110,.20), transparent 66%),
+    radial-gradient(ellipse 60% 55% at 72% -2%, rgba(255,200,130,.14), transparent 62%),
+    radial-gradient(ellipse 55% 50% at 28% -4%, rgba(110,160,255,.22), transparent 66%);
+  filter:blur(56px) saturate(120%);
+  opacity:.88;
 }
 [data-theme="dark"] .shell::after{
   opacity:.05;mix-blend-mode:screen;
@@ -761,22 +782,22 @@ document.getElementById("askSubmit").addEventListener("click",()=>{
 });
 /* fresh bar is non-sticky silk — no scroll hide */
 
-/* Theme toggle — system (prefers-color-scheme) until user toggles; then persist v2 key.
-   Legacy flip-beta-qa-theme is ignored/cleared so a stuck "light" cannot block system follow. */
+/* Theme toggle v3 — follow OS prefers-color-scheme until an explicit click.
+   Manual key is written ONLY on toggle click. All stale keys are wiped. */
 (function(){
-  const KEY='flip-beta-qa-theme-v2';
-  const LEGACY='flip-beta-qa-theme';
+  const MANUAL='flip-beta-qa-theme-manual';
+  const STALE=['flip-beta-qa-theme','flip-beta-qa-theme-v2','flip-beta-qa-theme-v1'];
   const root=document.documentElement;
   const btn=document.getElementById('themeToggle');
   const meta=document.getElementById('themeColorMeta');
-  try{localStorage.removeItem(LEGACY)}catch(e){}
+  for(const k of STALE){try{localStorage.removeItem(k)}catch(e){}}
   function systemTheme(){
     try{return window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'}
     catch(e){return 'light'}
   }
-  function savedPref(){
+  function manualPref(){
     try{
-      const s=localStorage.getItem(KEY);
+      const s=localStorage.getItem(MANUAL);
       return (s==='light'||s==='dark')?s:null;
     }catch(e){return null}
   }
@@ -789,16 +810,16 @@ document.getElementById("askSubmit").addEventListener("click",()=>{
       btn.setAttribute('aria-label', theme==='dark'?'Switch to light theme':'Switch to dark theme');
       btn.title=theme==='dark'?'Light':'Dark';
     }
-    if(persist){try{localStorage.setItem(KEY, theme)}catch(e){}}
+    if(persist){try{localStorage.setItem(MANUAL, theme)}catch(e){}}
   }
-  // Reconcile: if no manual override, force-follow system (fixes prior stuck attribute)
-  const pref=savedPref();
-  apply(pref || systemTheme(), false);
+  // First paint / reconcile: system wins unless user has clicked toggle this deploy era
+  apply(manualPref() || systemTheme(), false);
   if(btn) btn.addEventListener('click',()=>apply(current()==='dark'?'light':'dark', true));
   try{
-    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e=>{
-      if(!savedPref()) apply(e.matches?'dark':'light', false);
-    });
+    const mq=window.matchMedia('(prefers-color-scheme: dark)');
+    const onChange=e=>{ if(!manualPref()) apply(e.matches?'dark':'light', false); };
+    if(mq.addEventListener) mq.addEventListener('change', onChange);
+    else if(mq.addListener) mq.addListener(onChange);
   }catch(e){}
 })();
 
