@@ -77,6 +77,12 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/geist-mono@5.2.5/index.min.css" />
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&display=swap" />
 <style>
+/* Overhaul 2026-10-25 v10.51 — Global search. Main search box now scores every card across title, hidden kw (EN + CJK user phrasings), teaser, full answer text, tags and category,
+   reusing the Ask matcher pieces (askStem stemming, ASK_SYN synonyms, stopwords, CJK kw substring + bigrams, version strings) and adding the Ask score as a bonus so search and Ask agree.
+   Multi-word = all/most non-generic terms in any order (not exact phrase); prefix-as-you-type (firm → firmware); edit-distance-1 typos for words ≥5 chars (calender → calendar).
+   Weighted rank title > kw > teaser > tags > answer (+ idf, phrase bonus); results sorted by relevance while a query is active (Newest/Oldest resumes when cleared); single column order on mobile while searching.
+   Matched words get the existing teaser <mark> style in title + teaser; answer-only matches show a quiet 2-line “In answer” snippet (hidden once the card is open). Topic chips now combine with search
+   (empty-in-topic offers “Show N in all topics”); v10.50 empty-search “Ask the beta team” row kept. Instant paint on input (no debounce). No color / font changes. */
 /* Overhaul 2026-10-25 v10.50 — Composer-first Ask + T1 theme toggle (owner-approved prototypes composer-first / T1-icon-button, ported onto v10.49).
    (1) Hero: Ask pill → large prompt box “What’s going on with your Flip?” (sparkle + send) + 3 suggestion chips; tap focuses the sheet textarea synchronously inside the tap (iOS keyboard), chips prefill.
    (2) Ask sheet: composer textarea first (detailed 3-line placeholder @14px kept), live matches attached beneath like autocomplete (best match tinted), no-match line; Topics + iOS/Android behind “Add details · Optional” disclosure with summary;
@@ -1768,6 +1774,14 @@ footer{
   .modal.cf .modal-foot,[data-theme="dark"] .modal.cf .modal-foot{background:var(--surface);backdrop-filter:none;-webkit-backdrop-filter:none}
   .hp-sugs{flex-wrap:nowrap;margin-left:-80px;margin-right:-80px}
 }
+/* v10.51 global search: answer-only match snippet + title marks (existing teaser mark style, existing tokens only) */
+.item .q mark{background:transparent;color:inherit;font-weight:inherit;text-decoration:underline;text-decoration-thickness:1.5px;text-underline-offset:3px;text-decoration-color:var(--line2)}
+.item .snip{margin:-6px 0 14px;font-size:13px;font-weight:var(--fw-regular);letter-spacing:-.006em;line-height:1.45;color:var(--muted);
+  display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;line-clamp:2;overflow:hidden}
+.item .snip .snip-k{font-weight:var(--fw-medium);color:var(--faint);margin-right:6px}
+.item .snip mark{background:transparent;color:var(--ink-soft);font-weight:var(--fw-medium)}
+.item[open] .snip{display:none}
+.empty .empty-all{display:inline;background:none;border:0;padding:0;margin:0 0 0 4px;font:inherit;color:var(--accent);text-decoration:underline;text-underline-offset:3px;cursor:pointer}
 /* v10.50 search empty state → Ask row */
 .empty .empty-t{display:block;margin:0 0 16px}
 .empty-ask{display:flex;align-items:center;gap:12px;width:100%;max-width:440px;margin:0 auto;padding:12px 14px;border-radius:16px;border:1px solid var(--cta-border);
@@ -1927,24 +1941,32 @@ function validDate(d){const m=ISO_D.exec(d||"");return !!(m&&+m[2]>=1&&+m[2]<=12
 function sortVal(i){return validDate(i.date)?i.date:(i.sortKey||"")}
 function fmtDate(d){const m=ISO_D.exec(d);return MON[+m[2]-1]+" "+(+m[3])}
 function updHtml(i){return validDate(i.date)?`<time class="upd" datetime="${esc(i.date)}">Updated ${fmtDate(i.date)}</time>`:""}
-function cardHtml(i, openIds){
-  const teaser=i.teaserHtml||esc(i.teaser);
+function cardHtml(i, openIds, hit){
+  const teaser=hit?hit.teaserH:(i.teaserHtml||esc(i.teaser));
+  const title=hit?hit.titleH:esc(i.q);
+  const snip=hit&&hit.snipH?`<p class="snip"><span class="snip-k">In answer</span>${hit.snipH}</p>`:"";
   const neu=i.sortKey===PAGE_UPDATED?" is-new":"";
   const isOpen=openIds.has(i.id)?" open":"";
-  return `<details class="item${neu}" data-id="${esc(i.id)}" data-cat="${esc(i.cat)}"${isOpen}><summary><div class="q">${esc(i.q)}</div><p class="teaser">${teaser}</p><div class="meta">${pills(i)}</div>${updHtml(i)}</summary><div class="body">${i.a}</div></details>`;
+  return `<details class="item${neu}" data-id="${esc(i.id)}" data-cat="${esc(i.cat)}"${isOpen}><summary><div class="q">${title}</div><p class="teaser">${teaser}</p>${snip}<div class="meta">${pills(i)}</div>${updHtml(i)}</summary><div class="body">${i.a}</div></details>`;
 }
+const wideMQ=window.matchMedia("(min-width:720px)");
 function paint(){
-  const q=(qEl.value||"").trim().toLowerCase();
-  let items=DATA.slice();
-  /* Global search: non-empty query ignores topic tab so matches from all categories show */
+  const raw=(qEl.value||"").trim();
+  const q=raw.toLowerCase();
+  let items=DATA.slice(), hits=null, allHits=0;
   if(q){
-    items=items.filter(i=>(i.q+" "+i.a+" "+i.teaser+" "+i.id+" "+(i.tags||[]).join(" ")).toLowerCase().includes(q));
-  }else if(tab!=="all"){
-    items=items.filter(i=>i.cat===tab);
+    /* v10.51 global search: relevance-ranked across all fields; topic chip still filters */
+    const res=(typeof globalSearch==="function"&&window.__searchReady)?globalSearch(raw):[];
+    allHits=res.length;
+    const r2=tab==="all"?res:res.filter(h=>h.item.cat===tab);
+    hits=new Map(r2.map(h=>[h.item.id,h]));
+    items=r2.map(h=>h.item);
+  }else{
+    if(tab!=="all") items=items.filter(i=>i.cat===tab);
+    /* v10.49: optional ISO `date` wins over sortKey; undated cards keep their sortKey order (stable sort) */
+    items.sort((a,b)=> sortDir==="newest" ? sortVal(b).localeCompare(sortVal(a)) : sortVal(a).localeCompare(sortVal(b)));
   }
-  /* v10.49: optional ISO `date` wins over sortKey; undated cards keep their sortKey order (stable sort) */
-  items.sort((a,b)=> sortDir==="newest" ? sortVal(b).localeCompare(sortVal(a)) : sortVal(a).localeCompare(sortVal(b)));
-  if(q) sec.textContent=items.length===1?`1 match across topics`:`${items.length} matches across topics`;
+  if(q){const n=items.length;sec.textContent=(n===1?"1 match":n+" matches")+(tab==="all"?" across topics":" in "+(LABELS[tab]||"topic"))}
   else sec.textContent=(tab==="all"?`${items.length} answers`:`${items.length} in ${LABELS[tab]||"topic"}`);
   const openIds=new Set(Array.from(list.querySelectorAll("details.item[open]")).map(el=>el.dataset.id).filter(Boolean));
   let left=list.querySelector("#list-left");
@@ -1959,14 +1981,17 @@ function paint(){
     left.innerHTML='';
     right.innerHTML='';
     list.classList.remove("has-cols");
-    list.innerHTML='<div class="empty"><span class="empty-t">No matches — try another word or topic.</span><button type="button" class="empty-ask"><span class="ic"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2.5l1.9 5.6 5.6 1.9-5.6 1.9L12 17.5l-1.9-5.6L4.5 10l5.6-1.9z"/><path d="M19 15l.8 2.2 2.2.8-2.2.8L19 21l-.8-2.2-2.2-.8 2.2-.8z" opacity=".7"/></svg></span><span class="tx"><b>Ask the beta team</b><q>'+esc(qEl.value.trim())+'</q></span><span class="go"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></button></div>';
+    const other=(q&&tab!=="all"&&allHits)?`<span class="empty-t">No matches in ${esc(LABELS[tab]||"this topic")}.<button type="button" class="empty-all">Show ${allHits} in all topics</button></span>`:'<span class="empty-t">No matches — try another word or topic.</span>';
+    list.innerHTML='<div class="empty">'+other+'<button type="button" class="empty-ask"><span class="ic"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2.5l1.9 5.6 5.6 1.9-5.6 1.9L12 17.5l-1.9-5.6L4.5 10l5.6-1.9z"/><path d="M19 15l.8 2.2 2.2.8-2.2.8L19 21l-.8-2.2-2.2-.8 2.2-.8z" opacity=".7"/></svg></span><span class="tx"><b>Ask the beta team</b><q>'+esc(raw)+'</q></span><span class="go"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></button></div>';
     return;
   }
-  /* Odd/even split: stable columns — open only pushes within its column */
+  /* Odd/even split: stable columns — open only pushes within its column.
+     v10.51: while searching on a single-column (mobile) layout, keep pure relevance order in one column */
   const L=[], R=[];
-  items.forEach((it,idx)=>{(idx%2===0?L:R).push(it)});
-  left.innerHTML=L.map(i=>cardHtml(i,openIds)).join("");
-  right.innerHTML=R.map(i=>cardHtml(i,openIds)).join("");
+  const oneCol=!!q&&!wideMQ.matches;
+  items.forEach((it,idx)=>{(oneCol||idx%2===0?L:R).push(it)});
+  left.innerHTML=L.map(i=>cardHtml(i,openIds,hits&&hits.get(i.id))).join("");
+  right.innerHTML=R.map(i=>cardHtml(i,openIds,hits&&hits.get(i.id))).join("");
 }
 function render(){
   /* Instant paint — prior soft:true waited 150ms + opacity .4, felt laggy on topic chips */
@@ -1995,7 +2020,9 @@ document.querySelectorAll(".sort button").forEach(btn=>btn.addEventListener("cli
 window.addEventListener("resize", syncSortThumb, {passive:true});
 if(document.fonts&&document.fonts.ready) document.fonts.ready.then(syncSortThumb).catch(function(){});
 requestAnimationFrame(syncSortThumb);
-qEl.addEventListener("input",()=>render());render();
+qEl.addEventListener("input",()=>render());qEl.addEventListener("compositionend",()=>render());
+wideMQ.addEventListener&&wideMQ.addEventListener("change",()=>{if((qEl.value||"").trim()) render()});
+render();
 
 /* —— Ask modal v10.39 (multi-topic, smarter matching); v10.38: auto-grow textarea, live Q&A matching, optional OS, WhatsApp copy/jump —— */
 const modal=document.getElementById("askModal");
@@ -2293,6 +2320,13 @@ function askIdf(t){return Math.log(1+ASK_N/(ASK_DF.get(t)||1))/Math.log(1+ASK_N)
 /* Topic chip label → DATA cat */
 const ASK_TOPIC_CAT={"Getting started":"getting-started","Device":"device","App & firmware":"app-firmware","Recording & AI":"recording-ai","Privacy & MCP":"privacy","How to report":"feedback"};
 function findAskMatches(text, limit, topics){
+  const scored=askScoreAll(text, topics);
+  if(!scored.length) return [];
+  const top=scored[0].score;
+  return scored.filter(x=>x.score>=top*0.35).slice(0,limit||3).map(x=>x.item);
+}
+/* v10.51: raw Ask scoring, shared with the main search box (sorted, qualifying entries only) */
+function askScoreAll(text, topics){
   const words=askWords(text,true);
   const wset=new Set(words);
   const core=askWords(text,false);
@@ -2327,11 +2361,147 @@ function findAskMatches(text, limit, topics){
     if(score>0&&boostCats.has(e.item.cat)) score*=1.2;
     if(strong>=1&&score>=1.5) scored.push({item:e.item, score});
   });
-  if(!scored.length) return [];
   scored.sort((x,y)=>y.score-x.score);
-  const top=scored[0].score;
-  return scored.filter(x=>x.score>=top*0.35).slice(0,limit||3).map(x=>x.item);
+  return scored;
 }
+/* —— v10.51 Global search engine (main search box). Reuses askStem / ASK_STOP / ASK_SYN / ASK_GENERIC / CJK helpers and
+   adds Ask's own score as a bonus so search ranking and Ask live matches agree. —— */
+const SR_WORD=/[a-z0-9]+(?:\.[0-9]+)*/g;
+const SR_FW={title:4, kw:3, teaser:2.2, meta:1.5, answer:1.2};
+function srNorm(t){return String(t||"").toLowerCase().replace(/[’']/g,"").replace(/user\.md/g,"usermd")}
+function srCanon(st){return ASK_SYN.get(st)||st}
+function srTokens(text){
+  const m=new Map();
+  (srNorm(text).match(SR_WORD)||[]).forEach(w=>{if(!m.has(w)){const st=askStem(w);m.set(w,{w,st,c:srCanon(st)})}});
+  return Array.from(m.values());
+}
+function srEdit1(a,b){
+  if(a===b) return true;
+  const la=a.length, lb=b.length;
+  if(Math.abs(la-lb)>1) return false;
+  let i=0; while(i<la&&i<lb&&a[i]===b[i]) i++;
+  if(la===lb) return a.slice(i+1)===b.slice(i+1) || (i+1<la&&a[i]===b[i+1]&&a[i+1]===b[i]&&a.slice(i+2)===b.slice(i+2));
+  return la>lb ? a.slice(i+1)===b.slice(i) : a.slice(i)===b.slice(i+1);
+}
+/* Quality of query term t against one indexed token: exact/stem 1, prefix .85, typo .75, synonym .7 */
+function srQual(t, tok){
+  if(tok.w===t.w||tok.st===t.st) return 1;
+  if(t.w.length>=2&&tok.w.startsWith(t.w)&&!/^\d+$/.test(t.w)) return t.w.length>=3?0.85:0.6;
+  if(/\d/.test(t.w)&&tok.w.indexOf(t.w)===0) return 0.85;
+  if(t.w.length>=5&&tok.w.length>=4&&!/\d/.test(t.w)&&(srEdit1(t.w,tok.w)||srEdit1(t.st,tok.st)||(tok.w.length>t.w.length&&srEdit1(t.w,tok.w.slice(0,t.w.length))))) return 0.75;
+  if(t.c!==t.w&&t.c===tok.c&&t.c.length>1) return 0.7;
+  if(tok.c!==tok.st&&tok.c===t.st) return 0.7;
+  return 0;
+}
+const SR_INDEX=DATA.map(i=>{
+  const kwEn=[], kwCjk=[];
+  (i.kw||[]).forEach(k=>{if(/[\u3400-\u9fff\uf900-\ufaff]/.test(k)) kwCjk.push(k); else kwEn.push(k)});
+  const ans=stripHtml(String(i.a||"").replace(/<\/(p|li|h\d)>/g,"</$1> ")).replace(/\s+/g," ").trim();
+  const meta=(i.tags||[]).join(" ")+" "+(LABELS[i.cat]||"")+" "+(i.tag||"")+" "+String(i.id).replace(/-/g," ");
+  return {item:i, ans,
+    f:{title:srTokens(i.q), kw:srTokens(kwEn.join(" , ")), teaser:srTokens(i.teaser), meta:srTokens(meta), answer:srTokens(ans)},
+    low:{title:srNorm(i.q), kw:kwEn.map(srNorm), teaser:srNorm(i.teaser), answer:srNorm(ans)},
+    kwCjk, kwCjkAll:kwCjk.join(" ")};
+});
+function srQueryTerms(text){
+  const all=(srNorm(text).match(SR_WORD)||[]).filter(w=>w.length>=2||/\d/.test(w));
+  let ws=all.filter(w=>!ASK_STOP.has(w));
+  if(!ws.length) ws=all.filter(w=>w.length>=3); /* e.g. "how" alone still searches */
+  const seen=new Set(), out=[];
+  ws.forEach(w=>{if(seen.has(w))return;seen.add(w);const st=askStem(w);out.push({w,st,c:srCanon(st),gen:ASK_GENERIC.has(st)})});
+  return out;
+}
+function srBestQual(t, toks){let b=0;for(const tok of toks){const q=srQual(t,tok);if(q>b){b=q;if(b===1)break}}return b}
+window.__searchReady=true;
+function globalSearch(text){
+  const terms=srQueryTerms(text);
+  const cjkRuns=askCjkRuns(text).map(r=>r.replace(ASK_CJK_STOP,"")).filter(Boolean);
+  if(!terms.length&&!cjkRuns.length) return [];
+  const N=SR_INDEX.length;
+  const per=SR_INDEX.map(e=>{
+    const tq=terms.map(t=>{const r={};for(const f in SR_FW) r[f]=srBestQual(t,e.f[f]);return r});
+    const cq=cjkRuns.map(run=>{
+      if(e.kwCjk.some(k=>k.indexOf(run)>=0)) return 1;
+      if(run.length>=2&&e.kwCjk.some(k=>k.length>=2&&run.indexOf(k)>=0)) return 0.9;
+      const bi=[];for(let x=0;x<run.length-1;x++) bi.push(run.slice(x,x+2));
+      if(!bi.length) return 0;
+      const hit=bi.filter(b=>e.kwCjkAll.indexOf(b)>=0).length;
+      return hit/bi.length>=0.5?0.6*hit/bi.length:0;
+    });
+    return {e,tq,cq};
+  });
+  /* document frequency per term for idf */
+  const dfT=terms.map((t,k)=>per.filter(p=>Object.values(p.tq[k]).some(v=>v>0)).length);
+  const dfC=cjkRuns.map((r,k)=>per.filter(p=>p.cq[k]>0).length);
+  const idf=df=>0.5+0.5*Math.log(1+N/(df||1))/Math.log(1+N);
+  const strongTerms=terms.filter(t=>!t.gen).length;
+  const nNeed=strongTerms+cjkRuns.length;
+  const need=nNeed?Math.max(1,Math.ceil(nNeed*0.6)):Math.max(1,Math.ceil(terms.length*0.6));
+  const qLow=srNorm(text).replace(/\s+/g," ").trim();
+  const askMap=new Map(askScoreAll(text,[]).map(x=>[x.item.id,x.score]));
+  const out=[];
+  per.forEach(p=>{
+    let score=0, covered=0, coveredAll=0;
+    terms.forEach((t,k)=>{
+      const r=p.tq[k]; let best=0, rest=0;
+      for(const f in SR_FW){const v=SR_FW[f]*r[f]; if(v>best){rest+=best;best=v}else rest+=v}
+      if(best>0){coveredAll++; if(!t.gen) covered++}
+      score+=(best+0.15*rest)*idf(dfT[k])*(t.gen?0.25:1);
+    });
+    cjkRuns.forEach((run,k)=>{const v=p.cq[k]; if(v>0){covered++;coveredAll++;score+=3*v*idf(dfC[k])*(1+0.15*Math.min(run.length-2,3))}});
+    const cov=nNeed?covered:coveredAll;
+    /* phrase bonus (only multi-word / long queries) */
+    if(qLow.length>=4&&/\s/.test(qLow)){
+      if(p.e.low.title.indexOf(qLow)>=0) score+=3;
+      if(p.e.low.kw.some(k=>k===qLow||k.indexOf(qLow)>=0)) score+=2.5;
+      if(p.e.low.teaser.indexOf(qLow)>=0) score+=1.5;
+      if(p.e.low.answer.indexOf(qLow)>=0) score+=1;
+    }
+    const ask=askMap.get(p.e.item.id)||0;
+    const ok=cov>=need || ask>0;
+    if(!ok||(score<=0&&!ask)) return;
+    score+=0.6*ask + (nNeed?covered/nNeed:0);
+    out.push({item:p.e.item, score, e:p.e, termQ:p.tq});
+  });
+  if(!out.length) return [];
+  out.sort((a,b)=>b.score-a.score||sortVal(b.item).localeCompare(sortVal(a.item)));
+  /* drop weak tail far below the best hit (keeps "most terms" results, trims single generic-word noise) */
+  const top=out[0].score;
+  const res=out.filter(h=>h.score>=top*0.18);
+  res.forEach(h=>decorateHit(h,terms));
+  return res;
+}
+/* Wrap matched words (exact/stem/prefix/typo/synonym) in <mark>, escaping everything else */
+function srHighlight(text, terms){
+  const src=String(text||""); let html="", last=0, any=false;
+  const re=/[A-Za-z0-9]+(?:\.[0-9]+)*/g; let m;
+  while((m=re.exec(src))){
+    const w=srNorm(m[0]); const st=askStem(w); const tok={w,st,c:srCanon(st)};
+    const hit=terms.some(t=>srQual(t,tok)>0&&(!t.gen||srQual(t,tok)>=0.85));
+    if(hit){html+=esc(src.slice(last,m.index))+"<mark>"+esc(m[0])+"</mark>";last=m.index+m[0].length;any=true}
+  }
+  html+=esc(src.slice(last));
+  return {html, any};
+}
+function srSnippet(ans, terms){
+  const re=/[A-Za-z0-9]+(?:\.[0-9]+)*/g; let m, pos=-1;
+  while((m=re.exec(ans))){const w=srNorm(m[0]);const st=askStem(w);if(terms.some(t=>!t.gen&&srQual(t,{w,st,c:srCanon(st)})>=0.75)){pos=m.index;break}}
+  if(pos<0) return "";
+  let a=Math.max(0,pos-48), b=Math.min(ans.length,pos+110);
+  if(a>0){const sp=ans.indexOf(" ",a);a=(sp>=0&&sp<pos)?sp+1:a}
+  if(b<ans.length){const sp=ans.lastIndexOf(" ",b);b=sp>pos?sp:b}
+  return (a>0?"…":"")+srHighlight(ans.slice(a,b),terms).html+(b<ans.length?"…":"");
+}
+function decorateHit(h, terms){
+  const i=h.item, t=srHighlight(i.q,terms), z=srHighlight(i.teaser,terms);
+  h.titleH=t.html; h.teaserH=z.html;
+  /* answer-only: no strong term visible in title/teaser but one hits the answer → quiet snippet */
+  const visible=terms.some((tm,k)=>!tm.gen&&(h.termQ[k].title>0||h.termQ[k].teaser>0));
+  const inAns=terms.some((tm,k)=>!tm.gen&&h.termQ[k].answer>=0.75);
+  h.snipH=(!visible&&inAns)?srSnippet(h.e.ans,terms):"";
+}
+if((qEl.value||"").trim()) render();
+
 function askSnippet(i){
   const t=(i.teaser||stripHtml(i.a)).replace(/\s+/g," ").trim();
   return t.length>120?t.slice(0,117).replace(/\s+\S*$/,"")+"…":t;
@@ -2611,6 +2781,8 @@ document.querySelectorAll(".chip").forEach(btn=>btn.addEventListener("click",()=
 document.querySelectorAll('.hp-sug').forEach(b=>b.addEventListener('click',()=>openComposer(b.dataset.q)));
 /* v10.50: empty search → Ask the beta team, prefilled with the search text */
 list.addEventListener('click',e=>{if(e.target.closest('.empty-ask')) openComposer((qEl.value||'').trim())});
+/* v10.51: search found nothing in the selected topic → widen to All topics */
+list.addEventListener('click',e=>{if(!e.target.closest('.empty-all')) return;tab='all';document.querySelectorAll('.chip').forEach(b=>b.setAttribute('aria-selected',b.dataset.tab==='all'?'true':'false'));render()});
 </script>
 </body>
 </html>
