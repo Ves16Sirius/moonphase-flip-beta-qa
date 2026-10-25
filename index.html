@@ -817,27 +817,50 @@ footer{
 /* Modal */
 .modal-backdrop{
   position:fixed;inset:0;z-index:100;display:flex;align-items:center;justify-content:center;
-  padding:24px;background:rgba(16,14,12,.36);
+  padding:max(16px, env(safe-area-inset-top, 0px)) max(16px, env(safe-area-inset-right, 0px)) max(16px, env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px));
+  background:rgba(16,14,12,.36);
   backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
   opacity:0;transition:opacity 200ms var(--ease);
 }
 .modal-backdrop[hidden]{display:none}
 .modal-backdrop.open{opacity:1}
 .modal{
-  width:min(420px,100%);padding:26px;border-radius:20px;
+  display:flex;flex-direction:column;
+  width:min(420px,100%);max-height:min(90dvh, 90svh, 720px);
+  padding:0;border-radius:20px;
   background:color-mix(in srgb, var(--surface) 86%, transparent);
   border:1px solid var(--glass-rim);
   backdrop-filter:blur(24px) saturate(160%);
   -webkit-backdrop-filter:blur(24px) saturate(160%);
   box-shadow:var(--shadow-lg), var(--glass-highlight);
-  transform:translateY(5px);transition:transform 200ms var(--ease);
+  transform:translateY(8px);transition:transform 220ms var(--ease);
+  overflow:hidden;
 }
 .modal-backdrop.open .modal{transform:none}
-.modal h2{margin:0 0 6px;font-size:19px;font-weight:600;letter-spacing:-.03em;color:var(--ink)}
-.modal .hint{margin:0 0 18px;font-size:13px;color:var(--muted);line-height:1.45}
+.modal-head{
+  flex:0 0 auto;
+  padding:22px 24px 0;
+}
+.modal-body{
+  flex:1 1 auto;min-height:0;
+  overflow-x:hidden;overflow-y:auto;
+  -webkit-overflow-scrolling:touch;
+  overscroll-behavior:contain;
+  padding:12px 24px 8px;
+}
+.modal-foot{
+  flex:0 0 auto;
+  padding:10px 24px max(18px, env(safe-area-inset-bottom, 0px));
+  border-top:1px solid var(--line);
+  background:color-mix(in srgb, var(--surface) 72%, transparent);
+  backdrop-filter:blur(16px) saturate(150%);
+  -webkit-backdrop-filter:blur(16px) saturate(150%);
+}
+.modal h2{margin:0 0 4px;font-size:18px;font-weight:600;letter-spacing:-.03em;color:var(--ink)}
+.modal .hint{margin:0;font-size:12.5px;color:var(--muted);line-height:1.45}
 .modal label{display:block;font-family:var(--mono);font-size:10px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:var(--faint);margin:0 0 6px}
 .modal select,.modal textarea{
-  width:100%;margin:0 0 14px;padding:10px 12px;border-radius:11px;
+  width:100%;margin:0 0 12px;padding:10px 12px;border-radius:11px;
   border:1px solid var(--glass-rim);background:var(--glass-fill);outline:0;
   backdrop-filter:blur(14px) saturate(150%);
   -webkit-backdrop-filter:blur(14px) saturate(150%);
@@ -849,24 +872,25 @@ footer{
   border-color:color-mix(in srgb, var(--accent) 40%, var(--line));
   box-shadow:0 0 0 3px var(--accent-soft), var(--glass-highlight);
 }
-.modal textarea{min-height:100px;resize:vertical}
-.modal textarea.ask-preview{min-height:140px;font-family:var(--mono);font-size:12px;line-height:1.5;letter-spacing:0}
-.modal .ask-actions{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 14px}
-.modal .ask-note{margin:-6px 0 12px;font-size:12.5px;color:var(--muted);line-height:1.4}
+.modal textarea{min-height:96px;resize:vertical}
+.modal textarea.ask-preview{min-height:112px;max-height:220px;font-family:var(--mono);font-size:12px;line-height:1.5;letter-spacing:0}
+.modal .ask-actions{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 12px}
+.modal .ask-note{margin:0 0 10px;font-size:12.5px;color:var(--muted);line-height:1.4}
 .modal .ask-note[hidden]{display:none}
-.modal .row{display:flex;justify-content:flex-end;flex-wrap:wrap;gap:8px;margin-top:4px;align-items:center}
+.modal .row{display:flex;justify-content:flex-end;flex-wrap:wrap;gap:8px;margin:0;align-items:center}
 /* Ask topic chips — same glass language as page .chip */
 .ask-topics{
-  display:flex;flex-wrap:wrap;gap:8px;margin:0 0 14px;
+  display:flex;flex-wrap:wrap;gap:8px;margin:0 0 12px;
 }
 .ask-topic{
-  flex:0 0 auto;height:32px;padding:0 12px;border-radius:999px;
+  flex:0 1 auto;min-height:32px;height:auto;padding:8px 12px;border-radius:999px;
   border:1px solid var(--glass-rim);background:var(--glass-fill);
   backdrop-filter:blur(var(--glass-blur)) saturate(var(--glass-sat));
   -webkit-backdrop-filter:blur(var(--glass-blur)) saturate(var(--glass-sat));
   font-size:12.5px;font-weight:var(--fw-medium);letter-spacing:-.011em;color:var(--ink-soft);
   white-space:nowrap;box-shadow:var(--glass-shadow), var(--glass-highlight);
-  line-height:1;
+  line-height:1.2;
+  -webkit-tap-highlight-color:transparent;
   transition:background var(--dur) var(--ease), border-color var(--dur) var(--ease), color var(--dur) var(--ease), box-shadow var(--dur) var(--ease);
 }
 .ask-topic:hover{border-color:var(--line2);background:var(--glass-fill-strong)}
@@ -886,7 +910,7 @@ footer{
   display:inline-flex;align-items:center;width:100%;
   height:var(--control-h);
   padding:var(--ask-dest-inset-y-top) var(--ask-dest-inset-x) var(--ask-dest-inset-y-bottom);
-  margin:0 0 14px;
+  margin:0 0 4px;
   border-radius:999px;border:1px solid var(--glass-rim);
   background:var(--glass-fill);
   backdrop-filter:blur(var(--glass-blur)) saturate(var(--glass-sat));
@@ -938,6 +962,7 @@ footer{
   .ask-dest-thumb{transition:none}
 }
 .btn{
+  display:inline-flex;align-items:center;justify-content:center;
   height:36px;padding:0 15px;border-radius:999px;border:1px solid var(--line);
   font-size:12.5px;font-weight:500;color:var(--ink-soft);background:transparent;
   transition:background 150ms var(--ease), opacity 150ms var(--ease);
@@ -1446,6 +1471,67 @@ footer{
   .item .body{padding:4px 20px 20px}
   .item .q{margin:0 0 10px}
   footer{margin:40px 0 0;padding:22px 0 0;border:0;border-top:1px solid var(--line)}
+
+  /* Ask modal — mobile bottom sheet */
+  .modal-backdrop{
+    align-items:flex-end;justify-content:center;
+    padding:0;
+    padding-top:env(safe-area-inset-top, 0px);
+  }
+  .modal{
+    width:100%;max-width:100%;
+    max-height:min(90dvh, 90svh);
+    border-radius:20px 20px 0 0;
+    border-left:0;border-right:0;border-bottom:0;
+    transform:translateY(110%);
+  }
+  .modal-backdrop.open .modal{transform:translateY(0)}
+  .modal-head{
+    padding:14px max(18px, env(safe-area-inset-right, 0px)) 0 max(18px, env(safe-area-inset-left, 0px));
+  }
+  .modal-head::before{
+    content:"";display:block;width:36px;height:4px;border-radius:999px;
+    background:var(--line2);margin:2px auto 12px;opacity:.85;
+  }
+  .modal h2{font-size:17px;margin:0 0 4px}
+  .modal .hint{font-size:12px;line-height:1.4;margin:0 0 2px}
+  .modal-body{
+    padding:10px max(18px, env(safe-area-inset-right, 0px)) 6px max(18px, env(safe-area-inset-left, 0px));
+  }
+  .modal label{margin:0 0 5px}
+  .modal select,.modal textarea{margin:0 0 10px;font-size:16px;/* iOS zoom guard */}
+  .modal textarea{min-height:88px;resize:none}
+  .modal textarea.ask-preview{min-height:72px;max-height:140px}
+  .modal .ask-actions{margin:0 0 10px}
+  .modal .ask-actions .btn{min-height:40px;height:40px;padding:0 16px}
+  .ask-topics{gap:8px;margin:0 0 10px}
+  .ask-topic{
+    flex:0 1 auto;min-height:44px;padding:10px 14px;font-size:13px;
+  }
+  .ask-dest{
+    height:44px;min-height:44px;width:100%;margin:0 0 2px;
+  }
+  .ask-dest button{font-size:13.5px;min-height:100%}
+  .modal-foot{
+    padding:10px max(18px, env(safe-area-inset-right, 0px)) max(12px, env(safe-area-inset-bottom, 0px)) max(18px, env(safe-area-inset-left, 0px));
+  }
+  .modal .ask-note{margin:0 0 8px;font-size:12px}
+  .modal .row{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:8px;
+    width:100%;
+  }
+  .modal .row .btn{
+    width:100%;height:44px;min-height:44px;justify-content:center;
+    font-size:13.5px;
+  }
+  .modal .row #askCopy{
+    grid-column:1 / -1;
+    order:-1;
+  }
+  .modal .row #askCancel{order:1}
+  .modal .row #askOpenWa{order:2}
 }
 
 /* Desktop/web: search + Newest/Oldest MUST stay one horizontal row */
@@ -1535,38 +1621,44 @@ footer{
 </div>
 <div class="modal-backdrop" id="askModal" role="dialog" aria-modal="true" aria-labelledby="askTitle" hidden>
   <div class="modal">
-    <h2 id="askTitle">Ask the beta team</h2>
-    <p class="hint">Jot messy notes below. Tap Organise for a clear numbered message, then <strong>Copy message</strong> and paste into WhatsApp — General or your Beta Support chat.</p>
-    <label id="askCatLabel">Topic</label>
-    <div class="ask-topics" role="group" aria-labelledby="askCatLabel" id="askTopics">
-      <button type="button" class="ask-topic" data-topic="Getting started" aria-pressed="true">Getting started</button>
-      <button type="button" class="ask-topic" data-topic="Device" aria-pressed="false">Device</button>
-      <button type="button" class="ask-topic" data-topic="App &amp; firmware" aria-pressed="false">App &amp; firmware</button>
-      <button type="button" class="ask-topic" data-topic="Recording &amp; AI" aria-pressed="false">Recording &amp; AI</button>
-      <button type="button" class="ask-topic" data-topic="Privacy &amp; MCP" aria-pressed="false">Privacy &amp; MCP</button>
-      <button type="button" class="ask-topic" data-topic="How to report" aria-pressed="false">How to report</button>
-      <button type="button" class="ask-topic" data-topic="Other" aria-pressed="false">Other</button>
+    <div class="modal-head">
+      <h2 id="askTitle">Ask the beta team</h2>
+      <p class="hint">Jot messy notes below. Tap Organise for a clear numbered message, then <strong>Copy message</strong> and paste into WhatsApp — General or your Beta Support chat.</p>
     </div>
-    <input type="hidden" id="askCat" value="Getting started" />
-    <label for="askQ">Your notes</label>
-    <textarea id="askQ" placeholder="What are you seeing? Steps, SN, app build, firmware — messy notes are fine (中文也行)." maxlength="2000"></textarea>
-    <div class="ask-actions">
-      <button type="button" class="btn" id="askOrganise">Organise</button>
+    <div class="modal-body">
+      <label id="askCatLabel">Topic</label>
+      <div class="ask-topics" role="group" aria-labelledby="askCatLabel" id="askTopics">
+        <button type="button" class="ask-topic" data-topic="Getting started" aria-pressed="true">Getting started</button>
+        <button type="button" class="ask-topic" data-topic="Device" aria-pressed="false">Device</button>
+        <button type="button" class="ask-topic" data-topic="App &amp; firmware" aria-pressed="false">App &amp; firmware</button>
+        <button type="button" class="ask-topic" data-topic="Recording &amp; AI" aria-pressed="false">Recording &amp; AI</button>
+        <button type="button" class="ask-topic" data-topic="Privacy &amp; MCP" aria-pressed="false">Privacy &amp; MCP</button>
+        <button type="button" class="ask-topic" data-topic="How to report" aria-pressed="false">How to report</button>
+        <button type="button" class="ask-topic" data-topic="Other" aria-pressed="false">Other</button>
+      </div>
+      <input type="hidden" id="askCat" value="Getting started" />
+      <label for="askQ">Your notes</label>
+      <textarea id="askQ" placeholder="What are you seeing? Steps, SN, app build, firmware — messy notes are fine (中文也行)." maxlength="2000"></textarea>
+      <div class="ask-actions">
+        <button type="button" class="btn" id="askOrganise">Organise</button>
+      </div>
+      <label for="askPreview">Message preview</label>
+      <textarea id="askPreview" class="ask-preview" placeholder="Organised numbered message appears here — edit freely, then Copy message." maxlength="4000"></textarea>
+      <label id="askDestLabel">Send to</label>
+      <div class="ask-dest" role="group" aria-labelledby="askDestLabel" id="askDestSeg" data-dest="general">
+        <span class="ask-dest-thumb" aria-hidden="true"></span>
+        <button type="button" data-dest="general" aria-pressed="true">General</button>
+        <button type="button" data-dest="beta" aria-pressed="false">Beta Support</button>
+      </div>
+      <input type="hidden" id="askDest" value="general" />
     </div>
-    <label for="askPreview">Message preview</label>
-    <textarea id="askPreview" class="ask-preview" placeholder="Organised numbered message appears here — edit freely, then Copy message." maxlength="4000"></textarea>
-    <label id="askDestLabel">Send to</label>
-    <div class="ask-dest" role="group" aria-labelledby="askDestLabel" id="askDestSeg" data-dest="general">
-      <span class="ask-dest-thumb" aria-hidden="true"></span>
-      <button type="button" data-dest="general" aria-pressed="true">General</button>
-      <button type="button" data-dest="beta" aria-pressed="false">Beta Support</button>
-    </div>
-    <input type="hidden" id="askDest" value="general" />
-    <p class="ask-note" id="askNote" hidden></p>
-    <div class="row">
-      <button type="button" class="btn" id="askCancel">Cancel</button>
-      <button type="button" class="btn" id="askOpenWa">Open WhatsApp</button>
-      <button type="button" class="btn primary" id="askCopy">Copy message</button>
+    <div class="modal-foot">
+      <p class="ask-note" id="askNote" hidden></p>
+      <div class="row">
+        <button type="button" class="btn" id="askCancel">Cancel</button>
+        <button type="button" class="btn" id="askOpenWa">Open WhatsApp</button>
+        <button type="button" class="btn primary" id="askCopy">Copy message</button>
+      </div>
     </div>
   </div>
 </div>
@@ -1710,6 +1802,9 @@ function setAskDest(key){
 if(askDestSeg){
   askDestSeg.querySelectorAll("button").forEach(btn=>btn.addEventListener("click",()=>setAskDest(btn.dataset.dest)));
   window.addEventListener("resize", syncAskDestThumb, {passive:true});
+  if(window.visualViewport){
+    window.visualViewport.addEventListener("resize", syncAskDestThumb, {passive:true});
+  }
   if(document.fonts&&document.fonts.ready) document.fonts.ready.then(syncAskDestThumb).catch(function(){});
 }
 document.querySelectorAll(".ask-topic").forEach(btn=>btn.addEventListener("click",()=>{
@@ -1720,13 +1815,23 @@ document.querySelectorAll(".ask-topic").forEach(btn=>btn.addEventListener("click
 function openAsk(){
   if(askNote){askNote.hidden=true;askNote.textContent=""}
   modal.hidden=false;
+  document.documentElement.style.overflow="hidden";
+  document.body.style.overflow="hidden";
   requestAnimationFrame(()=>{
     modal.classList.add("open");
     syncAskDestThumb();
+    /* second pass after sheet layout / font metrics */
+    requestAnimationFrame(syncAskDestThumb);
   });
-  askQ.focus();
+  /* Delay focus slightly so iOS keyboard doesn't fight sheet slide */
+  setTimeout(function(){try{askQ.focus({preventScroll:true})}catch(e){try{askQ.focus()}catch(_){}}}, 220);
 }
-function closeAsk(){modal.classList.remove("open");setTimeout(()=>{modal.hidden=true},200)}
+function closeAsk(){
+  modal.classList.remove("open");
+  document.documentElement.style.overflow="";
+  document.body.style.overflow="";
+  setTimeout(()=>{modal.hidden=true},220);
+}
 document.getElementById("askOpen").addEventListener("click",openAsk);
 document.getElementById("askCancel").addEventListener("click",closeAsk);
 modal.addEventListener("click",e=>{if(e.target===modal)closeAsk()});
