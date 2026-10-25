@@ -83,7 +83,7 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/geist-mono@5.2.5/index.min.css" />
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:opsz,wght@14..32,400;14..32,500;14..32,560;14..32,600&display=swap" />
 <style>
-/* Overhaul 2026-10-25 v10.22 — continuous island aurora (dual-layer hex) · theme sync · keep Inter 560 + light #5B5678 */
+/* Overhaul 2026-10-25 v10.23 — kill island seam: sticky full twin of aurora curtain · keep Inter 560 + light #5B5678 */
 :root{
   /* Surfaces */
   --bg:#F6F5FB;
@@ -185,9 +185,10 @@ body{
   position:relative;
 }
 /* FIXED dual-layer aurora — PRECOMPUTED hex washes (no color-mix; iOS Safari safe).
-   Sticky + main share the SAME purple family so island→content is one continuous silk.
+   Sticky + main are FULL-HEIGHT twins (same height, same hex stops, same soft mask) so
+   island→content is one continuous silk — never a short solid-bottom band edge.
    Theme flip = CSS opacity crossfade on BOTH stacks from the same data-theme (~200ms).
-   #aurora-sticky = thin backup wash if iOS Safari drops the fixed compositor layer. */
+   #aurora-sticky = full-height backup twin if iOS Safari drops the fixed compositor layer. */
 .aurora,.aurora-stack{
   position:fixed;
   top:0;left:0;right:0;
@@ -207,13 +208,13 @@ body{
   position:fixed;
   top:0;left:0;right:0;
   width:100%;
-  height:calc(env(safe-area-inset-top, 0px) + 96px);
+  height:calc(env(safe-area-inset-top, 0px) + min(280px, 40vh));
   margin:0;padding:0;
   pointer-events:none;
   z-index:0;
   transform:translateZ(0);
   background:transparent;
-  overflow:hidden;
+  overflow:visible;
 }
 /* Per-theme wash layers — hard hex sRGB mixes; opacity crossfade is the only change */
 .aurora-layer{
@@ -225,13 +226,15 @@ body{
   transform:translateZ(0);
 }
 .aurora-layer.is-active{opacity:1}
-/* Main aurora (masked fade to transparent) — v10.17 stops as precomputed hex */
-.aurora > .aurora-layer{
+/* Main + sticky aurora twins (masked fade to transparent) — same hex stops, same soft mask */
+.aurora > .aurora-layer,
+#aurora-sticky > .aurora-layer{
   -webkit-mask-image:linear-gradient(180deg,#000 0%,#000 40%,rgba(0,0,0,.55) 70%,transparent 100%);
   mask-image:linear-gradient(180deg,#000 0%,#000 40%,rgba(0,0,0,.55) 70%,transparent 100%);
 }
-.aurora > .aurora-layer.layer-light{
-  /* 28/18/10/4% #A898FF/#B8A8FF/#C8BCFF → #F6F5FB */
+.aurora > .aurora-layer.layer-light,
+#aurora-sticky > .aurora-layer.layer-light{
+  /* 28/18/10/4% #A898FF/#B8A8FF/#C8BCFF → soft fade */
   background:linear-gradient(180deg,
     #E0DBFC 0%,
     #E8E4FC 22%,
@@ -239,29 +242,15 @@ body{
     #F4F3FB 72%,
     transparent 100%);
 }
-.aurora > .aurora-layer.layer-dark{
-  /* 32/22/12/5% #5B66C4/#6B78E8/#4A54B0 → #0E0F14 */
+.aurora > .aurora-layer.layer-dark,
+#aurora-sticky > .aurora-layer.layer-dark{
+  /* 32/22/12/5% #5B66C4/#6B78E8/#4A54B0 → soft fade */
   background:linear-gradient(180deg,
     #272B4C 0%,
     #1F223B 20%,
     #191C2D 42%,
     #11121C 68%,
     transparent 100%);
-}
-/* Sticky thin wash (NO mask; bottom stop = solid bg hex — no hard cliff) */
-#aurora-sticky > .aurora-layer.layer-light{
-  /* ~22% then ~10% #A898FF → #F6F5FB */
-  background:linear-gradient(180deg,
-    #E5E1FC 0%,
-    #EEECFB 55%,
-    #F6F5FB 100%);
-}
-#aurora-sticky > .aurora-layer.layer-dark{
-  /* ~26% then ~12% #5B66C4 → #0E0F14 — same purple family as main top */
-  background:linear-gradient(180deg,
-    #222642 0%,
-    #171929 55%,
-    #0E0F14 100%);
 }
 /* Default (no attr yet / dark-first): dark layers on — sticky+main locked */
 .aurora > .aurora-layer.layer-dark,
@@ -1082,7 +1071,7 @@ footer{
 [data-theme="light"] .pill::before{background:#635BFF;box-shadow:0 0 6px rgba(99,91,255,.45)}
 [data-theme="light"] .pill:hover{background:rgba(99,91,255,.14);color:#3730A3}
 
-/* Dual-layer aurora washes baked as hex on .aurora-layer (v10.22).
+/* Dual-layer aurora washes baked as hex on .aurora-layer (v10.23).
    Title colors preserved (dark gold / light violet). */
 @media (prefers-color-scheme: dark){
   /* Dark v10.15: lighter gold on Beta Q&A / h1, deeper gold on Center (em) */
@@ -1234,7 +1223,7 @@ footer{
     will-change:transform;
   }
   #aurora-sticky{
-    height:calc(env(safe-area-inset-top, 0px) + 88px);
+    height:calc(env(safe-area-inset-top, 0px) + min(260px, 38vh));
   }
   .brand{
     margin:0 0 18px;min-height:20px;align-items:flex-start;
@@ -1490,7 +1479,7 @@ document.getElementById("askSubmit").addEventListener("click",()=>{
 });
 /* fresh bar is non-sticky silk — no scroll hide */
 
-/* Theme toggle v10.22 — dual-layer hex aurora; pure CSS [data-theme] opacity sync.
+/* Theme toggle v10.23 — dual-layer hex aurora; pure CSS [data-theme] opacity sync.
    Set data-theme + --bg + theme-color same tick. No inline aurora background mutation,
    no sticky opacity flash. Sticky + main layers flip together from data-theme. */
 (function(){
