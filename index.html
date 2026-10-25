@@ -77,7 +77,7 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/geist-mono@5.2.5/index.min.css" />
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&display=swap" />
 <style>
-/* Overhaul 2026-10-25 v10.44 — Entry ids: FB-xxx → readable kebab-case slugs (e.g. first-steps, ios-build); #slug / ?id=slug deep links open + scroll to the card; legacy #FB-xxx / ?id=FB-xxx resolve via LEGACY_IDS. No visual changes (v10.43 type system, aurora, sort thumb, chips, Ask sheet unchanged). */
+/* Overhaul 2026-10-25 v10.44 — Entry ids: FB-xxx → readable kebab-case slugs (e.g. first-steps, ios-build); #slug / ?id=slug deep links open + scroll to the card; legacy #FB-xxx / ?id=FB-xxx resolve via LEGACY_IDS. Mobile Ask sheet loosened (spacing only): 22px sides, ~24px section rhythm, 10px label gap, 34px/14px topic + phone chips, textarea 14/16 padding at 1.5 line-height, 44px Cancel target, body scrolls instead of squeezing. Colors, fonts, aurora, sort thumb, page chips, Ask behavior unchanged. */
 :root{
   /* Surfaces */
   --bg:#F6F5FB;
@@ -1544,6 +1544,29 @@ footer{
   .modal-backdrop.kb-open .modal{max-height:calc(var(--vvh, 100dvh) - 8px + var(--sheet-over))}
   .modal-backdrop.kb-open .modal-foot{padding-bottom:10px}
   .modal-backdrop.kb-open .modal textarea#askQ{max-height:calc(var(--vvh, 100dvh) * .32)}
+  /* v10.44 roomier Ask sheet (spacing only — colors, fonts, behavior unchanged): 22px sides, ~24px between
+     sections, 10px label→content, lighter 34px chips, 14/16 textarea padding at 1.5 line-height, 44px Cancel */
+  .modal-head{padding-left:max(22px, env(safe-area-inset-left, 0px));padding-right:max(22px, env(safe-area-inset-right, 0px))}
+  .modal h2{margin:0 0 6px}
+  .modal .hint{line-height:1.45;margin:0}
+  .modal-body{padding:24px max(22px, env(safe-area-inset-right, 0px)) 12px max(22px, env(safe-area-inset-left, 0px))}
+  .modal label{margin:0 0 10px}
+  .ask-topics{gap:8px;margin:0 0 26px}
+  .ask-topic{display:inline-flex;align-items:center;min-height:34px;height:34px;padding:0 14px;font-size:14px;line-height:1}
+  .modal textarea#askQ{
+    padding:14px 16px;line-height:1.5;margin:0 0 26px;
+    min-height:calc(4 * 1.5em + 30px);height:calc(4 * 1.5em + 30px);
+  }
+  .modal textarea#askQ::placeholder{line-height:1.5}
+  .ask-matches{margin:-14px 0 26px}
+  .ask-matches .ask-matches-label{margin:0 0 10px}
+  .ask-match{margin:0 0 8px}
+  .ask-match:last-child{margin-bottom:0}
+  .modal .ask-os{margin:0 0 14px}
+  .modal .ask-shots{margin:0 0 4px;line-height:1.45}
+  .modal-foot{padding:12px max(22px, env(safe-area-inset-right, 0px)) max(6px, env(safe-area-inset-bottom, 0px)) max(22px, env(safe-area-inset-left, 0px))}
+  .ask-cancel{height:44px;line-height:44px;margin:0}
+  .ask-cancel::after{top:0;bottom:0}
 }
 
 /* Desktop/web: search + Newest/Oldest MUST stay one horizontal row */
