@@ -78,7 +78,7 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/geist-mono@5.2.5/index.min.css" />
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" />
 <style>
-/* Overhaul 2026-10-25 v10.32 — restore sort accent fills + optical lift; Ask chips/dest glass + organise polish; island untouched */
+/* Overhaul 2026-10-25 v10.33 — research-informed equal 2px sort thumb inset (was optically high after 1/3 lift); accent fills + spring kept; island untouched */
 :root{
   /* Surfaces */
   --bg:#F6F5FB;
@@ -598,10 +598,10 @@ a:hover{text-decoration:underline;text-underline-offset:3px}
 .search input::-webkit-search-cancel-button{-webkit-appearance:none}
 
 .sort{
-  /* Glass track + accent thumb — equal inset structure, optically lifted (top 1 / bottom 3) */
+  /* Glass track + accent thumb — research-informed equal inset (BetterSegmentedControl/iOS/Notion p≈2px) */
   --sort-inset-x:2px;
-  --sort-inset-y-top:1px;
-  --sort-inset-y-bottom:3px;
+  --sort-inset-y-top:2px;
+  --sort-inset-y-bottom:2px;
   position:relative;
   box-sizing:border-box;
   display:inline-flex;align-items:center;height:var(--control-h);
