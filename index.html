@@ -72,13 +72,12 @@
 <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link rel="preconnect" href="https://rsms.me/" crossorigin />
-<!-- v10.41 type system: Inter Variable (rsms, opsz + full wght axis) = UI/body; Instrument Serif = hero display; Geist Mono = badge/code -->
-<link rel="stylesheet" href="https://rsms.me/inter/inter.css" />
+<!-- v10.43 type system: Instrument Sans (wdth 75–100, wght 400–700) = UI/body/card titles; Instrument Serif = hero display; Geist Mono = badge/code -->
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wdth,wght@75..100,400..700&display=swap" />
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/geist-mono@5.2.5/index.min.css" />
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&display=swap" />
 <style>
-/* Overhaul 2026-10-25 v10.42 — Ask close: circled × removed. Mobile sheet = grabber + drag-to-dismiss + backdrop tap + quiet plain-text "Cancel" under the CTA (iOS/vaul pattern, +24px footer). Desktop modal = bare thin × glyph (no circle/fill/rim) + Esc + backdrop. Mobile sheet + footer fully opaque (solid --surface, same color), solid fill extends below the bottom edge/toolbar, scrim overflows viewport. Ask placeholder shortened ("Which screen, and what did you see?") at 14px; input text stays 16px. Nothing else changed. v10.41 — Ask sheet: real drag-to-dismiss (grabber/head; body when scrolled to top), slide-up/down, scrim follows drag, × close, slim 44px footer (Cancel removed, "Copied ✓" swaps in-button, screenshots hint moved to body), visualViewport keyboard fit. Typography: Inter Variable (Linear-style 400/460/510/560), card titles 510 / -0.012em, body 15/1.6, sentence-case labels, CJK fallback (PingFang SC / Noto Sans SC). Colors/island/sort/chips/matching untouched. v10.40 — Ask modal: merged Feishu + WhatsApp kw phrasings into DATA kw; exact-substring kw hit for version strings (1.0.6.8, 1.1.46). v10.39 — Ask modal: smarter live matching (hidden per-entry kw EN+CJK, query synonyms, stemming, CJK bigrams; kw > title > body; topics = mild boost), multi-select topic chips, copy = "[Topic A, Topic B] · OS" + raw text, placeholder nudges page/screen + what you saw. v10.38 — Ask modal: auto-grow textarea, content-fit sheet (max 85dvh), Organise/Undo removed, live Q&A matching ("Might already be answered"), optional iOS | Android choice, copy = "[Topic] · OS" + raw text. v10.37 single WhatsApp CTA; island/sort/theme untouched */
+/* Overhaul 2026-10-25 v10.43 — Font scheme B: Instrument Sans (Google Fonts <link>, Inter removed) for UI/body; card titles 470 / -0.008em. Ask placeholder = 3-line hint (what/screen, example, SN/version/firmware) at 14px; default textarea height fits 4 lines. Hero serif, mono badge, CJK fallback, colors/island/sort/chips/Ask/DATA untouched. v10.42 — Ask close: circled × removed. Mobile sheet = grabber + drag-to-dismiss + backdrop tap + quiet plain-text "Cancel" under the CTA (iOS/vaul pattern, +24px footer). Desktop modal = bare thin × glyph (no circle/fill/rim) + Esc + backdrop. Mobile sheet + footer fully opaque (solid --surface, same color), solid fill extends below the bottom edge/toolbar, scrim overflows viewport. Ask placeholder shortened ("Which screen, and what did you see?") at 14px; input text stays 16px. Nothing else changed. v10.41 — Ask sheet: real drag-to-dismiss (grabber/head; body when scrolled to top), slide-up/down, scrim follows drag, × close, slim 44px footer (Cancel removed, "Copied ✓" swaps in-button, screenshots hint moved to body), visualViewport keyboard fit. Typography: Inter Variable (Linear-style 400/460/510/560), card titles 510 / -0.012em, body 15/1.6, sentence-case labels, CJK fallback (PingFang SC / Noto Sans SC). Colors/island/sort/chips/matching untouched. v10.40 — Ask modal: merged Feishu + WhatsApp kw phrasings into DATA kw; exact-substring kw hit for version strings (1.0.6.8, 1.1.46). v10.39 — Ask modal: smarter live matching (hidden per-entry kw EN+CJK, query synonyms, stemming, CJK bigrams; kw > title > body; topics = mild boost), multi-select topic chips, copy = "[Topic A, Topic B] · OS" + raw text, placeholder nudges page/screen + what you saw. v10.38 — Ask modal: auto-grow textarea, content-fit sheet (max 85dvh), Organise/Undo removed, live Q&A matching ("Might already be answered"), optional iOS | Android choice, copy = "[Topic] · OS" + raw text. v10.37 single WhatsApp CTA; island/sort/theme untouched */
 :root{
   /* Surfaces */
   --bg:#F6F5FB;
@@ -130,13 +129,13 @@
   --dur:180ms;
   --r:20px;
   /* Families */
-  --font:InterVariable,Inter,-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Noto Sans SC","Microsoft YaHei",system-ui,sans-serif;
+  --font:"Instrument Sans",-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Noto Sans SC","Microsoft YaHei",system-ui,sans-serif;
   --display:"Instrument Serif",Georgia,"Songti SC","Noto Serif SC",serif;
   --mono:"Geist Mono",ui-monospace,"SF Mono",Menlo,Consolas,"PingFang SC","Noto Sans SC",monospace;
   /* Type scale */
   --fs-hero:clamp(2.5rem,5.4vw,3.5rem);
-  --fs-title:16px; /* card Q — Inter 510 / -0.012em (Linear title-1 rhythm) */
-  --fw-title:510;
+  --fs-title:16px; /* card Q — Instrument Sans 470 / -0.008em (Linear title-1 rhythm) */
+  --fw-title:470;
   --fs-body:15px;
   --fs-teaser:14px;
   --fs-ui:13.5px;
@@ -735,13 +734,13 @@ a:hover{text-decoration:underline;text-underline-offset:3px}
 }
 .item:hover summary::after{border-color:var(--muted)}
 .item .q{
-  /* v10.41: Inter 510 / 16px / -0.012em / 1.38 — Linear title-1 (510) & OpenAI card h (500); was Geist 600 */
+  /* v10.41: Instrument Sans 470 / 16px / -0.008em / 1.38 — Linear title-1 (510) & OpenAI card h (500); was Geist 600 */
   font-family:var(--font);
   font-size:var(--fs-title);
   font-weight:var(--fw-title);
   font-style:normal;
   font-synthesis:none;
-  letter-spacing:-0.012em;
+  letter-spacing:-0.008em;
   line-height:var(--lh-title);
   text-wrap:pretty;
   color:var(--ink);
@@ -907,7 +906,7 @@ footer{
 /* v10.38 auto-grow: ~3 lines by default, JS grows to content, scrolls past max */
 .modal textarea#askQ{
   display:block;line-height:1.55;margin:0 0 8px;resize:none;
-  min-height:calc(3 * 1.55em + 22px);height:calc(3 * 1.55em + 22px);
+  min-height:calc(4 * 1.55em + 22px);height:calc(4 * 1.55em + 22px);
   max-height:320px;overflow-y:auto;
 }
 /* Live matches — same glass language as ask chips, no new colors */
@@ -1150,12 +1149,12 @@ footer{
 }
 [data-theme="light"] .item .body strong{color:var(--ink-soft);font-weight:var(--fw-semibold)} /* #3F3A58 secondary emphasis */
 [data-theme="light"] .item .q{
-  /* v10.41: soft charcoal-violet title — Inter 510 / 16px / -0.012em; never #000/#1A1917 */
+  /* v10.41: soft charcoal-violet title — Instrument Sans 470 / 16px / -0.008em; never #000/#1A1917 */
   font-family:var(--font);
   color:var(--ink); /* #2E2A42 */
   font-weight:var(--fw-title);
   font-size:var(--fs-title);
-  letter-spacing:-0.012em;
+  letter-spacing:-0.008em;
 }
 
 /* Light toggle hover — brighter glass */
@@ -1652,7 +1651,7 @@ footer{
         <button type="button" class="ask-topic" data-topic="Other" aria-pressed="false">Other</button>
       </div>
       <label for="askQ">Your question</label>
-      <textarea id="askQ" rows="3" placeholder="Which screen, and what did you see?" maxlength="4000"></textarea>
+      <textarea id="askQ" rows="3" placeholder="What happened, and on which screen?&#10;e.g. &quot;Memory page shows another language&quot;&#10;Add your SN, app version or firmware if you can" maxlength="4000"></textarea>
       <div class="ask-matches" id="askMatches" aria-live="polite" hidden>
         <label class="ask-matches-label">Might already be answered</label>
         <div id="askMatchList"></div>
@@ -1800,7 +1799,7 @@ document.querySelectorAll("#askOs .ask-topic").forEach(btn=>btn.addEventListener
   askOs=(askOs===v)?"":v;
   document.querySelectorAll("#askOs .ask-topic").forEach(b=>b.setAttribute("aria-pressed",(askOs&&b.dataset.os===askOs)?"true":"false"));
 }));
-/* Auto-grow: CSS min = ~3 lines, CSS max = 40dvh mobile / 320px desktop, then scrolls inside */
+/* Auto-grow: CSS min = ~4 lines (fits 3-line placeholder + wrap), CSS max = 40dvh mobile / 320px desktop, then scrolls inside */
 function growAsk(){
   askQ.style.height="auto";
   askQ.style.height=(askQ.scrollHeight+2)+"px";
