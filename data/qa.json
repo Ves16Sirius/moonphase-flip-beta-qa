@@ -45,13 +45,13 @@
     },
     {
       "id": "FB-035",
-      "question": "Device just arrived — what next?",
-      "teaser": "Send your SN, wait for our push notice, then follow Checklist_revised.pdf.",
-      "answerHtml": "<p>Send your device <strong>serial number (SN)</strong> in <strong>General</strong> or your private <strong>Beta Support</strong> group so we can push firmware to your unit.</p><p><strong>Pause</strong> until we notify you that the firmware update has been pushed.</p><p>Then open Announcements and follow <strong>Checklist_revised.pdf</strong> (plus QuickStart / Checklist as needed). After updating, keep app and firmware current; unbind and re-pair if the screen still needs a sync.</p>",
+      "question": "My device just arrived — what should I do first?",
+      "teaser": "Follow Checklist_revised.pdf steps 1–7 (share SN), wait for us to remind you, then continue from step 8.",
+      "answerHtml": "<p>In the WhatsApp beta community, open <strong>Announcements</strong> and use <code>Checklist_revised.pdf</code> and <code>QuickStartGuide.pdf</code> as your guides.</p><p>Follow <code>Checklist_revised.pdf</code> step by step through <strong>steps 1–7</strong> (including sharing your <strong>serial number (<code>SN</code>)</strong>). Then <strong>stop</strong> and wait for us to remind you.</p><p>After our reminder, continue from <strong>step 8</strong> and set up the device.</p>",
       "category": "getting-started",
       "updatedAt": "2026-10-24",
       "status": "answered",
-      "teaserHtml": "Send your <mark>SN</mark>, wait for our push notice, then follow <mark>Checklist_revised.pdf</mark>."
+      "teaserHtml": "Follow <mark>Checklist_revised.pdf</mark> steps 1–7 (share SN), wait for us to remind you, then continue from step 8."
     },
     {
       "id": "FB-014",
