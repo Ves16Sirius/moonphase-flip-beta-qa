@@ -78,7 +78,7 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/geist-mono@5.2.5/index.min.css" />
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&display=swap" />
 <style>
-/* Overhaul 2026-10-25 v10.41 — Ask sheet: real drag-to-dismiss (grabber/head; body when scrolled to top), slide-up/down, scrim follows drag, × close, slim 44px footer (Cancel removed, "Copied ✓" swaps in-button, screenshots hint moved to body), visualViewport keyboard fit. Typography: Inter Variable (Linear-style 400/460/510/560), card titles 510 / -0.012em, body 15/1.6, sentence-case labels, CJK fallback (PingFang SC / Noto Sans SC). Colors/island/sort/chips/matching untouched. v10.40 — Ask modal: merged Feishu + WhatsApp kw phrasings into DATA kw; exact-substring kw hit for version strings (1.0.6.8, 1.1.46). v10.39 — Ask modal: smarter live matching (hidden per-entry kw EN+CJK, query synonyms, stemming, CJK bigrams; kw > title > body; topics = mild boost), multi-select topic chips, copy = "[Topic A, Topic B] · OS" + raw text, placeholder nudges page/screen + what you saw. v10.38 — Ask modal: auto-grow textarea, content-fit sheet (max 85dvh), Organise/Undo removed, live Q&A matching ("Might already be answered"), optional iOS | Android choice, copy = "[Topic] · OS" + raw text. v10.37 single WhatsApp CTA; island/sort/theme untouched */
+/* Overhaul 2026-10-25 v10.42 — Ask close: circled × removed. Mobile sheet = grabber + drag-to-dismiss + backdrop tap + quiet plain-text "Cancel" under the CTA (iOS/vaul pattern, +24px footer). Desktop modal = bare thin × glyph (no circle/fill/rim) + Esc + backdrop. Mobile sheet + footer fully opaque (solid --surface, same color), solid fill extends below the bottom edge/toolbar, scrim overflows viewport. Ask placeholder shortened ("Which screen, and what did you see?") at 14px; input text stays 16px. Nothing else changed. v10.41 — Ask sheet: real drag-to-dismiss (grabber/head; body when scrolled to top), slide-up/down, scrim follows drag, × close, slim 44px footer (Cancel removed, "Copied ✓" swaps in-button, screenshots hint moved to body), visualViewport keyboard fit. Typography: Inter Variable (Linear-style 400/460/510/560), card titles 510 / -0.012em, body 15/1.6, sentence-case labels, CJK fallback (PingFang SC / Noto Sans SC). Colors/island/sort/chips/matching untouched. v10.40 — Ask modal: merged Feishu + WhatsApp kw phrasings into DATA kw; exact-substring kw hit for version strings (1.0.6.8, 1.1.46). v10.39 — Ask modal: smarter live matching (hidden per-entry kw EN+CJK, query synonyms, stemming, CJK bigrams; kw > title > body; topics = mild boost), multi-select topic chips, copy = "[Topic A, Topic B] · OS" + raw text, placeholder nudges page/screen + what you saw. v10.38 — Ask modal: auto-grow textarea, content-fit sheet (max 85dvh), Organise/Undo removed, live Q&A matching ("Might already be answered"), optional iOS | Android choice, copy = "[Topic] · OS" + raw text. v10.37 single WhatsApp CTA; island/sort/theme untouched */
 :root{
   /* Surfaces */
   --bg:#F6F5FB;
@@ -854,17 +854,22 @@ footer{
   padding:22px 24px 0;
 }
 .sheet-grabber{display:none}
+/* v10.42 desktop close: bare thin × glyph — no circle, no fill, no rim (Airbnb / Vercel / Radix dialog style).
+   Mobile sheet hides it: grabber + drag + backdrop tap + plain "Cancel" text under the CTA (iOS / vaul pattern). */
 .modal-x{
-  position:absolute;top:16px;right:16px;
+  position:absolute;top:18px;right:18px;
   display:inline-flex;align-items:center;justify-content:center;
-  width:30px;height:30px;border-radius:999px;padding:0;
-  border:1px solid var(--glass-rim);background:var(--glass-fill);color:var(--muted);
-  -webkit-tap-highlight-color:transparent;
-  transition:color var(--dur) var(--ease), background var(--dur) var(--ease);
+  width:28px;height:28px;border-radius:8px;padding:0;
+  border:0;background:transparent;color:var(--faint);box-shadow:none;
+  -webkit-tap-highlight-color:transparent;cursor:pointer;
+  transition:color var(--dur) var(--ease);
 }
-.modal-x::after{content:"";position:absolute;inset:-7px} /* 44px hit target */
-.modal-x:hover{color:var(--ink-soft);background:var(--glass-fill-strong)}
-.modal-x svg{width:12px;height:12px;display:block}
+.modal-x::after{content:"";position:absolute;inset:-8px} /* 44px hit target */
+.modal-x:hover{color:var(--ink-soft)}
+.modal-x:focus-visible{outline:2px solid var(--accent-soft);outline-offset:2px}
+.modal-x svg{width:14px;height:14px;display:block}
+/* v10.42 plain-text Cancel (mobile sheet only): no box, muted ink, ~24px added to the footer */
+.ask-cancel{display:none}
 .modal-head h2{padding-right:40px}
 .modal-body{
   flex:1 1 auto;min-height:0;
@@ -1492,7 +1497,18 @@ footer{
     position:relative;
   }
   .sheet-grabber::after{content:"";position:absolute;left:-40px;right:-40px;top:-10px;bottom:-10px}
-  .modal-x{top:14px;right:max(14px, env(safe-area-inset-right, 0px))}
+  .modal-x{display:none} /* v10.42: no × on the sheet — grabber/drag/backdrop + Cancel text */
+  .modal-head h2{padding-right:0}
+  .ask-cancel{
+    display:block;position:relative;width:100%;height:20px;margin:4px 0 0;padding:0;
+    border:0;background:transparent;box-shadow:none;
+    font-family:var(--font);font-size:13.5px;font-weight:var(--fw-ui);letter-spacing:-.006em;line-height:20px;
+    color:var(--muted);text-align:center;cursor:pointer;-webkit-tap-highlight-color:transparent;
+    transition:color var(--dur) var(--ease);
+  }
+  .ask-cancel::after{content:"";position:absolute;left:25%;right:25%;top:-8px;bottom:-12px} /* ≥40px hit area */
+  .ask-cancel:active,.ask-cancel:hover{color:var(--ink-soft)}
+  .ask-cancel:focus-visible{outline:2px solid var(--accent-soft);outline-offset:2px;border-radius:6px}
   .modal h2{font-size:17px;margin:0 0 4px}
   .modal .hint{font-size:12.5px;line-height:1.4;margin:0 0 2px}
   .modal-body{
@@ -1502,6 +1518,20 @@ footer{
   .modal select,.modal textarea{margin:0 0 10px;font-size:16px;/* iOS zoom guard */}
   .modal textarea{min-height:88px;resize:none}
   .modal textarea#askQ{max-height:40vh;max-height:40dvh}
+  /* v10.42: typed text stays 16px (iOS zoom guard); placeholder is quieter at 14px */
+  .modal textarea#askQ::placeholder{font-size:14px;letter-spacing:-.006em}
+  /* v10.42 opaque sheet: solid --surface (same color, no translucency/blur) so nothing behind shows through.
+     A solid offset shadow paints the same color far below the sheet's bottom edge (under the home indicator and
+     Safari's floating toolbar); the scrim also overflows the viewport bottom so the page is covered everywhere. */
+  .modal-backdrop::before{top:-120px;bottom:-240px}
+  .modal,
+  :root:not([data-theme="light"]) .modal,
+  [data-theme="dark"] .modal,[data-theme="light"] .modal{
+    background:var(--surface);
+    backdrop-filter:none;-webkit-backdrop-filter:none;
+    box-shadow:0 60vh 0 0 var(--surface), var(--shadow-lg), var(--glass-highlight);
+  }
+  .modal-foot{background:var(--surface);backdrop-filter:none;-webkit-backdrop-filter:none}
   .modal .ask-os{margin:0 0 10px}
   .ask-topics{gap:8px;margin:0 0 10px}
   .ask-topic{
@@ -1606,7 +1636,7 @@ footer{
   <div class="modal" id="askSheet">
     <div class="modal-head" id="askHead">
       <div class="sheet-grabber" aria-hidden="true"></div>
-      <button type="button" class="modal-x" id="askClose" aria-label="Close"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><path d="M2.5 2.5l7 7M9.5 2.5l-7 7"/></svg></button>
+      <button type="button" class="modal-x" id="askClose" aria-label="Close"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" aria-hidden="true"><path d="M2.5 2.5l7 7M9.5 2.5l-7 7"/></svg></button>
       <h2 id="askTitle">Ask the beta team</h2>
       <p class="hint">Write your question below. We'll show matching answers first. If none help, copy it into WhatsApp.</p>
     </div>
@@ -1622,7 +1652,7 @@ footer{
         <button type="button" class="ask-topic" data-topic="Other" aria-pressed="false">Other</button>
       </div>
       <label for="askQ">Your question</label>
-      <textarea id="askQ" rows="3" placeholder="Which page or screen, and what did you see? (e.g. Memory page shows text in another language) Add SN / app build / firmware if relevant." maxlength="4000"></textarea>
+      <textarea id="askQ" rows="3" placeholder="Which screen, and what did you see?" maxlength="4000"></textarea>
       <div class="ask-matches" id="askMatches" aria-live="polite" hidden>
         <label class="ask-matches-label">Might already be answered</label>
         <div id="askMatchList"></div>
@@ -1637,6 +1667,7 @@ footer{
     <div class="modal-foot">
       <p class="ask-note" id="askNote" role="status" aria-live="polite"></p>
       <button type="button" class="btn primary" id="askSend"><span class="ask-send-label">Copy &amp; open WhatsApp</span></button>
+      <button type="button" class="ask-cancel" id="askCancel">Cancel</button>
     </div>
   </div>
 </div>
@@ -1817,6 +1848,7 @@ function closeAsk(){
 }
 document.getElementById("askOpen").addEventListener("click",openAsk);
 document.getElementById("askClose").addEventListener("click",closeAsk);
+document.getElementById("askCancel").addEventListener("click",closeAsk);
 
 /* —— v10.41 Bottom-sheet drag-to-dismiss (mobile only) ——
    Pointer drag on grabber/head; touch drag on body only when body is scrolled to top and the gesture starts downward
