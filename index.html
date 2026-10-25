@@ -77,6 +77,12 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/geist-mono@5.2.5/index.min.css" />
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&display=swap" />
 <style>
+/* Overhaul 2026-10-25 v10.50 — Composer-first Ask + T1 theme toggle (owner-approved prototypes composer-first / T1-icon-button, ported onto v10.49).
+   (1) Hero: Ask pill → large prompt box “What’s going on with your Flip?” (sparkle + send) + 3 suggestion chips; tap focuses the sheet textarea synchronously inside the tap (iOS keyboard), chips prefill.
+   (2) Ask sheet: composer textarea first (detailed 3-line placeholder @14px kept), live matches attached beneath like autocomplete (best match tinted), no-match line; Topics + iOS/Android behind “Add details · Optional” disclosure with summary;
+       footer = General / Beta Support channel rows + “Attach screenshots in WhatsApp.” + solid “Copy & open WhatsApp →”; plain-text Cancel in the head (no ×). v10.48 keyboard-hides-footer, grabber drag, single scroller, autogrow kept.
+   (3) Search empty state gets an “Ask the beta team” row → sheet prefilled with the search text.
+   (4) Theme toggle → single 36px circular icon button (current mode icon, rotate/fade); light sun #FFD84D with ink outline, dark moon #FFF8D0. No palette changes. */
 /* Overhaul 2026-10-25 v10.49 — (1) shipping-and-bugs copy: UPS tracking number is posted in each tester’s private WhatsApp Beta Support group (no longer “arrives by email”); bug-report wording unchanged; kw + tracking/UPS/单号/物流, email dropped. (2) Optional per-card ISO `date` (YYYY-MM-DD): Newest/Oldest sort on date when present, else sortKey (stable — undated cards keep relative order); dated cards show a 12px --faint “Updated Oct 23” line under the tags. No cards carry a date yet. Colors, fonts, ids, deep links, sheet, sort thumb unchanged. */
 /* Overhaul 2026-10-25 v10.48 — (1) Mobile ≤719 keyboard open (.kb-open from visualViewport, or #askQ focused with vv noticeably shorter than layout): .modal-foot hidden (display:none) so composer + matches get the full sheet; footer returns on blur/keyboard close (re-sync on focusout). Caret-follow re-runs after the footer hides. (2) Footer helper .ask-shots paragraph → .ask-where two-row list (General / Beta Support, name in --fw-medium --ink-soft, description --muted) + 12px --faint note “Attach screenshots in WhatsApp.” Existing colors, fonts, drag, matching, ids unchanged. */
 /* Overhaul 2026-10-25 v10.47 — Copy-only: hero .sub → “Common beta questions, answered. Search, browse, or ask the team.”; Ask .ask-shots → General/Beta Support preference + screenshots. No colors, layout, fonts, behavior. */
@@ -1630,6 +1636,151 @@ footer{
   }
   .toolbar .sort{flex:0 0 auto!important;align-self:center!important}
 }
+
+/* ===== PROTOTYPE: composer-first sheet ===== */
+.modal-x{display:none!important}
+.modal.cf .modal-head{padding-bottom:14px}
+.cf-headrow{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.modal.cf .modal-head h2{padding-right:0;margin:0}
+.modal.cf .hint{margin-top:4px}
+.cf-cancel{position:relative;border:0;background:transparent;padding:0;margin:0 -2px 0 0;font:inherit;font-size:15px;font-weight:var(--fw-ui);letter-spacing:-.01em;color:var(--accent-deep);cursor:pointer;-webkit-tap-highlight-color:transparent}
+[data-theme="light"] .cf-cancel{color:var(--cta-ink)}
+.cf-cancel::after{content:"";position:absolute;inset:-12px -10px}
+.modal.cf .modal-body{padding-top:4px}
+.cf-composer{border:1px solid var(--line2);border-radius:18px;background:var(--bg);overflow:hidden;
+  transition:border-color 160ms var(--ease), box-shadow 160ms var(--ease)}
+.cf-composer:focus-within{border-color:var(--cta-border);box-shadow:0 0 0 4px var(--accent-soft)}
+.modal.cf textarea#askQ{display:block;width:100%;margin:0;border:0;border-radius:0;background:transparent!important;box-shadow:none!important;
+  backdrop-filter:none;-webkit-backdrop-filter:none;outline:0;resize:none;overflow:hidden;
+  padding:16px 16px 6px;font-size:16px;line-height:1.5;letter-spacing:-.011em;color:var(--ink);
+  min-height:calc(3 * 1.5em + 22px);height:calc(3 * 1.5em + 22px)}
+.modal.cf textarea#askQ::placeholder{color:var(--faint);font-size:16px}
+.cf-comp-foot{display:flex;align-items:center;justify-content:space-between;padding:0 16px 12px;font-size:12px;letter-spacing:-.003em;color:var(--faint)}
+.modal.cf .ask-matches{margin:0;padding:6px 6px 6px;border-top:1px solid var(--line);background:var(--surface)}
+.cf-mlabel{display:flex;align-items:center;gap:6px;padding:8px 10px 6px;font-size:12px;font-weight:var(--fw-medium);letter-spacing:-.003em;color:var(--faint)}
+.cf-spark{width:13px;height:13px;color:var(--accent);display:inline-flex}
+.cf-spark svg{width:13px;height:13px}
+.modal.cf .ask-match{position:relative;margin:0;padding:10px 38px 10px 12px;border:0;border-radius:12px;background:transparent;box-shadow:none;backdrop-filter:none;-webkit-backdrop-filter:none}
+.modal.cf .ask-match + .ask-match{margin-top:2px}
+.modal.cf .ask-match:first-child{background:var(--accent-soft)}
+.modal.cf .ask-match::after{content:"";position:absolute;right:16px;top:50%;width:7px;height:7px;border-right:1.6px solid var(--faint);border-top:1.6px solid var(--faint);transform:translateY(-50%) rotate(45deg)}
+.modal.cf .ask-match:first-child::after{border-color:var(--accent)}
+.modal.cf .ask-match-q{font-size:14px;line-height:1.35}
+.modal.cf .ask-match-a{font-size:12.5px;margin-top:3px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.cf-nomatch{display:flex;align-items:center;gap:8px;padding:11px 16px;border-top:1px solid var(--line);background:var(--surface);font-size:13px;letter-spacing:-.006em;color:var(--muted)}
+.cf-nomatch[hidden]{display:none}
+.cf-nm-dot{width:6px;height:6px;border-radius:50%;background:var(--ok);box-shadow:0 0 0 3px var(--ok-soft);flex:0 0 auto}
+.cf-details-btn{display:flex;align-items:center;gap:8px;width:100%;height:44px;margin:12px 0 0;padding:0 2px;border:0;background:transparent;font:inherit;text-align:left;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.cf-db-l{font-size:14px;font-weight:var(--fw-medium);letter-spacing:-.01em;color:var(--ink-soft)}
+.cf-db-s{flex:1;font-size:13px;color:var(--faint);letter-spacing:-.005em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cf-db-c{width:16px;height:16px;color:var(--faint);transition:transform 220ms var(--ease)}
+.cf-db-c svg{width:16px;height:16px;display:block}
+.cf-details-btn[aria-expanded="true"] .cf-db-c{transform:rotate(180deg)}
+.cf-details[hidden]{display:none}
+.cf-details{padding:2px 0 6px;animation:cfIn 260ms var(--ease)}
+@keyframes cfIn{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:none}}
+.cf-row-label{font-size:12px;font-weight:var(--fw-medium);color:var(--faint);margin:6px 2px 8px}
+.modal.cf .ask-topics{gap:6px;margin:0 0 10px}
+.modal.cf .cf-scroll{flex-wrap:nowrap;overflow-x:auto;margin-left:-22px;margin-right:-22px;padding:0 22px;scrollbar-width:none;-webkit-mask-image:linear-gradient(90deg,transparent 0,#000 22px,#000 calc(100% - 28px),transparent)}
+.modal.cf .cf-scroll::-webkit-scrollbar{display:none}
+.modal.cf .ask-topic{height:32px;min-height:32px;padding:0 13px;font-size:13.5px;display:inline-flex;align-items:center;flex:0 0 auto;background:transparent;border:1px solid var(--line2);box-shadow:none;backdrop-filter:none;-webkit-backdrop-filter:none;color:var(--ink-soft)}
+.modal.cf .ask-topic[aria-pressed="true"]{background:var(--accent-soft);border-color:var(--cta-border);color:var(--cta-ink)}
+.modal.cf .cf-seg{display:inline-flex;gap:0;padding:2px;border:1px solid var(--line2);border-radius:999px}
+.modal.cf .cf-seg .ask-topic{border-color:transparent;height:30px;min-height:30px;padding:0 16px}
+.modal.cf .modal-foot{border-top:1px solid var(--line);padding-top:14px}
+.cf-where-label{font-size:12px;font-weight:var(--fw-medium);color:var(--faint);margin:0 2px 8px}
+.cf-channels{list-style:none;margin:0 0 12px;padding:0;border:1px solid var(--line);border-radius:14px;overflow:hidden}
+.cf-channels li{display:flex;align-items:center;gap:0;padding:9px 12px;font-size:13px;letter-spacing:-.006em;line-height:1.35;color:var(--muted);white-space:nowrap}
+.cf-channels li + li{border-top:1px solid var(--line)}
+.cf-channels b{font-weight:var(--fw-medium);color:var(--ink)}
+.cf-channels .sep{color:var(--faint);padding:0 6px}
+.cf-ch-d{overflow:hidden;text-overflow:ellipsis}
+.cf-ch-ic{width:24px;height:24px;border-radius:8px;display:inline-flex;align-items:center;justify-content:center;background:var(--accent-soft);color:var(--cta-ink);margin-right:10px;flex:0 0 auto}
+.cf-ch-ic svg{width:13px;height:13px}
+.modal.cf .modal-foot .btn.primary.cf-send{height:50px;min-height:50px;border-radius:14px;gap:8px;font-size:15px;font-weight:var(--fw-medium);
+  background:var(--accent-deep);color:var(--bg);border:0;box-shadow:0 1px 2px rgba(24,18,12,.03),0 8px 22px -8px var(--accent);backdrop-filter:none;-webkit-backdrop-filter:none}
+[data-theme="dark"] .modal.cf .modal-foot .btn.primary.cf-send{background:var(--accent);color:var(--bg)}
+.cf-send-ic{width:16px;height:16px;display:inline-flex}.cf-send-ic svg{width:16px;height:16px}
+.modal.cf .modal-foot .btn.primary.cf-send.is-copied{background:var(--ok)}
+.modal.cf .ask-cancel{display:none!important}
+@media (max-width:719px){
+  .modal.cf .modal-head{padding-bottom:14px}
+  .modal.cf .modal-body{padding-top:4px;padding-bottom:10px}
+  .modal.cf .modal-foot{padding-top:14px;padding-bottom:max(14px, env(safe-area-inset-bottom, 0px))}
+}
+
+.hero{z-index:5}
+.hero .sub{margin-bottom:22px}
+.hp{position:relative;width:100%;max-width:520px;margin:0 auto}
+.hp-box{position:relative;display:flex;align-items:center;gap:12px;width:100%;min-height:60px;padding:9px 9px 9px 18px;border-radius:22px;
+  border:1px solid var(--line2);background:var(--surface);font:inherit;text-align:left;cursor:text;-webkit-tap-highlight-color:transparent;
+  box-shadow:var(--shadow-md), 0 18px 40px -22px var(--accent), var(--glass-highlight);
+  transition:border-color 180ms var(--ease), box-shadow 180ms var(--ease), transform 180ms var(--ease)}
+.hp-box:hover,.hp-box:focus-within{border-color:var(--cta-border)}
+.hp-box:focus-within{box-shadow:0 0 0 4px var(--accent-soft), var(--shadow-md), 0 18px 40px -22px var(--accent)}
+.hp-box:active{transform:scale(.995)}
+.hp-ic{width:18px;height:18px;color:var(--accent);flex:0 0 auto;display:inline-flex}
+.hp-ic svg{width:18px;height:18px}
+.hp-ph,.hp-in{flex:1;min-width:0;font-size:16px;letter-spacing:-.012em;color:var(--faint);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hp-in{border:0;outline:0;background:transparent;color:var(--ink);font-family:var(--font);padding:0;height:40px}
+.hp-in::placeholder{color:var(--faint);opacity:1}
+.hp-in::-webkit-search-cancel-button{-webkit-appearance:none}
+.hp-go{width:40px;height:40px;border-radius:14px;flex:0 0 auto;display:inline-flex;align-items:center;justify-content:center;border:0;
+  background:var(--accent-deep);color:var(--bg);box-shadow:0 6px 16px -6px var(--accent)}
+[data-theme="dark"] .hp-go{background:var(--accent)}
+.hp-go svg{width:18px;height:18px}
+.hp-sugs{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin-top:14px}
+.hp-sug{display:inline-flex;align-items:center;gap:6px;height:32px;padding:0 13px;border-radius:999px;border:1px solid var(--glass-rim);
+  background:var(--glass-fill);backdrop-filter:blur(var(--glass-blur)) saturate(var(--glass-sat));-webkit-backdrop-filter:blur(var(--glass-blur)) saturate(var(--glass-sat));
+  font:inherit;font-size:13px;font-weight:var(--fw-ui);letter-spacing:-.008em;color:var(--muted);cursor:pointer;box-shadow:var(--glass-shadow), var(--glass-highlight);
+  transition:color var(--dur) var(--ease), border-color var(--dur) var(--ease)}
+.hp-sug svg{width:12px;height:12px;color:var(--faint)}
+.hp-sug:hover{color:var(--ink-soft);border-color:var(--line2)}
+@media (max-width:719px){.hero .sub{margin-bottom:20px}}
+
+.tt1{position:relative;width:36px;height:36px;margin-top:-8px;padding:0;border-radius:50%;flex:0 0 auto;cursor:pointer;-webkit-tap-highlight-color:transparent;
+  border:1px solid var(--glass-rim);background:var(--glass-fill-strong);backdrop-filter:blur(var(--glass-blur)) saturate(var(--glass-sat));-webkit-backdrop-filter:blur(var(--glass-blur)) saturate(var(--glass-sat));
+  box-shadow:var(--glass-shadow), var(--glass-highlight);transition:border-color .2s var(--ease), background .2s var(--ease)}
+[data-theme="light"] .tt1{border-color:var(--line2);background:var(--surface)}
+.tt1:hover{border-color:var(--line2)}
+.tt1-ic{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;transition:opacity .3s var(--ease), transform .55s var(--ease-spring)}
+.tt1-ic svg{width:18px;height:18px}
+.tt1 .sun-disc{fill:#FFD84D;stroke:var(--ink);stroke-width:1.6}
+.tt1 .sun-rays{stroke:var(--ink);stroke-width:1.9}
+.tt1-moon{color:#FFF8D0}
+.tt1-moon svg{width:16px;height:16px}
+[data-theme="light"] .tt1-sun{opacity:1;transform:none}
+[data-theme="light"] .tt1-moon{opacity:0;transform:rotate(-90deg) scale(.5)}
+[data-theme="dark"] .tt1-sun{opacity:0;transform:rotate(90deg) scale(.5)}
+[data-theme="dark"] .tt1-moon{opacity:1;transform:none}
+@media (max-width:719px){.tt1{margin-top:-8px;margin-bottom:-3px}}
+.tt1{margin-bottom:-3px}
+
+/* v10.50 composer: detailed placeholder stays 14px; tip shows only once typing starts (placeholder already says it) */
+.modal.cf textarea#askQ::placeholder{font-size:14px;line-height:1.5;letter-spacing:-.006em}
+.modal.cf textarea#askQ:placeholder-shown + .cf-comp-foot .cf-tip{opacity:0}
+.cf-tip{transition:opacity 160ms var(--ease)}
+.modal.cf .modal-foot .ask-shots{margin:-4px 2px 12px;font-size:12px;letter-spacing:-.003em;line-height:1.4;color:var(--faint)}
+.modal-backdrop.kb-open .modal.cf .modal-body{padding-bottom:12px}
+/* v10.50 desktop: opaque sheet like mobile (existing --surface token) so composer/foot read as one card; suggestions on one row */
+@media (min-width:720px){
+  .modal.cf,[data-theme="dark"] .modal.cf{background:var(--surface)}
+  .modal.cf .modal-foot,[data-theme="dark"] .modal.cf .modal-foot{background:var(--surface);backdrop-filter:none;-webkit-backdrop-filter:none}
+  .hp-sugs{flex-wrap:nowrap;margin-left:-80px;margin-right:-80px}
+}
+/* v10.50 search empty state → Ask row */
+.empty .empty-t{display:block;margin:0 0 16px}
+.empty-ask{display:flex;align-items:center;gap:12px;width:100%;max-width:440px;margin:0 auto;padding:12px 14px;border-radius:16px;border:1px solid var(--cta-border);
+  background:var(--surface);font:inherit;text-align:left;cursor:pointer;-webkit-tap-highlight-color:transparent;
+  box-shadow:var(--shadow-md), 0 14px 32px -22px var(--accent);transition:border-color var(--dur) var(--ease), transform var(--dur) var(--ease)}
+.empty-ask:active{transform:scale(.995)}
+.empty-ask .ic{width:30px;height:30px;border-radius:10px;flex:0 0 auto;display:inline-flex;align-items:center;justify-content:center;background:var(--accent-soft);color:var(--accent)}
+.empty-ask .ic svg{width:15px;height:15px}
+.empty-ask .tx{flex:1;min-width:0;font-size:13px;letter-spacing:-.006em;color:var(--muted);line-height:1.35}
+.empty-ask .tx b{display:block;font-size:14px;font-weight:var(--fw-medium);letter-spacing:-.01em;color:var(--cta-ink)}
+.empty-ask .tx q{display:block;color:var(--ink-soft);quotes:"“" "”";white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.empty-ask .go{width:16px;height:16px;color:var(--cta-ink);flex:0 0 auto;display:inline-flex}.empty-ask .go svg{width:16px;height:16px}
+
 </style>
 </head>
 <body>
@@ -1647,23 +1798,14 @@ footer{
       </div>
     </div>
     <div class="brand-slot brand-slot-end">
-      <button type="button" class="theme-toggle" id="themeToggle" aria-label="Switch to dark theme" title="Theme">
-        <span class="tt-track" aria-hidden="true">
-          <span class="tt-icon icon-moon"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M21 14.5A8.5 8.5 0 0 1 9.5 3 7 7 0 1 0 21 14.5z"/></svg></span>
-          <span class="tt-icon icon-sun"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4" fill="currentColor" stroke="none"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg></span>
-          <span class="tt-thumb">
-            <span class="tt-thumb-face tt-face-moon"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M21 14.5A8.5 8.5 0 0 1 9.5 3 7 7 0 1 0 21 14.5z"/></svg></span>
-            <span class="tt-thumb-face tt-face-sun"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4" fill="currentColor" stroke="none"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg></span>
-          </span>
-        </span>
-      </button>
+      <button type="button" class="tt1" id="themeToggle" aria-label="Switch theme" title="Theme"><span class="tt1-ic tt1-sun"><svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle class="sun-disc" cx="12" cy="12" r="4.2"/><path class="sun-rays" d="M12 2.6v2.1M12 19.3v2.1M4.9 4.9l1.5 1.5M17.6 17.6l1.5 1.5M2.6 12h2.1M19.3 12h2.1M4.9 19.1l1.5-1.5M17.6 6.4l1.5-1.5"/></svg></span><span class="tt1-ic tt1-moon"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M21 14.5A8.5 8.5 0 0 1 9.5 3 7 7 0 1 0 21 14.5z"/></svg></span></button>
     </div>
   </div>
   <div class="fresh" role="status"><span><i aria-hidden="true"></i> Updated Oct 25, 2026</span></div>
   <div class="hero">
     <h1>Beta Q&amp;A <em>Center</em></h1>
     <p class="sub">Common beta questions, answered. Search, browse, or ask the team.</p>
-    <button type="button" class="ask-cta" id="askOpen">Ask a question…</button>
+    <div class="hp"><button type="button" class="hp-box" id="askOpen" aria-label="Ask the beta team"><span class="hp-ic"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2.5l1.9 5.6 5.6 1.9-5.6 1.9L12 17.5l-1.9-5.6L4.5 10l5.6-1.9z"/><path d="M19 15l.8 2.2 2.2.8-2.2.8L19 21l-.8-2.2-2.2-.8 2.2-.8z" opacity=".7"/></svg></span><span class="hp-ph">What’s going on with your Flip?</span><span class="hp-go"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5M5.5 11.5L12 5l6.5 6.5"/></svg></span></button><div class="hp-sugs" id="hpSugs"><button type="button" class="hp-sug" data-q="Memory page in another language"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17L17 7M9 7h8v8"/></svg>Memory page in another language</button><button type="button" class="hp-sug" data-q="Stuck on old firmware"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17L17 7M9 7h8v8"/></svg>Stuck on old firmware</button><button type="button" class="hp-sug" data-q="How do I track shipping?"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17L17 7M9 7h8v8"/></svg>How do I track shipping?</button></div></div>
   </div>
   <div class="layout">
     <div class="main">
@@ -1699,49 +1841,53 @@ footer{
   </div>
 </div>
 <div class="modal-backdrop" id="askModal" role="dialog" aria-modal="true" aria-labelledby="askTitle" hidden>
-  <div class="modal" id="askSheet">
+  <div class="modal cf" id="askSheet">
     <div class="modal-head" id="askHead">
       <div class="sheet-grabber" aria-hidden="true"></div>
-      <button type="button" class="modal-x" id="askClose" aria-label="Close"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" aria-hidden="true"><path d="M2.5 2.5l7 7M9.5 2.5l-7 7"/></svg></button>
-      <h2 id="askTitle">Ask the beta team</h2>
-      <p class="hint">Write your question below. We'll show matching answers first. If none help, copy it into WhatsApp.</p>
+      <div class="cf-headrow"><h2 id="askTitle">Ask the beta team</h2><button type="button" class="cf-cancel" id="askCancel">Cancel</button></div>
+      <p class="hint">We check saved answers as you type.</p>
     </div>
     <div class="modal-body">
-      <label id="askCatLabel">Topics</label>
-      <div class="ask-topics" role="group" aria-labelledby="askCatLabel" id="askTopics">
-        <button type="button" class="ask-topic" data-topic="Getting started" aria-pressed="false">Getting started</button>
-        <button type="button" class="ask-topic" data-topic="Device" aria-pressed="false">Device</button>
-        <button type="button" class="ask-topic" data-topic="App &amp; firmware" aria-pressed="false">App &amp; firmware</button>
-        <button type="button" class="ask-topic" data-topic="Recording &amp; AI" aria-pressed="false">Recording &amp; AI</button>
-        <button type="button" class="ask-topic" data-topic="Privacy &amp; MCP" aria-pressed="false">Privacy &amp; MCP</button>
-        <button type="button" class="ask-topic" data-topic="How to report" aria-pressed="false">How to report</button>
-        <button type="button" class="ask-topic" data-topic="Other" aria-pressed="false">Other</button>
+      <div class="cf-composer" id="cfComposer">
+        <textarea id="askQ" rows="2" placeholder="What happened, and on which screen?&#10;e.g. &quot;Memory page shows another language&quot;&#10;Add your SN, app version or firmware if you can" maxlength="4000" aria-label="Your question"></textarea>
+        <div class="cf-comp-foot"><span class="cf-tip">Add your SN, app or firmware version if you can</span></div>
+        <div class="ask-matches" id="askMatches" aria-live="polite" hidden>
+          <div class="cf-mlabel"><span class="cf-spark"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2.5l1.9 5.6 5.6 1.9-5.6 1.9L12 17.5l-1.9-5.6L4.5 10l5.6-1.9z"/><path d="M19 15l.8 2.2 2.2.8-2.2.8L19 21l-.8-2.2-2.2-.8 2.2-.8z" opacity=".7"/></svg></span>Might already be answered</div>
+          <div id="askMatchList"></div>
+        </div>
+        <div class="cf-nomatch" id="cfNoMatch" hidden><span class="cf-nm-dot"></span>No saved answer yet — the team can help with this one.</div>
       </div>
-      <label for="askQ">Your question</label>
-      <textarea id="askQ" rows="3" placeholder="What happened, and on which screen?&#10;e.g. &quot;Memory page shows another language&quot;&#10;Add your SN, app version or firmware if you can" maxlength="4000"></textarea>
-      <div class="ask-matches" id="askMatches" aria-live="polite" hidden>
-        <label class="ask-matches-label">Might already be answered</label>
-        <div id="askMatchList"></div>
+      <button type="button" class="cf-details-btn" id="cfDetailsBtn" aria-expanded="false" aria-controls="cfDetails"><span class="cf-db-l">Add details</span><span class="cf-db-s" id="cfDetailsSum">Optional · topic, phone</span><span class="cf-db-c"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></span></button>
+      <div class="cf-details" id="cfDetails" hidden>
+        <div class="cf-row-label">Topic</div>
+        <div class="ask-topics cf-scroll" role="group" aria-label="Topics" id="askTopics">
+          <button type="button" class="ask-topic" data-topic="Getting started" aria-pressed="false">Getting started</button>
+          <button type="button" class="ask-topic" data-topic="Device" aria-pressed="false">Device</button>
+          <button type="button" class="ask-topic" data-topic="App &amp; firmware" aria-pressed="false">App &amp; firmware</button>
+          <button type="button" class="ask-topic" data-topic="Recording &amp; AI" aria-pressed="false">Recording &amp; AI</button>
+          <button type="button" class="ask-topic" data-topic="Privacy &amp; MCP" aria-pressed="false">Privacy &amp; MCP</button>
+          <button type="button" class="ask-topic" data-topic="How to report" aria-pressed="false">How to report</button>
+          <button type="button" class="ask-topic" data-topic="Other" aria-pressed="false">Other</button>
+        </div>
+        <div class="cf-row-label">Phone</div>
+        <div class="ask-topics ask-os cf-seg" role="group" aria-label="Phone" id="askOs">
+          <button type="button" class="ask-topic" data-os="iOS" aria-pressed="false">iOS</button>
+          <button type="button" class="ask-topic" data-os="Android" aria-pressed="false">Android</button>
+        </div>
       </div>
-      <label id="askOsLabel">Phone (optional)</label>
-      <div class="ask-topics ask-os" role="group" aria-labelledby="askOsLabel" id="askOs">
-        <button type="button" class="ask-topic" data-os="iOS" aria-pressed="false">iOS</button>
-        <button type="button" class="ask-topic" data-os="Android" aria-pressed="false">Android</button>
-      </div>
-      <ul class="ask-where" aria-label="Where to post">
-        <li><b>General</b><span class="sep" aria-hidden="true">·</span>ask openly, others can help</li>
-        <li><b>Beta Support</b><span class="sep" aria-hidden="true">·</span>private, just you and the team</li>
-      </ul>
-      <p class="ask-shots">Attach screenshots in WhatsApp.</p>
     </div>
     <div class="modal-foot">
+      <div class="cf-where-label">Paste it into either WhatsApp chat</div>
+      <ul class="cf-channels" aria-label="Where to post">
+        <li><span class="cf-ch-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M5 9h14M5 15h14M10 4L8 20M16 4l-2 16"/></svg></span><b>General</b><span class="sep">·</span><span class="cf-ch-d">ask openly, others can help</span></li>
+        <li><span class="cf-ch-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="11" width="14" height="9" rx="2.5"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg></span><b>Beta Support</b><span class="sep">·</span><span class="cf-ch-d">private, just you and the team</span></li>
+      </ul>
+      <p class="ask-shots">Attach screenshots in WhatsApp.</p>
       <p class="ask-note" id="askNote" role="status" aria-live="polite"></p>
-      <button type="button" class="btn primary" id="askSend"><span class="ask-send-label">Copy &amp; open WhatsApp</span></button>
-      <button type="button" class="ask-cancel" id="askCancel">Cancel</button>
+      <button type="button" class="btn primary cf-send" id="askSend"><span class="ask-send-label">Copy &amp; open WhatsApp</span><span class="cf-send-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></button>
     </div>
   </div>
 </div>
-
 <script>
 
 
@@ -1813,7 +1959,7 @@ function paint(){
     left.innerHTML='';
     right.innerHTML='';
     list.classList.remove("has-cols");
-    list.innerHTML='<div class="empty">No matches — try another word or topic.</div>';
+    list.innerHTML='<div class="empty"><span class="empty-t">No matches — try another word or topic.</span><button type="button" class="empty-ask"><span class="ic"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2.5l1.9 5.6 5.6 1.9-5.6 1.9L12 17.5l-1.9-5.6L4.5 10l5.6-1.9z"/><path d="M19 15l.8 2.2 2.2.8-2.2.8L19 21l-.8-2.2-2.2-.8 2.2-.8z" opacity=".7"/></svg></span><span class="tx"><b>Ask the beta team</b><q>'+esc(qEl.value.trim())+'</q></span><span class="go"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></button></div>';
     return;
   }
   /* Odd/even split: stable columns — open only pushes within its column */
@@ -1959,8 +2105,8 @@ function closeAsk(){
   clearTimeout(askHideTimer);
   askHideTimer=setTimeout(()=>{modal.hidden=true;clearAskViewport()}, reduceMQ.matches?0:(sheetMQ.matches?280:220));
 }
-document.getElementById("askOpen").addEventListener("click",openAsk);
-document.getElementById("askClose").addEventListener("click",closeAsk);
+document.getElementById("askOpen")&&document.getElementById("askOpen").addEventListener("click",()=>openComposer());
+
 document.getElementById("askCancel").addEventListener("click",closeAsk);
 
 /* —— v10.41 Bottom-sheet drag-to-dismiss (mobile only) ——
@@ -2432,6 +2578,39 @@ document.querySelectorAll(".chip").forEach(btn=>btn.addEventListener("click",()=
   render();
 }));
 
+</script>
+<script>
+/* ===== PROTOTYPE: composer-first sheet glue (reuses openAsk / findAskMatches / updateAskMatches) ===== */
+(function(){
+  const nm=document.getElementById('cfNoMatch');
+  const dBtn=document.getElementById('cfDetailsBtn'), dBox=document.getElementById('cfDetails'), dSum=document.getElementById('cfDetailsSum');
+  const _u=updateAskMatches;
+  updateAskMatches=function(){
+    _u();
+    const v=(askQ.value||'').trim();
+    nm.hidden=!(askMatches.hidden && v.replace(/\s+/g,'').length>=14);
+  };
+  function sum(){
+    const t=askSelectedTopics(); const bits=t.slice(); if(askOs) bits.push(askOs);
+    dSum.textContent=bits.length?bits.join(' · '):'Optional · topic, phone';
+  }
+  dBtn.addEventListener('click',()=>{const on=dBox.hidden;dBox.hidden=!on;dBtn.setAttribute('aria-expanded',on?'true':'false')});
+  document.querySelectorAll('#askTopics .ask-topic,#askOs .ask-topic').forEach(b=>b.addEventListener('click',()=>setTimeout(sum,0)));
+  /* Composer-first: open + focus synchronously inside the tap (iOS keeps the keyboard), optional prefill */
+  window.openComposer=function(text){
+    if(typeof text==='string'){askQ.value=text}
+    openAsk();
+    try{askQ.focus({preventScroll:true})}catch(e){askQ.focus()}
+    try{const n=askQ.value.length;askQ.setSelectionRange(n,n)}catch(e){}
+    growAsk();updateAskMatches();
+  };
+  const mo=new MutationObserver(()=>document.documentElement.classList.toggle('ask-open',modal.classList.contains('open')));
+  mo.observe(modal,{attributes:true,attributeFilter:['class']});
+})();
+
+document.querySelectorAll('.hp-sug').forEach(b=>b.addEventListener('click',()=>openComposer(b.dataset.q)));
+/* v10.50: empty search → Ask the beta team, prefilled with the search text */
+list.addEventListener('click',e=>{if(e.target.closest('.empty-ask')) openComposer((qEl.value||'').trim())});
 </script>
 </body>
 </html>
