@@ -37,7 +37,7 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600&display=swap" />
 <style>
 /* Blank-slate v4 — luminous chromatic + voice polish
-   System theme default · Instrument Serif title · soft-ink · soft iris CTA · aurora from viewport top
+   System theme default · Instrument Serif title · soft-ink · soft iris CTA · fixed aurora at viewport y=0
    Tight mobile safe-area · Flip wordmark · gallery cards */
 :root{
   --bg:#F7F5F1;
@@ -79,31 +79,41 @@
   color-scheme:light;
 }
 *,*::before,*::after{box-sizing:border-box}
-html{scroll-behavior:smooth;background:var(--bg);color-scheme:light dark;overflow-x:clip;width:100%;max-width:100%}
+html{scroll-behavior:smooth;background:var(--bg);color-scheme:light dark;overflow-x:hidden;width:100%;max-width:100%}
 body{
   margin:0;min-height:100vh;min-height:100dvh;color:var(--ink-soft);background:var(--bg);
   font-family:var(--font);font-size:15px;line-height:1.55;font-weight:400;
   letter-spacing:-.011em;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;
-  overflow-x:clip;width:100%;max-width:100%;
+  width:100%;max-width:100%;
   position:relative;
 }
-/* Silk aurora — pinned to the VERY TOP of the viewport (behind Updated + brand).
-   Was on .shell::before and got clipped / trapped mid-band under the Updated chip. */
-body::before{
-  content:"";position:absolute;left:0;right:0;top:0;
-  width:100%;height:min(560px, 72vh);pointer-events:none;z-index:0;
+/* Full-bleed aurora: FIXED to viewport y=0 (under status bar), behind Updated + Flip.
+   Hotspots sit at/above the top edge so the glow is strongest at the phone crown —
+   not a mid-band between Updated and the wordmark. */
+.aurora{
+  position:fixed;
+  top:0;left:0;right:0;
+  width:100vw;
+  height:min(520px, 70dvh);
+  margin:0;padding:0;
+  pointer-events:none;
+  z-index:0;
+  overflow:visible;
   background:
-    radial-gradient(ellipse 70% 55% at 18% 28%, rgba(168,145,255,.34), transparent 70%),
-    radial-gradient(ellipse 60% 50% at 82% 18%, rgba(255,160,195,.26), transparent 68%),
-    radial-gradient(ellipse 55% 48% at 50% 40%, rgba(255,200,160,.22), transparent 65%),
-    radial-gradient(ellipse 45% 40% at 65% 12%, rgba(255,230,190,.18), transparent 62%),
-    radial-gradient(ellipse 40% 38% at 35% 16%, rgba(170,205,255,.16), transparent 68%);
-  filter:blur(72px) saturate(108%);
-  opacity:.78;
-  mask-image:linear-gradient(180deg,#000 0%,#000 48%,transparent 100%);
-  -webkit-mask-image:linear-gradient(180deg,#000 0%,#000 48%,transparent 100%);
+    /* primary wash anchored ABOVE the fold so blur blooms onto y=0 */
+    radial-gradient(ellipse 90% 70% at 50% -8%, rgba(168,145,255,.42), transparent 72%),
+    radial-gradient(ellipse 70% 60% at 12% 0%, rgba(255,160,195,.30), transparent 70%),
+    radial-gradient(ellipse 65% 55% at 88% 0%, rgba(255,200,160,.26), transparent 68%),
+    radial-gradient(ellipse 55% 50% at 70% 4%, rgba(255,230,190,.20), transparent 65%),
+    radial-gradient(ellipse 50% 45% at 30% 2%, rgba(170,205,255,.20), transparent 68%);
+  filter:blur(56px) saturate(112%);
+  opacity:.85;
+  mask-image:linear-gradient(180deg,#000 0%,#000 55%,transparent 100%);
+  -webkit-mask-image:linear-gradient(180deg,#000 0%,#000 55%,transparent 100%);
 }
-body > *{position:relative;z-index:1}
+/* Content above the fixed aurora */
+.fresh,.shell,.modal-backdrop{position:relative;z-index:1}
+.modal-backdrop{z-index:100}
 button,input,select,textarea{font:inherit;color:inherit}
 button{cursor:pointer;border:0;background:none}
 a{color:var(--accent-deep);text-decoration:none}
@@ -113,7 +123,9 @@ a:hover{text-decoration:underline;text-underline-offset:3px}
 /* Updated bar — quiet silk chip */
 .fresh{
   display:flex;justify-content:center;align-items:center;
-  padding:max(0px, env(safe-area-inset-top, 0px)) 0 0;background:transparent;border:0;
+  padding:max(0px, env(safe-area-inset-top, 0px)) 0 0;
+  background:transparent;border:0;box-shadow:none;
+  /* sits ON TOP of fixed .aurora — do not paint an opaque full-bleed bar */
 }
 .fresh span{
   display:inline-flex;align-items:center;gap:7px;
@@ -169,7 +181,7 @@ a:hover{text-decoration:underline;text-underline-offset:3px}
     padding-left:max(20px, env(safe-area-inset-left, 0px));
     padding-right:max(20px, env(safe-area-inset-right, 0px));
   }
-  body::before{height:min(420px, 68vh);filter:blur(56px) saturate(108%);opacity:.7}
+  .aurora{height:min(460px, 62dvh);filter:blur(48px) saturate(112%);opacity:.88}
   /* shell already insets — avoid double padding on brand/hero/controls */
   .brand{padding:0}
   .hero{padding:0;margin:0 auto 14px}
@@ -547,15 +559,15 @@ footer{
 }
 [data-theme="dark"] html,
 [data-theme="dark"] body{background:var(--bg)}
-[data-theme="dark"] body::before{
+[data-theme="dark"] .aurora{
   background:
-    radial-gradient(ellipse 70% 55% at 18% 28%, rgba(120,105,255,.38), transparent 70%),
-    radial-gradient(ellipse 60% 50% at 82% 18%, rgba(210,100,165,.22), transparent 68%),
-    radial-gradient(ellipse 55% 48% at 50% 40%, rgba(255,160,110,.12), transparent 65%),
-    radial-gradient(ellipse 45% 40% at 65% 12%, rgba(255,200,130,.1), transparent 62%),
-    radial-gradient(ellipse 40% 38% at 35% 16%, rgba(110,160,255,.14), transparent 68%);
-  filter:blur(80px) saturate(115%);
-  opacity:.72;
+    radial-gradient(ellipse 90% 70% at 50% -8%, rgba(120,105,255,.46), transparent 72%),
+    radial-gradient(ellipse 70% 60% at 12% 0%, rgba(210,100,165,.28), transparent 70%),
+    radial-gradient(ellipse 65% 55% at 88% 0%, rgba(255,160,110,.16), transparent 68%),
+    radial-gradient(ellipse 55% 50% at 70% 4%, rgba(255,200,130,.12), transparent 65%),
+    radial-gradient(ellipse 50% 45% at 30% 2%, rgba(110,160,255,.18), transparent 68%);
+  filter:blur(60px) saturate(118%);
+  opacity:.8;
 }
 [data-theme="dark"] .shell::after{
   opacity:.05;mix-blend-mode:screen;
@@ -624,6 +636,7 @@ footer{
 </style>
 </head>
 <body>
+<div class="aurora" aria-hidden="true"></div>
 <div class="fresh" role="status"><span><i aria-hidden="true"></i> Updated Oct 24, 2026</span></div>
 <div class="shell">
   <div class="brand">
