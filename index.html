@@ -74,7 +74,7 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/geist-mono@5.2.5/index.min.css" />
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600&display=swap" />
 <style>
-/* Overhaul 2026-10-25 v10.8 — island continuous --bg (no black veil) · liquid-glass toggle · light purple titles · deeper Center gold */
+/* Overhaul 2026-10-25 v10.9 — toggle height = Updated badge · clearer liquid glass · keep island continuous --bg */
 :root{
   /* Surfaces */
   --bg:#F6F5FB;
@@ -308,49 +308,60 @@ a:hover{text-decoration:underline;text-underline-offset:3px}
   flex:0 0 auto;display:flex;align-items:flex-start;justify-content:center;
 }
 .brand .wm{height:32px;width:auto;display:block}
-/* Glass moon|sun switch — Apple liquid glass · height = Moonphase letter box · spring thumb */
+/* Glass moon|sun switch — Apple liquid glass · outer height = Updated badge · spring thumb */
 .theme-toggle{
   position:relative;transform:none;isolation:isolate;
   align-self:flex-start;
-  margin-top:0; /* TOP flush with Moonphase glyph tops (Flip P sits lower — ignore) */
-  /* Moonphase letters ≈15.2/21 of 32px wm → ~23px */
-  height:23px;min-height:23px;width:50px;min-width:50px;padding:0;border-radius:999px;gap:0;
+  margin-top:0;
+  /* Outer height matches .fresh span (pad 6+6 + mono ~11–13 + border) ≈ 28px */
+  height:28px;min-height:28px;width:60px;min-width:60px;padding:0;border-radius:999px;gap:0;
   display:inline-flex;align-items:center;justify-content:center;
-  /* Quiet but readable glass — not muddy gray */
-  border:1px solid rgba(255,255,255,.26);
-  background:rgba(255,255,255,.12);
-  backdrop-filter:blur(12px) saturate(180%) brightness(1.08);
-  -webkit-backdrop-filter:blur(12px) saturate(180%) brightness(1.08);
+  /* Liquid glass — clear translucent fill, strong blur/saturate, specular rim (not gray sludge) */
+  border:1px solid rgba(255,255,255,.42);
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.28) 0%, rgba(255,255,255,.10) 55%, rgba(255,255,255,.06) 100%);
+  backdrop-filter:blur(28px) saturate(220%) brightness(1.14);
+  -webkit-backdrop-filter:blur(28px) saturate(220%) brightness(1.14);
   box-shadow:
-    0 1px 2px rgba(0,0,0,.18),
-    0 4px 12px rgba(0,0,0,.10),
-    inset 0 1px 1px rgba(255,255,255,.50),
-    inset 0 -1px 1px rgba(255,255,255,.12),
-    inset 1px 0 1px rgba(255,255,255,.16),
-    inset -1px 0 1px rgba(255,255,255,.16);
+    0 1px 2px rgba(0,0,0,.20),
+    0 6px 18px rgba(0,0,0,.14),
+    inset 0 1px 0 rgba(255,255,255,.72),
+    inset 0 -1px 0 rgba(255,255,255,.10),
+    inset 1px 0 0 rgba(255,255,255,.28),
+    inset -1px 0 0 rgba(255,255,255,.22);
   color:var(--muted);
   overflow:visible;
   transition:background .28s var(--ease), border-color .28s var(--ease), box-shadow .28s var(--ease);
   -webkit-tap-highlight-color:transparent;
 }
+/* Specular rim highlight (top edge catch light) */
+.theme-toggle::before{
+  content:"";
+  position:absolute;left:8%;right:8%;top:0;height:1px;border-radius:999px;
+  background:linear-gradient(90deg, transparent, rgba(255,255,255,.85), transparent);
+  pointer-events:none;z-index:3;opacity:.9;
+}
 /* Diagonal glass sheen */
 .theme-toggle::after{
   content:"";
   position:absolute;inset:0;border-radius:inherit;pointer-events:none;z-index:0;
-  background:linear-gradient(135deg, rgba(255,255,255,.42) 0%, rgba(255,255,255,.08) 28%, transparent 56%);
+  background:
+    linear-gradient(135deg, rgba(255,255,255,.55) 0%, rgba(255,255,255,.16) 26%, transparent 52%),
+    linear-gradient(210deg, transparent 40%, rgba(255,255,255,.10) 70%, transparent 100%);
   mix-blend-mode:screen;
-  opacity:.85;
+  opacity:.95;
 }
 .theme-toggle:hover{
-  border-color:rgba(255,255,255,.34);
-  background:rgba(255,255,255,.16);
+  border-color:rgba(255,255,255,.55);
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.34) 0%, rgba(255,255,255,.14) 55%, rgba(255,255,255,.08) 100%);
   box-shadow:
-    0 2px 6px rgba(0,0,0,.20),
-    0 6px 16px rgba(0,0,0,.12),
-    inset 0 1px 1px rgba(255,255,255,.58),
-    inset 0 -1px 1px rgba(255,255,255,.14),
-    inset 1px 0 1px rgba(255,255,255,.18),
-    inset -1px 0 1px rgba(255,255,255,.18);
+    0 2px 6px rgba(0,0,0,.22),
+    0 8px 22px rgba(0,0,0,.16),
+    inset 0 1px 0 rgba(255,255,255,.82),
+    inset 0 -1px 0 rgba(255,255,255,.12),
+    inset 1px 0 0 rgba(255,255,255,.32),
+    inset -1px 0 0 rgba(255,255,255,.26);
 }
 .theme-toggle:active{transform:none}
 .theme-toggle .tlabel{display:none!important}
@@ -363,28 +374,30 @@ a:hover{text-decoration:underline;text-underline-offset:3px}
 }
 .theme-toggle .tt-icon{
   position:absolute;top:50%;
-  width:11px;height:11px;
-  margin-top:-5.5px;
+  width:13px;height:13px;
+  margin-top:-6.5px;
   z-index:1;
   pointer-events:none;
-  opacity:.62;
+  opacity:.78;
   transition:opacity .32s var(--ease), color .32s var(--ease), transform .42s var(--ease-spring);
-  color:rgba(110,112,128,.72);
+  color:rgba(230,228,210,.88);
+  filter:drop-shadow(0 0 2px rgba(0,0,0,.35));
 }
-.theme-toggle .tt-icon svg{width:11px;height:11px;display:block}
-/* Moon LEFT · Sun RIGHT — both always readable */
-.theme-toggle .icon-moon{left:6px;opacity:.78;color:#E8E2C4}
-.theme-toggle .icon-sun{right:6px;opacity:.78;color:#C9A24A}
+.theme-toggle .tt-icon svg{width:13px;height:13px;display:block;stroke-width:2.25}
+/* Moon LEFT · Sun RIGHT — both always readable, higher contrast */
+.theme-toggle .icon-moon{left:7px;opacity:.88;color:#F5EEC8}
+.theme-toggle .icon-sun{right:7px;opacity:.88;color:#E0B84A}
 .theme-toggle .tt-thumb{
   position:absolute;
-  top:2px;left:2px;
-  width:19px;height:19px;
+  top:3px;left:3px;
+  width:22px;height:22px;
   border-radius:50%;
-  background:rgba(28,29,38,.94);
+  background:
+    linear-gradient(180deg, rgba(42,44,56,.98) 0%, rgba(22,23,30,.98) 100%);
   box-shadow:
-    0 1px 2px rgba(0,0,0,.34),
-    0 3px 8px rgba(0,0,0,.22),
-    inset 0 1px 0 rgba(255,255,255,.14);
+    0 1px 2px rgba(0,0,0,.40),
+    0 4px 10px rgba(0,0,0,.28),
+    inset 0 1px 0 rgba(255,255,255,.22);
   z-index:2;
   pointer-events:none;
   transform:translateX(0); /* default dark → over moon (left) */
@@ -395,55 +408,65 @@ a:hover{text-decoration:underline;text-underline-offset:3px}
 @media (prefers-color-scheme: dark){
   :root:not([data-theme="light"]) .theme-toggle .tt-thumb{
     transform:translateX(0);
-    background:rgba(28,29,38,.94);
+    background:linear-gradient(180deg, rgba(42,44,56,.98) 0%, rgba(22,23,30,.98) 100%);
     box-shadow:
-      0 1px 2px rgba(0,0,0,.38),
-      0 3px 10px rgba(0,0,0,.26),
-      inset 0 1px 0 rgba(255,255,255,.16);
+      0 1px 2px rgba(0,0,0,.42),
+      0 4px 12px rgba(0,0,0,.30),
+      inset 0 1px 0 rgba(255,255,255,.24);
   }
-  :root:not([data-theme="light"]) .theme-toggle .icon-moon{opacity:1;color:#FFFBC1;transform:scale(1.05)}
-  :root:not([data-theme="light"]) .theme-toggle .icon-sun{opacity:.62;color:#C9A24A;transform:scale(1)}
+  :root:not([data-theme="light"]) .theme-toggle .icon-moon{opacity:1;color:#FFFBC1;transform:scale(1.08);filter:drop-shadow(0 0 3px rgba(255,251,193,.45))}
+  :root:not([data-theme="light"]) .theme-toggle .icon-sun{opacity:.72;color:#E0B84A;transform:scale(1);filter:drop-shadow(0 0 2px rgba(0,0,0,.35))}
 }
 [data-theme="dark"] .theme-toggle .tt-thumb{
   transform:translateX(0);
-  background:rgba(28,29,38,.94);
+  background:linear-gradient(180deg, rgba(42,44,56,.98) 0%, rgba(22,23,30,.98) 100%);
   box-shadow:
-    0 1px 2px rgba(0,0,0,.38),
-    0 3px 10px rgba(0,0,0,.26),
-    inset 0 1px 0 rgba(255,255,255,.16);
+    0 1px 2px rgba(0,0,0,.42),
+    0 4px 12px rgba(0,0,0,.30),
+    inset 0 1px 0 rgba(255,255,255,.24);
 }
-[data-theme="dark"] .theme-toggle .icon-moon{opacity:1;color:#FFFBC1;transform:scale(1.05)}
-[data-theme="dark"] .theme-toggle .icon-sun{opacity:.62;color:#C9A24A;transform:scale(1)}
+[data-theme="dark"] .theme-toggle .icon-moon{opacity:1;color:#FFFBC1;transform:scale(1.08);filter:drop-shadow(0 0 3px rgba(255,251,193,.45))}
+[data-theme="dark"] .theme-toggle .icon-sun{opacity:.72;color:#E0B84A;transform:scale(1);filter:drop-shadow(0 0 2px rgba(0,0,0,.35))}
 /* Light: thumb over sun (right); both icons still visible */
 [data-theme="light"] .theme-toggle .tt-thumb{
-  transform:translateX(27px);
-  background:rgba(255,255,255,.96);
+  transform:translateX(32px);
+  background:linear-gradient(180deg, #FFFFFF 0%, #F4F2FA 100%);
   box-shadow:
-    0 1px 2px rgba(40,28,12,.12),
-    0 3px 8px rgba(40,28,12,.10),
-    inset 0 1px 0 rgba(255,255,255,.95);
+    0 1px 2px rgba(40,28,12,.14),
+    0 4px 10px rgba(40,28,12,.12),
+    inset 0 1px 0 rgba(255,255,255,1);
 }
-[data-theme="light"] .theme-toggle .icon-sun{opacity:1;color:#B8923A;transform:scale(1.05)}
-[data-theme="light"] .theme-toggle .icon-moon{opacity:.55;color:#7A7688;transform:scale(1)}
+[data-theme="light"] .theme-toggle .icon-sun{opacity:1;color:#B8923A;transform:scale(1.08);filter:drop-shadow(0 0 2px rgba(184,146,58,.35))}
+[data-theme="light"] .theme-toggle .icon-moon{opacity:.62;color:#5A5668;transform:scale(1);filter:none}
 [data-theme="light"] .theme-toggle{
-  border-color:rgba(255,255,255,.72);
-  background:rgba(255,255,255,.46);
-  backdrop-filter:blur(14px) saturate(150%) brightness(1.04);
-  -webkit-backdrop-filter:blur(14px) saturate(150%) brightness(1.04);
+  border-color:rgba(255,255,255,.88);
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.72) 0%, rgba(255,255,255,.42) 55%, rgba(246,245,251,.36) 100%);
+  backdrop-filter:blur(28px) saturate(200%) brightness(1.06);
+  -webkit-backdrop-filter:blur(28px) saturate(200%) brightness(1.06);
   box-shadow:
-    0 1px 3px rgba(40,30,80,.08),
-    0 4px 12px rgba(60,50,120,.06),
-    inset 0 1px 1px rgba(255,255,255,.92),
-    inset 0 -1px 1px rgba(40,30,80,.06);
+    0 1px 3px rgba(40,30,80,.10),
+    0 6px 16px rgba(60,50,120,.08),
+    inset 0 1px 0 rgba(255,255,255,1),
+    inset 0 -1px 0 rgba(40,30,80,.06),
+    inset 1px 0 0 rgba(255,255,255,.70),
+    inset -1px 0 0 rgba(255,255,255,.50);
+}
+[data-theme="light"] .theme-toggle::before{
+  background:linear-gradient(90deg, transparent, rgba(255,255,255,1), transparent);
+  opacity:1;
 }
 [data-theme="light"] .theme-toggle::after{
-  background:linear-gradient(135deg, rgba(255,255,255,.78) 0%, rgba(255,255,255,.18) 30%, transparent 58%);
+  background:
+    linear-gradient(135deg, rgba(255,255,255,.92) 0%, rgba(255,255,255,.28) 28%, transparent 56%),
+    linear-gradient(210deg, transparent 45%, rgba(255,255,255,.18) 75%, transparent 100%);
   mix-blend-mode:normal;
   opacity:1;
 }
 [data-theme="dark"] .theme-toggle{
-  border-color:rgba(255,255,255,.26);
-  background:rgba(255,255,255,.12);
+  border-color:rgba(255,255,255,.42);
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.28) 0%, rgba(255,255,255,.10) 55%, rgba(255,255,255,.06) 100%);
 }
 @media (prefers-reduced-motion: reduce){
   .theme-toggle .tt-thumb{transition:none}
@@ -898,10 +921,10 @@ footer{
   color:#5B5678;
   border-color:rgba(99,91,255,.14);
 }
-/* Light toggle hover — brighter glass, still quiet */
+/* Light toggle hover — brighter glass */
 [data-theme="light"] .theme-toggle:hover{
-  background:rgba(255,255,255,.58);
-  border-color:rgba(255,255,255,.84);
+  background:linear-gradient(180deg, rgba(255,255,255,.82) 0%, rgba(255,255,255,.52) 55%, rgba(246,245,251,.42) 100%);
+  border-color:rgba(255,255,255,.96);
 }
 [data-theme="light"] .chip[aria-selected="true"],
 [data-theme="light"] .sort button[aria-pressed="true"]{
@@ -1019,12 +1042,14 @@ html[data-theme="dark"] body,
 [data-theme="dark"] .fresh span{background:var(--control-bg);border-color:var(--line);color:var(--muted)}
 [data-theme="dark"] .fresh i{background:var(--ok);box-shadow:0 0 0 3px var(--ok-soft)}
 [data-theme="dark"] .theme-toggle{
-  background:rgba(255,255,255,.12);color:var(--muted);
-  border-color:rgba(255,255,255,.26);
+  color:var(--muted);
+  border-color:rgba(255,255,255,.42);
+  background:linear-gradient(180deg, rgba(255,255,255,.28) 0%, rgba(255,255,255,.10) 55%, rgba(255,255,255,.06) 100%);
 }
 [data-theme="dark"] .theme-toggle:hover{
-  background:rgba(255,255,255,.18);color:var(--ink);
-  border-color:rgba(255,255,255,.34);
+  color:var(--ink);
+  border-color:rgba(255,255,255,.55);
+  background:linear-gradient(180deg, rgba(255,255,255,.34) 0%, rgba(255,255,255,.14) 55%, rgba(255,255,255,.08) 100%);
 }
 [data-theme="dark"] .chip{background:var(--control-bg);color:var(--ink-soft)}
 [data-theme="dark"] .chip:hover{background:var(--surface)}
@@ -1074,12 +1099,14 @@ html[data-theme="dark"] body,
   :root:not([data-theme="light"]) .fresh span{background:var(--control-bg);border-color:var(--line);color:var(--muted)}
   :root:not([data-theme="light"]) .fresh i{background:var(--ok);box-shadow:0 0 0 3px var(--ok-soft)}
   :root:not([data-theme="light"]) .theme-toggle{
-    background:rgba(255,255,255,.12);color:var(--muted);
-    border-color:rgba(255,255,255,.26);
+    color:var(--muted);
+    border-color:rgba(255,255,255,.42);
+    background:linear-gradient(180deg, rgba(255,255,255,.28) 0%, rgba(255,255,255,.10) 55%, rgba(255,255,255,.06) 100%);
   }
   :root:not([data-theme="light"]) .theme-toggle:hover{
-    background:rgba(255,255,255,.18);color:var(--ink);
-    border-color:rgba(255,255,255,.34);
+    color:var(--ink);
+    border-color:rgba(255,255,255,.55);
+    background:linear-gradient(180deg, rgba(255,255,255,.34) 0%, rgba(255,255,255,.14) 55%, rgba(255,255,255,.08) 100%);
   }
   :root:not([data-theme="light"]) .chip{background:var(--control-bg);color:var(--ink-soft)}
   :root:not([data-theme="light"]) .chip:hover{background:var(--surface)}
@@ -1149,20 +1176,20 @@ html[data-theme="dark"] body,
   .brand-slot{min-height:28px;align-items:flex-start}
   .brand .wm{height:28px}
   .theme-toggle{
-    /* Moonphase letters ≈15.2/21 of 28px wm → ~20px */
-    height:20px;min-height:20px;width:44px;min-width:44px;padding:0;gap:0;
-    margin-top:0; /* TOP flush with Moonphase glyph tops */
+    /* Outer height matches Updated badge on mobile */
+    height:28px;min-height:28px;width:58px;min-width:58px;padding:0;gap:0;
+    margin-top:0;
   }
-  .theme-toggle .tt-thumb{width:16px;height:16px;top:2px;left:2px}
-  .theme-toggle .tt-icon{width:10px;height:10px;margin-top:-5px}
-  .theme-toggle .tt-icon svg{width:10px;height:10px}
-  .theme-toggle .icon-moon{left:5px}
-  .theme-toggle .icon-sun{right:5px}
+  .theme-toggle .tt-thumb{width:22px;height:22px;top:3px;left:3px}
+  .theme-toggle .tt-icon{width:12px;height:12px;margin-top:-6px}
+  .theme-toggle .tt-icon svg{width:12px;height:12px}
+  .theme-toggle .icon-moon{left:7px}
+  .theme-toggle .icon-sun{right:7px}
   @media (prefers-color-scheme: dark){
     :root:not([data-theme="light"]) .theme-toggle .tt-thumb{transform:translateX(0)}
   }
   [data-theme="dark"] .theme-toggle .tt-thumb{transform:translateX(0)}
-  [data-theme="light"] .theme-toggle .tt-thumb{transform:translateX(24px)}
+  [data-theme="light"] .theme-toggle .tt-thumb{transform:translateX(30px)}
   .theme-toggle .tlabel{display:none!important}
   .hero{margin:0 auto 32px;padding:0}
   .hero h1{font-size:clamp(2rem,8.5vw,2.5rem);letter-spacing:-.01em;line-height:1.1;margin-bottom:10px}
