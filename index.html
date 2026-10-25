@@ -4,7 +4,7 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 <meta name="color-scheme" content="light dark" />
-<!-- theme-color MUST match aurora START (island wash), not pure black/white — continuous with .aurora 0%. -->
+<!-- theme-color ≈ page-top aurora (chrome hint only). Status is black-translucent — content scrolls UNDER island; no opaque slab. -->
 <meta name="theme-color" content="#E0DBFC" media="(prefers-color-scheme: light)" id="themeColorMetaLight" />
 <meta name="theme-color" content="#333968" media="(prefers-color-scheme: dark)" id="themeColorMetaDark" />
 <meta name="theme-color" content="#333968" id="themeColorMeta" />
@@ -22,6 +22,7 @@
     'flip-beta-qa-theme-manual-v5','flip-beta-qa-theme-manual-v6','flip-beta-qa-theme-manual-v7'
   ];
   var LIGHT_TC='#E0DBFC', DARK_TC='#333968';
+  var LIGHT_BG='#F6F5FB', DARK_BG='#0E0F14';
   try{
     for(var i=0;i<STALE.length;i++){
       try{localStorage.removeItem(STALE[i])}catch(e){}
@@ -36,6 +37,7 @@
     var metaD=document.getElementById('themeColorMetaDark');
     function setTC(theme, manual){
       var tc=theme==='dark'?DARK_TC:LIGHT_TC;
+      var bg=theme==='dark'?DARK_BG:LIGHT_BG;
       if(meta) meta.setAttribute('content', tc);
       if(manual){
         if(metaL) metaL.setAttribute('content', tc);
@@ -44,9 +46,9 @@
         if(metaL) metaL.setAttribute('content', LIGHT_TC);
         if(metaD) metaD.setAttribute('content', DARK_TC);
       }
-      /* Always paint html/body so iOS status / Dynamic Island never flash black in light */
-      document.documentElement.style.backgroundColor=tc;
-      try{if(document.body) document.body.style.backgroundColor=tc}catch(e){}
+      /* Paint --bg only (not aurora-top). Status is translucent — page scrolls under island. */
+      document.documentElement.style.backgroundColor=bg;
+      try{if(document.body) document.body.style.backgroundColor=bg}catch(e){}
     }
     if(saved){
       document.documentElement.setAttribute('data-theme', saved);
@@ -74,7 +76,7 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/geist-mono@5.2.5/index.min.css" />
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600&display=swap" />
 <style>
-/* Overhaul 2026-10-25 v10.12 — aurora y=0 continuous (theme-color=aurora-top) · toggle top flush with MOONPHASE · no hard island edge */
+/* Overhaul 2026-10-25 v10.13 — Google-like transparent status: aurora scrolls under island · no fixed opaque cap · toggle flush MOONPHASE */
 :root{
   /* Surfaces */
   --bg:#F6F5FB;
@@ -146,56 +148,30 @@
 html{
   scroll-behavior:smooth;overflow-x:hidden;width:100%;max-width:100%;
   color-scheme:light dark;
-  /* Island chrome = aurora start (--aurora-top), never pure black then sudden wash */
-  background-color:var(--aurora-top);
-  background:var(--aurora-top);
+  /* Page --bg; status bar translucent — no opaque aurora cap sealing the top */
+  background-color:var(--bg);
+  background:var(--bg);
   min-height:100%;
   min-height:100dvh;
   padding:0;
   margin:0;
 }
 html,body{-webkit-overflow-scrolling:touch;overscroll-behavior-y:none}
-/* Continuity under Dynamic Island:
-   theme-color == --aurora-top == html/body top wash == .aurora gradient 0%.
-   Soft fade only — no hard black band then sudden light. */
-/* Full-viewport underlay — overscroll shows aurora-top (matches status chrome) */
-html::after{
-  content:"";
-  position:fixed;
-  inset:0;
-  background:var(--aurora-top);
-  background-color:var(--aurora-top);
-  pointer-events:none;
-  z-index:-1;
-}
-html[data-theme="light"]::after{background:#E0DBFC!important;background-color:#E0DBFC!important}
-html[data-theme="dark"]::after{background:#333968!important;background-color:#333968!important}
-@media (prefers-color-scheme: light){
-  :root:not([data-theme="dark"])::after{background:#E0DBFC!important;background-color:#E0DBFC!important}
-}
-@media (prefers-color-scheme: dark){
-  :root:not([data-theme="light"])::after{background:#333968!important;background-color:#333968!important}
-}
+/* No html::after fixed opaque wash — that sealed the top and blocked Google-like scroll-under.
+   black-translucent + viewport-fit=cover: aurora/content paint to y=0 and scroll under island. */
 body{
   margin:0;min-height:100vh;min-height:100dvh;color:var(--ink-soft);
-  /* Same --aurora-top as theme-color from y=0; soft fade to --bg — no hard hold/cliff */
-  background-color:var(--aurora-top);
-  background:
-    linear-gradient(180deg,
-      var(--aurora-top) 0%,
-      color-mix(in srgb, var(--aurora-top) 55%, var(--bg)) 28%,
-      var(--bg) 62%,
-      var(--bg) 100%);
+  background-color:var(--bg);
+  background:var(--bg);
   font-family:var(--font);font-size:15px;line-height:1.55;font-weight:var(--fw-regular);
   letter-spacing:-.011em;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;
   width:100%;max-width:100%;
-  position:relative;
+  position:relative; /* absolute aurora scrolls with page under translucent status */
 }
-/* FIXED top-curtain aurora — top:0 = physical screen top (viewport-fit=cover).
-   Gradient 0% = var(--aurora-top) === theme-color/html/body top. Soft % fade only;
-   never hold a solid band through safe-area then cliff to a lighter wash. */
+/* SCROLLING aurora (absolute, not fixed) — Google-like: washes to y=0 and scrolls UNDER
+   translucent status / Dynamic Island with the page. Soft fade from --aurora-top; no opaque cap. */
 .aurora{
-  position:fixed;
+  position:absolute;
   top:0;left:0;right:0;
   width:100%;
   height:min(340px, 46vh);
@@ -203,7 +179,6 @@ body{
   pointer-events:none;
   z-index:0;
   overflow:hidden;
-  /* 0% = --aurora-top (= theme-color). Only softens toward --bg — never a brighter strip. */
   background:
     radial-gradient(ellipse 150% 100% at 50% -5%,
       color-mix(in srgb, #A898FF 28%, transparent) 0%,
@@ -219,7 +194,6 @@ body{
   -webkit-mask-image:none;
   mask-image:none;
 }
-/* Crown: same family as aurora-top, only softens — no luminance jump */
 .aurora-crown{
   display:block!important;
   position:absolute;
@@ -1433,8 +1407,10 @@ document.getElementById("askSubmit").addEventListener("click",()=>{
   const meta=document.getElementById('themeColorMeta');
   const metaL=document.getElementById('themeColorMetaLight');
   const metaD=document.getElementById('themeColorMetaDark');
-  const LIGHT_TC='#E0DBFC'; /* = --aurora-top / theme-color / aurora 0% */
+  const LIGHT_TC='#E0DBFC'; /* theme-color hint ≈ aurora top */
   const DARK_TC='#333968';
+  const LIGHT_BG='#F6F5FB';
+  const DARK_BG='#0E0F14';
   for(const k of STALE){try{localStorage.removeItem(k)}catch(e){}}
   function manualPref(){
     try{
@@ -1449,12 +1425,13 @@ document.getElementById("askSubmit").addEventListener("click",()=>{
   }
   function setThemeColor(theme){
     const tc=theme==='dark'?DARK_TC:LIGHT_TC;
+    const bg=theme==='dark'?DARK_BG:LIGHT_BG;
     if(meta) meta.setAttribute('content', tc);
     if(metaL) metaL.setAttribute('content', tc);
     if(metaD) metaD.setAttribute('content', tc);
     try{
-      root.style.backgroundColor=tc;
-      if(document.body) document.body.style.backgroundColor=tc;
+      root.style.backgroundColor=bg;
+      if(document.body) document.body.style.backgroundColor=bg;
     }catch(e){}
     if(btn){
       btn.setAttribute('aria-label', theme==='dark'?'Switch to light theme':'Switch to dark theme');
