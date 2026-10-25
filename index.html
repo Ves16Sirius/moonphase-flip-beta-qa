@@ -83,7 +83,7 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/geist-mono@5.2.5/index.min.css" />
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:opsz,wght@14..32,400;14..32,500;14..32,560;14..32,600&display=swap" />
 <style>
-/* Overhaul 2026-10-25 v10.23 — kill island seam: sticky full twin of aurora curtain · keep Inter 560 + light #5B5678 */
+/* Overhaul 2026-10-25 v10.24 — single aurora curtain (no sticky twin compositor seam) · keep Inter 560 + light #5B5678 */
 :root{
   /* Surfaces */
   --bg:#F6F5FB;
@@ -184,11 +184,11 @@ body{
   width:100%;max-width:100%;
   position:relative;
 }
-/* FIXED dual-layer aurora — PRECOMPUTED hex washes (no color-mix; iOS Safari safe).
-   Sticky + main are FULL-HEIGHT twins (same height, same hex stops, same soft mask) so
-   island→content is one continuous silk — never a short solid-bottom band edge.
-   Theme flip = CSS opacity crossfade on BOTH stacks from the same data-theme (~200ms).
-   #aurora-sticky = full-height backup twin if iOS Safari drops the fixed compositor layer. */
+/* FIXED dual-layer aurora — ONE continuous curtain (v10.24).
+   PRECOMPUTED hex washes (no color-mix; iOS Safari safe).
+   Twin sticky was removed: two stacked fixed+translateZ layers caused a Safari
+   compositor hairline even when gradients matched. Theme flip = CSS opacity
+   crossfade on .aurora-layer from data-theme (~200ms) — silkiness untouched. */
 .aurora,.aurora-stack{
   position:fixed;
   top:0;left:0;right:0;
@@ -198,23 +198,7 @@ body{
   pointer-events:none;
   z-index:0;
   overflow:hidden;
-  isolation:isolate;
-  transform:translateZ(0);
-  -webkit-backface-visibility:hidden;
-  backface-visibility:hidden;
   background:transparent;
-}
-#aurora-sticky{
-  position:fixed;
-  top:0;left:0;right:0;
-  width:100%;
-  height:calc(env(safe-area-inset-top, 0px) + min(280px, 40vh));
-  margin:0;padding:0;
-  pointer-events:none;
-  z-index:0;
-  transform:translateZ(0);
-  background:transparent;
-  overflow:visible;
 }
 /* Per-theme wash layers — hard hex sRGB mixes; opacity crossfade is the only change */
 .aurora-layer{
@@ -223,17 +207,14 @@ body{
   opacity:0;
   will-change:opacity;
   transition:opacity var(--aurora-xfade, 200ms) cubic-bezier(.22,1,.36,1);
-  transform:translateZ(0);
 }
 .aurora-layer.is-active{opacity:1}
-/* Main + sticky aurora twins (masked fade to transparent) — same hex stops, same soft mask */
-.aurora > .aurora-layer,
-#aurora-sticky > .aurora-layer{
-  -webkit-mask-image:linear-gradient(180deg,#000 0%,#000 40%,rgba(0,0,0,.55) 70%,transparent 100%);
-  mask-image:linear-gradient(180deg,#000 0%,#000 40%,rgba(0,0,0,.55) 70%,transparent 100%);
+/* Soft mask — no solid plateau (avoids reading as a band edge) */
+.aurora > .aurora-layer{
+  -webkit-mask-image:linear-gradient(180deg, #000 0%, rgba(0,0,0,.85) 35%, rgba(0,0,0,.45) 60%, rgba(0,0,0,.15) 80%, transparent 100%);
+  mask-image:linear-gradient(180deg, #000 0%, rgba(0,0,0,.85) 35%, rgba(0,0,0,.45) 60%, rgba(0,0,0,.15) 80%, transparent 100%);
 }
-.aurora > .aurora-layer.layer-light,
-#aurora-sticky > .aurora-layer.layer-light{
+.aurora > .aurora-layer.layer-light{
   /* 28/18/10/4% #A898FF/#B8A8FF/#C8BCFF → soft fade */
   background:linear-gradient(180deg,
     #E0DBFC 0%,
@@ -242,8 +223,7 @@ body{
     #F4F3FB 72%,
     transparent 100%);
 }
-.aurora > .aurora-layer.layer-dark,
-#aurora-sticky > .aurora-layer.layer-dark{
+.aurora > .aurora-layer.layer-dark{
   /* 32/22/12/5% #5B66C4/#6B78E8/#4A54B0 → soft fade */
   background:linear-gradient(180deg,
     #272B4C 0%,
@@ -252,17 +232,12 @@ body{
     #11121C 68%,
     transparent 100%);
 }
-/* Default (no attr yet / dark-first): dark layers on — sticky+main locked */
-.aurora > .aurora-layer.layer-dark,
-#aurora-sticky > .aurora-layer.layer-dark{opacity:1}
-[data-theme="light"] .aurora > .aurora-layer.layer-dark,
-[data-theme="light"] #aurora-sticky > .aurora-layer.layer-dark{opacity:0}
-[data-theme="light"] .aurora > .aurora-layer.layer-light,
-[data-theme="light"] #aurora-sticky > .aurora-layer.layer-light{opacity:1}
-[data-theme="dark"] .aurora > .aurora-layer.layer-light,
-[data-theme="dark"] #aurora-sticky > .aurora-layer.layer-light{opacity:0}
-[data-theme="dark"] .aurora > .aurora-layer.layer-dark,
-[data-theme="dark"] #aurora-sticky > .aurora-layer.layer-dark{opacity:1}
+/* Default (no attr yet / dark-first): dark layer on */
+.aurora > .aurora-layer.layer-dark{opacity:1}
+[data-theme="light"] .aurora > .aurora-layer.layer-dark{opacity:0}
+[data-theme="light"] .aurora > .aurora-layer.layer-light{opacity:1}
+[data-theme="dark"] .aurora > .aurora-layer.layer-light{opacity:0}
+[data-theme="dark"] .aurora > .aurora-layer.layer-dark{opacity:1}
 .aurora-crown{display:none!important}
 .aurora-blobs{display:none!important}
 @media (prefers-reduced-motion:reduce){
@@ -1071,7 +1046,7 @@ footer{
 [data-theme="light"] .pill::before{background:#635BFF;box-shadow:0 0 6px rgba(99,91,255,.45)}
 [data-theme="light"] .pill:hover{background:rgba(99,91,255,.14);color:#3730A3}
 
-/* Dual-layer aurora washes baked as hex on .aurora-layer (v10.23).
+/* Dual-layer aurora washes baked as hex on .aurora-layer (v10.24).
    Title colors preserved (dark gold / light violet). */
 @media (prefers-color-scheme: dark){
   /* Dark v10.15: lighter gold on Beta Q&A / h1, deeper gold on Center (em) */
@@ -1220,10 +1195,6 @@ footer{
   .aurora{
     top:0;left:0;right:0;
     height:calc(env(safe-area-inset-top, 0px) + min(260px, 38vh));
-    will-change:transform;
-  }
-  #aurora-sticky{
-    height:calc(env(safe-area-inset-top, 0px) + min(260px, 38vh));
   }
   .brand{
     margin:0 0 18px;min-height:20px;align-items:flex-start;
@@ -1293,10 +1264,6 @@ footer{
 </style>
 </head>
 <body>
-<div id="aurora-sticky" aria-hidden="true">
-  <div class="aurora-layer layer-dark is-active" data-aurora="dark"></div>
-  <div class="aurora-layer layer-light" data-aurora="light"></div>
-</div>
 <div class="aurora" aria-hidden="true" id="aurora">
   <div class="aurora-layer layer-dark is-active" data-aurora="dark"></div>
   <div class="aurora-layer layer-light" data-aurora="light"></div>
@@ -1479,9 +1446,9 @@ document.getElementById("askSubmit").addEventListener("click",()=>{
 });
 /* fresh bar is non-sticky silk — no scroll hide */
 
-/* Theme toggle v10.23 — dual-layer hex aurora; pure CSS [data-theme] opacity sync.
-   Set data-theme + --bg + theme-color same tick. No inline aurora background mutation,
-   no sticky opacity flash. Sticky + main layers flip together from data-theme. */
+/* Theme toggle v10.24 — dual-layer hex aurora; pure CSS [data-theme] opacity sync.
+   Set data-theme + --bg + theme-color same tick. No inline aurora background mutation.
+   Single #aurora curtain; layer opacity crossfade silkiness unchanged. */
 (function(){
   const MANUAL='flip-beta-qa-theme-manual-v8';
   const STALE=['flip-beta-qa-theme','flip-beta-qa-theme-v1','flip-beta-qa-theme-v2','flip-beta-qa-theme-manual','flip-beta-qa-theme-v3','flip-beta-qa-theme-manual-v4','flip-beta-qa-theme-manual-v5','flip-beta-qa-theme-manual-v6','flip-beta-qa-theme-manual-v7'];
@@ -1506,7 +1473,7 @@ document.getElementById("askSubmit").addEventListener("click",()=>{
     if(a==='dark'||a==='light') return a;
     return 'dark';
   }
-  /* Optional class mirror — CSS [data-theme] rules already drive opacity on sticky+main. */
+  /* Optional class mirror — CSS [data-theme] rules already drive layer opacity. */
   function syncAuroraLayers(theme){
     const t=theme==='light'?'light':'dark';
     document.querySelectorAll('.aurora-layer').forEach(function(layer){
@@ -1515,8 +1482,8 @@ document.getElementById("askSubmit").addEventListener("click",()=>{
         layer.classList.toggle('is-active', layer.getAttribute('data-aurora')===t);
       }catch(e){}
     });
-    /* Clear any leftover v10.21 inline washes on containers */
-    ['aurora','aurora-sticky'].forEach(function(id){
+    /* Clear any leftover inline washes on #aurora */
+    ['aurora'].forEach(function(id){
       const el=document.getElementById(id);
       if(!el||!el.style) return;
       try{
