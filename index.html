@@ -7,20 +7,19 @@
 <!-- theme-color = soft page wash (matches --bg). No purple/black slab. -->
 <meta name="theme-color" content="#F6F5FB" media="(prefers-color-scheme: light)" id="themeColorMetaLight" />
 <meta name="theme-color" content="#0E0F14" media="(prefers-color-scheme: dark)" id="themeColorMetaDark" />
-<meta name="theme-color" content="#F6F5FB" id="themeColorMeta" />
+<meta name="theme-color" content="#0E0F14" id="themeColorMeta" />
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 <title>Moonphase Flip — Beta Q&amp;A Center</title>
 <script>
-/* Theme bootstrap v7 — CSS @media (prefers-color-scheme) is the DEFAULT.
-   data-theme ONLY after explicit user toggle (manual-v7). Wipe ALL prior
-   keys so a stuck override cannot block OS follow (esp. on phones). */
+/* Theme bootstrap v8 — first visit defaults to DARK (manual-v8).
+   Saved light/dark from toggle still wins. Wipe prior keys incl v7. */
 (function(){
-  var MANUAL='flip-beta-qa-theme-manual-v7';
+  var MANUAL='flip-beta-qa-theme-manual-v8';
   var STALE=[
     'flip-beta-qa-theme','flip-beta-qa-theme-v1','flip-beta-qa-theme-v2',
     'flip-beta-qa-theme-manual','flip-beta-qa-theme-v3','flip-beta-qa-theme-manual-v4',
-    'flip-beta-qa-theme-manual-v5','flip-beta-qa-theme-manual-v6'
+    'flip-beta-qa-theme-manual-v5','flip-beta-qa-theme-manual-v6','flip-beta-qa-theme-manual-v7'
   ];
   var LIGHT_TC='#F6F5FB', DARK_TC='#0E0F14';
   try{
@@ -54,14 +53,16 @@
       document.documentElement.style.colorScheme=saved;
       setTC(saved, true);
     }else{
-      document.documentElement.removeAttribute('data-theme');
-      document.documentElement.style.colorScheme='light dark';
-      var sys='light';
-      try{if(window.matchMedia('(prefers-color-scheme: dark)').matches) sys='dark'}catch(e){}
-      setTC(sys, false);
+      /* No saved preference → DARK (not follow-system) */
+      document.documentElement.setAttribute('data-theme', 'dark');
+      document.documentElement.style.colorScheme='dark';
+      setTC('dark', true);
     }
   }catch(e){
-    try{document.documentElement.removeAttribute('data-theme')}catch(_){}
+    try{
+      document.documentElement.setAttribute('data-theme','dark');
+      document.documentElement.style.colorScheme='dark';
+    }catch(_){}
   }
 })();
 </script>
@@ -73,7 +74,7 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/geist-mono@5.2.5/index.min.css" />
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600&display=swap" />
 <style>
-/* Overhaul 2026-10-25 v10.5 — clean top-curtain aurora · unified controls · snug search · toggle flush wordmark */
+/* Overhaul 2026-10-25 v10.6 — default dark · deeper Center gold · glass moon|sun toggle */
 :root{
   /* Surfaces */
   --bg:#F6F5FB;
@@ -333,24 +334,25 @@ a:hover{text-decoration:underline;text-underline-offset:3px}
   flex:0 0 auto;display:flex;align-items:flex-start;justify-content:center;
 }
 .brand .wm{height:32px;width:auto;display:block}
-/* Horizontal moon/sun switch — track + sliding thumb (Moonphase-quiet) */
+/* Glass moon|sun switch — moon LEFT, sun RIGHT; both always visible; quiet gray glass */
 .theme-toggle{
   position:static;transform:none;
   align-self:flex-start;
   margin-top:0; /* TOP edge flush with Moonphase wordmark top */
   height:28px;min-height:28px;width:52px;min-width:52px;padding:0;border-radius:999px;gap:0;
   display:inline-flex;align-items:center;justify-content:center;
-  border:1px solid var(--line);
-  background:var(--control-bg);
-  backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
-  box-shadow:var(--shadow-sm);
+  border:1px solid rgba(120,122,140,.16);
+  background:rgba(128,130,148,.14);
+  backdrop-filter:blur(18px) saturate(1.1);-webkit-backdrop-filter:blur(18px) saturate(1.1);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.18), 0 1px 2px rgba(20,18,40,.04);
   color:var(--muted);
   transition:background .28s var(--ease), border-color .28s var(--ease), box-shadow .28s var(--ease);
   -webkit-tap-highlight-color:transparent;
 }
 .theme-toggle:hover{
-  border-color:var(--line2);background:#fff;
-  box-shadow:var(--shadow-md);
+  border-color:rgba(120,122,140,.26);
+  background:rgba(128,130,148,.20);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.22), 0 2px 6px rgba(20,18,40,.06);
 }
 .theme-toggle:active{transform:none}
 .theme-toggle .tlabel{display:none!important}
@@ -367,52 +369,60 @@ a:hover{text-decoration:underline;text-underline-offset:3px}
   margin-top:-6px;
   z-index:1;
   pointer-events:none;
-  opacity:.42;
+  opacity:.62;
   transition:opacity .28s var(--ease), color .28s var(--ease);
-  color:var(--muted);
+  color:rgba(110,112,128,.72);
 }
 .theme-toggle .tt-icon svg{width:12px;height:12px;display:block}
-.theme-toggle .icon-sun{left:7px}
-.theme-toggle .icon-moon{right:7px}
+/* Moon LEFT · Sun RIGHT — both always readable */
+.theme-toggle .icon-moon{left:7px;opacity:.72;color:#C9C4A8}
+.theme-toggle .icon-sun{right:7px;opacity:.72;color:#B8923A}
 .theme-toggle .tt-thumb{
   position:absolute;
   top:2px;left:2px;
   width:22px;height:22px;
   border-radius:50%;
-  background:#FFFFFF;
-  box-shadow:0 1px 2px rgba(40,28,12,.10), 0 2px 6px rgba(40,28,12,.08);
+  background:rgba(42,43,54,.92);
+  box-shadow:0 1px 2px rgba(0,0,0,.28), 0 2px 6px rgba(0,0,0,.18);
   z-index:2;
   pointer-events:none;
-  transform:translateX(0);
+  transform:translateX(0); /* default dark → over moon (left) */
   transition:transform .32s cubic-bezier(.22,1,.36,1), background .28s var(--ease), box-shadow .28s var(--ease);
   will-change:transform;
 }
-/* Light: thumb over sun (left); sun lit */
-.theme-toggle .icon-sun{opacity:.85;color:#B8923A}
-.theme-toggle .icon-moon{opacity:.38}
+/* Dark (default): thumb over moon (left); both icons still visible */
 @media (prefers-color-scheme: dark){
   :root:not([data-theme="light"]) .theme-toggle .tt-thumb{
-    transform:translateX(26px);
-    background:#2A2B36;
-    box-shadow:0 1px 2px rgba(0,0,0,.35), 0 2px 8px rgba(0,0,0,.28);
+    transform:translateX(0);
+    background:rgba(42,43,54,.92);
+    box-shadow:0 1px 2px rgba(0,0,0,.32), 0 2px 8px rgba(0,0,0,.22);
   }
-  :root:not([data-theme="light"]) .theme-toggle .icon-moon{opacity:.9;color:#FFFBC1}
-  :root:not([data-theme="light"]) .theme-toggle .icon-sun{opacity:.35;color:var(--muted)}
+  :root:not([data-theme="light"]) .theme-toggle .icon-moon{opacity:.95;color:#FFFBC1}
+  :root:not([data-theme="light"]) .theme-toggle .icon-sun{opacity:.55;color:#B8923A}
 }
 [data-theme="dark"] .theme-toggle .tt-thumb{
-  transform:translateX(26px);
-  background:#2A2B36;
-  box-shadow:0 1px 2px rgba(0,0,0,.35), 0 2px 8px rgba(0,0,0,.28);
-}
-[data-theme="dark"] .theme-toggle .icon-moon{opacity:.9;color:#FFFBC1}
-[data-theme="dark"] .theme-toggle .icon-sun{opacity:.35;color:var(--muted)}
-[data-theme="light"] .theme-toggle .tt-thumb{
   transform:translateX(0);
-  background:#FFFFFF;
+  background:rgba(42,43,54,.92);
+  box-shadow:0 1px 2px rgba(0,0,0,.32), 0 2px 8px rgba(0,0,0,.22);
+}
+[data-theme="dark"] .theme-toggle .icon-moon{opacity:.95;color:#FFFBC1}
+[data-theme="dark"] .theme-toggle .icon-sun{opacity:.55;color:#B8923A}
+/* Light: thumb over sun (right); both icons still visible */
+[data-theme="light"] .theme-toggle .tt-thumb{
+  transform:translateX(26px);
+  background:rgba(255,255,255,.94);
   box-shadow:0 1px 2px rgba(40,28,12,.10), 0 2px 6px rgba(40,28,12,.08);
 }
-[data-theme="light"] .theme-toggle .icon-sun{opacity:.85;color:#B8923A}
-[data-theme="light"] .theme-toggle .icon-moon{opacity:.38;color:var(--muted)}
+[data-theme="light"] .theme-toggle .icon-sun{opacity:.95;color:#B8923A}
+[data-theme="light"] .theme-toggle .icon-moon{opacity:.55;color:#8A8670}
+[data-theme="light"] .theme-toggle{
+  border-color:rgba(110,112,130,.18);
+  background:rgba(140,142,158,.12);
+}
+[data-theme="dark"] .theme-toggle{
+  border-color:rgba(160,162,180,.14);
+  background:rgba(150,152,170,.12);
+}
 @media (prefers-reduced-motion: reduce){
   .theme-toggle .tt-thumb{transition:none}
 }
@@ -847,16 +857,19 @@ footer{
 [data-theme="light"] .chip,
 [data-theme="light"] .search,
 [data-theme="light"] .sort,
-[data-theme="light"] .theme-toggle,
 [data-theme="light"] .fresh span{
   background:rgba(255,255,255,.94);
   border-color:rgba(60,50,120,.10);
   box-shadow:0 1px 2px rgba(40,30,80,.03), 0 2px 10px rgba(99,91,255,.05);
 }
-[data-theme="light"] .chip:hover,
-[data-theme="light"] .theme-toggle:hover{
+[data-theme="light"] .chip:hover{
   background:#fff;
   border-color:rgba(99,91,255,.22);
+}
+/* theme-toggle keeps quiet gray glass (not white slab) */
+[data-theme="light"] .theme-toggle:hover{
+  background:rgba(140,142,158,.20);
+  border-color:rgba(110,112,130,.26);
 }
 [data-theme="light"] .chip[aria-selected="true"],
 [data-theme="light"] .sort button[aria-pressed="true"]{
@@ -918,9 +931,9 @@ html[data-theme="dark"] body,
       transparent 100%);
     opacity:1;
   }
-  /* Dark: ALL brand yellow #FFFBC1 — Beta Q&A + Center (no white/coral split) */
+  /* Dark: h1 #FFFBC1; Center (em) deeper gold #C4B46A */
   :root:not([data-theme="light"]) .hero h1{color:#FFFBC1;text-shadow:0 0 28px rgba(255,251,193,.18);filter:none}
-  :root:not([data-theme="light"]) .hero h1 em{color:#FFFBC1;text-shadow:none;opacity:1}
+  :root:not([data-theme="light"]) .hero h1 em{color:#C4B46A;text-shadow:none;opacity:1}
 }
 [data-theme="dark"] .aurora{
   background:linear-gradient(180deg,
@@ -960,12 +973,18 @@ html[data-theme="dark"] body,
   opacity:1;
 }
 [data-theme="dark"] .hero h1{color:#FFFBC1;text-shadow:0 0 28px rgba(255,251,193,.18);filter:none}
-[data-theme="dark"] .hero h1 em{color:#FFFBC1;text-shadow:none;opacity:1}
+[data-theme="dark"] .hero h1 em{color:#C4B46A;text-shadow:none;opacity:1}
 [data-theme="dark"] .shell::after{opacity:.05;mix-blend-mode:screen}
 [data-theme="dark"] .fresh span{background:var(--control-bg);border-color:var(--line);color:var(--muted)}
 [data-theme="dark"] .fresh i{background:var(--ok);box-shadow:0 0 0 3px var(--ok-soft)}
-[data-theme="dark"] .theme-toggle{background:var(--control-bg);color:var(--muted)}
-[data-theme="dark"] .theme-toggle:hover{background:var(--surface);color:var(--ink);border-color:var(--line2)}
+[data-theme="dark"] .theme-toggle{
+  background:rgba(150,152,170,.12);color:var(--muted);
+  border-color:rgba(160,162,180,.14);
+}
+[data-theme="dark"] .theme-toggle:hover{
+  background:rgba(150,152,170,.20);color:var(--ink);
+  border-color:rgba(160,162,180,.24);
+}
 [data-theme="dark"] .chip{background:var(--control-bg);color:var(--ink-soft)}
 [data-theme="dark"] .chip:hover{background:var(--surface)}
 [data-theme="dark"] .chip[aria-selected="true"]{
@@ -1013,8 +1032,14 @@ html[data-theme="dark"] body,
   :root:not([data-theme="light"]) .shell::after{opacity:.05;mix-blend-mode:screen}
   :root:not([data-theme="light"]) .fresh span{background:var(--control-bg);border-color:var(--line);color:var(--muted)}
   :root:not([data-theme="light"]) .fresh i{background:var(--ok);box-shadow:0 0 0 3px var(--ok-soft)}
-  :root:not([data-theme="light"]) .theme-toggle{background:var(--control-bg);color:var(--muted)}
-  :root:not([data-theme="light"]) .theme-toggle:hover{background:var(--surface);color:var(--ink);border-color:var(--line2)}
+  :root:not([data-theme="light"]) .theme-toggle{
+    background:rgba(150,152,170,.12);color:var(--muted);
+    border-color:rgba(160,162,180,.14);
+  }
+  :root:not([data-theme="light"]) .theme-toggle:hover{
+    background:rgba(150,152,170,.20);color:var(--ink);
+    border-color:rgba(160,162,180,.24);
+  }
   :root:not([data-theme="light"]) .chip{background:var(--control-bg);color:var(--ink-soft)}
   :root:not([data-theme="light"]) .chip:hover{background:var(--surface)}
   :root:not([data-theme="light"]) .chip[aria-selected="true"]{
@@ -1058,7 +1083,7 @@ html[data-theme="dark"] body,
   }
   :root:not([data-theme="light"]) ::selection{background:var(--accent-soft);color:var(--ink)}
   :root:not([data-theme="light"]) .hero h1{color:#FFFBC1;text-shadow:0 0 28px rgba(255,251,193,.18);filter:none}
-  :root:not([data-theme="light"]) .hero h1 em{color:#FFFBC1;text-shadow:none;opacity:1}
+  :root:not([data-theme="light"]) .hero h1 em{color:#C4B46A;text-shadow:none;opacity:1}
 }
 
 /* —— Mobile rhythm —— */
@@ -1089,13 +1114,13 @@ html[data-theme="dark"] body,
   .theme-toggle .tt-thumb{width:20px;height:20px;top:2px;left:2px}
   .theme-toggle .tt-icon{width:11px;height:11px;margin-top:-5.5px}
   .theme-toggle .tt-icon svg{width:11px;height:11px}
-  .theme-toggle .icon-sun{left:6px}
-  .theme-toggle .icon-moon{right:6px}
+  .theme-toggle .icon-moon{left:6px}
+  .theme-toggle .icon-sun{right:6px}
   @media (prefers-color-scheme: dark){
-    :root:not([data-theme="light"]) .theme-toggle .tt-thumb{transform:translateX(24px)}
+    :root:not([data-theme="light"]) .theme-toggle .tt-thumb{transform:translateX(0)}
   }
-  [data-theme="dark"] .theme-toggle .tt-thumb{transform:translateX(24px)}
-  [data-theme="light"] .theme-toggle .tt-thumb{transform:translateX(0)}
+  [data-theme="dark"] .theme-toggle .tt-thumb{transform:translateX(0)}
+  [data-theme="light"] .theme-toggle .tt-thumb{transform:translateX(24px)}
   .theme-toggle .tlabel{display:none!important}
   .hero{margin:0 auto 32px;padding:0}
   .hero h1{font-size:clamp(2rem,8.5vw,2.5rem);letter-spacing:-.01em;line-height:1.1;margin-bottom:10px}
@@ -1153,8 +1178,8 @@ html[data-theme="dark"] body,
     <div class="brand-slot brand-slot-end">
       <button type="button" class="theme-toggle" id="themeToggle" aria-label="Switch to dark theme" title="Theme">
         <span class="tt-track" aria-hidden="true">
-          <span class="tt-icon icon-sun"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg></span>
           <span class="tt-icon icon-moon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 14.5A8.5 8.5 0 0 1 9.5 3 7 7 0 1 0 21 14.5z"/></svg></span>
+          <span class="tt-icon icon-sun"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg></span>
           <span class="tt-thumb"></span>
         </span>
       </button>
@@ -1314,11 +1339,11 @@ document.getElementById("askSubmit").addEventListener("click",()=>{
 });
 /* fresh bar is non-sticky silk — no scroll hide */
 
-/* Theme toggle v7 — CSS @media is the default (no data-theme).
-   data-theme + manual-v7 ONLY after an explicit click. All stale keys wiped (incl v6). */
+/* Theme toggle v8 — first visit defaults to DARK (manual-v8).
+   Toggle persists light/dark. Prior keys wiped (incl v7). */
 (function(){
-  const MANUAL='flip-beta-qa-theme-manual-v7';
-  const STALE=['flip-beta-qa-theme','flip-beta-qa-theme-v1','flip-beta-qa-theme-v2','flip-beta-qa-theme-manual','flip-beta-qa-theme-v3','flip-beta-qa-theme-manual-v4','flip-beta-qa-theme-manual-v5','flip-beta-qa-theme-manual-v6'];
+  const MANUAL='flip-beta-qa-theme-manual-v8';
+  const STALE=['flip-beta-qa-theme','flip-beta-qa-theme-v1','flip-beta-qa-theme-v2','flip-beta-qa-theme-manual','flip-beta-qa-theme-v3','flip-beta-qa-theme-manual-v4','flip-beta-qa-theme-manual-v5','flip-beta-qa-theme-manual-v6','flip-beta-qa-theme-manual-v7'];
   const root=document.documentElement;
   const btn=document.getElementById('themeToggle');
   const meta=document.getElementById('themeColorMeta');
@@ -1327,10 +1352,6 @@ document.getElementById("askSubmit").addEventListener("click",()=>{
   const LIGHT_TC='#F6F5FB'; /* soft violet page wash — matches --bg */
   const DARK_TC='#0E0F14';
   for(const k of STALE){try{localStorage.removeItem(k)}catch(e){}}
-  function systemTheme(){
-    try{return window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'}
-    catch(e){return 'light'}
-  }
   function manualPref(){
     try{
       const s=localStorage.getItem(MANUAL);
@@ -1340,19 +1361,13 @@ document.getElementById("askSubmit").addEventListener("click",()=>{
   function current(){
     const a=root.getAttribute('data-theme');
     if(a==='dark'||a==='light') return a;
-    return systemTheme();
+    return 'dark'; /* default */
   }
-  function setThemeColor(theme, manual){
+  function setThemeColor(theme){
     const tc=theme==='dark'?DARK_TC:LIGHT_TC;
     if(meta) meta.setAttribute('content', tc);
-    if(manual){
-      if(metaL) metaL.setAttribute('content', tc);
-      if(metaD) metaD.setAttribute('content', tc);
-    }else{
-      if(metaL) metaL.setAttribute('content', LIGHT_TC);
-      if(metaD) metaD.setAttribute('content', DARK_TC);
-    }
-    /* Always paint html/body — light = cream wash for status / Dynamic Island (never black) */
+    if(metaL) metaL.setAttribute('content', tc);
+    if(metaD) metaD.setAttribute('content', tc);
     try{
       root.style.backgroundColor=tc;
       if(document.body) document.body.style.backgroundColor=tc;
@@ -1362,29 +1377,24 @@ document.getElementById("askSubmit").addEventListener("click",()=>{
       btn.title=theme==='dark'?'Light':'Dark';
     }
   }
-  function followSystem(){
-    root.removeAttribute('data-theme');
-    root.style.colorScheme='light dark';
-    setThemeColor(systemTheme(), false);
+  function applyDefaultDark(){
+    root.setAttribute('data-theme', 'dark');
+    root.style.colorScheme='dark';
+    setThemeColor('dark');
+    /* do not persist — first visit only until user toggles */
   }
   function applyManual(theme){
     root.setAttribute('data-theme', theme);
     root.style.colorScheme=theme;
     try{localStorage.setItem(MANUAL, theme)}catch(e){}
-    setThemeColor(theme, true);
+    setThemeColor(theme);
   }
   const saved=manualPref();
   if(saved) applyManual(saved);
-  else followSystem();
+  else applyDefaultDark();
   if(btn) btn.addEventListener('click',()=>{
     applyManual(current()==='dark'?'light':'dark');
   });
-  try{
-    const mq=window.matchMedia('(prefers-color-scheme: dark)');
-    const onChange=()=>{ if(!manualPref()) followSystem(); };
-    if(mq.addEventListener) mq.addEventListener('change', onChange);
-    else if(mq.addListener) mq.addListener(onChange);
-  }catch(e){}
 })();
 
 
