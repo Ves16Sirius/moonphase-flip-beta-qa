@@ -73,7 +73,7 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/geist-mono@5.2.5/index.min.css" />
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600&display=swap" />
 <style>
-/* Overhaul 2026-10-25 v10.2 — scroll aurora · light status wash · chip clip · no dark 炫光 · title contrast */
+/* Overhaul 2026-10-25 v10.3 — fixed top-curtain aurora · kill island white gap · toggle↑ · brand coral titles */
 :root{
   /* Surfaces */
   --bg:#F6F5FB;
@@ -147,28 +147,13 @@ html{
   min-height:100%;
   min-height:100dvh;
 }
-/* Explicit status/Dynamic Island wash — always --bg, never a white strip in dark */
-html::before{
-  content:"";
-  position:fixed;
-  top:0;left:0;right:0;
-  height:calc(env(safe-area-inset-top, 0px) + 2px);
-  background:var(--bg);
-  background-color:var(--bg);
-  pointer-events:none;
-  z-index:50;
-}
-/* Light: force cream/soft wash into status / Dynamic Island — never black */
-html[data-theme="light"]::before{
-  background:#F6F5FB !important;
-  background-color:#F6F5FB !important;
-}
-@media (prefers-color-scheme: light){
-  :root:not([data-theme="dark"])::before{
-    background:#F6F5FB;
-    background-color:#F6F5FB;
-  }
-}
+/* Status / Dynamic Island: paint --bg only (no separate white veil slab).
+   Aurora (fixed) continues the same --bg into the top curtain — no white strip. */
+html::before{content:none;display:none}
+html,body{-webkit-overflow-scrolling:touch;overscroll-behavior-y:none}
+/* Force --bg into status chrome; never a white strip under the island */
+html[data-theme="light"],
+html[data-theme="light"] body,
 [data-theme="light"],
 [data-theme="light"] body{
   background:#F6F5FB !important;
@@ -177,7 +162,8 @@ html[data-theme="light"]::before{
 @media (prefers-color-scheme: light){
   :root:not([data-theme="dark"]),
   :root:not([data-theme="dark"]) body{
-    background-color:#F6F5FB;
+    background:#F6F5FB !important;
+    background-color:#F6F5FB !important;
   }
 }
 body{
@@ -189,44 +175,45 @@ body{
   width:100%;max-width:100%;
   position:relative;
 }
-/* TOP-curtain aurora (Linear / Cursor pattern).
-   Anchored at top-center only; fades downward. NO side/edge frame wash.
-   Soft gradient stops — no container blur (blur bleeds to all 4 edges). */
+/* FIXED horizontal top-curtain aurora (Moonphase-style band from viewport top).
+   Starts under Dynamic Island; --bg continuous into wash. No blob / side frame. */
 .aurora{
-  /* Static page decoration (Moonphase web): scrolls away with content — NOT viewport-fixed */
-  position:absolute;
+  /* FIXED top curtain: hangs from visible screen top (under Dynamic Island).
+     Horizontal band — not a blob. Continuously matches --bg at y=0. */
+  position:fixed;
   top:0;left:0;right:0;
   width:100%;
-  height:calc(env(safe-area-inset-top, 0px) + min(360px, 46vh));
+  height:calc(env(safe-area-inset-top, 0px) + min(320px, 42vh));
   margin:0;padding:0;
   pointer-events:none;
   z-index:0;
   overflow:hidden;
   isolation:isolate;
-  /* Light: soft violet / iris TOP curtain from document top (under Dynamic Island / status) */
+  /* Horizontal band: --bg crown → soft violet wash → fade. Wide flat ellipse only. */
   background:
-    radial-gradient(ellipse 110% 85% at 50% -10%, rgba(124,110,255,.22) 0%, transparent 58%),
-    radial-gradient(ellipse 70% 55% at 50% 0%, rgba(168,148,255,.14) 0%, transparent 55%),
-    radial-gradient(ellipse 50% 40% at 50% 6%, rgba(255,255,255,.55) 0%, transparent 50%);
+    linear-gradient(180deg,
+      var(--bg) 0%,
+      var(--bg) env(safe-area-inset-top, 0px),
+      color-mix(in srgb, #A898FF 22%, var(--bg)) calc(env(safe-area-inset-top, 0px) + 8px),
+      color-mix(in srgb, #B8A8FF 14%, var(--bg)) calc(env(safe-area-inset-top, 0px) + 72px),
+      color-mix(in srgb, #C8BCFF 6%, var(--bg)) calc(env(safe-area-inset-top, 0px) + 160px),
+      transparent 100%),
+    radial-gradient(ellipse 160% 55% at 50% calc(env(safe-area-inset-top, 0px) + 0px),
+      rgba(124,110,255,.20) 0%, transparent 72%);
   filter:none;
   opacity:1;
-  -webkit-mask-image:linear-gradient(180deg,#000 0%,#000 22%,rgba(0,0,0,.55) 55%,transparent 100%);
-  mask-image:linear-gradient(180deg,#000 0%,#000 22%,rgba(0,0,0,.55) 55%,transparent 100%);
+  -webkit-mask-image:linear-gradient(180deg,#000 0%,#000 40%,rgba(0,0,0,.55) 70%,transparent 100%);
+  mask-image:linear-gradient(180deg,#000 0%,#000 40%,rgba(0,0,0,.55) 70%,transparent 100%);
 }
-/* Thin safe-area crown — paints --bg into Dynamic Island / status; top veil only */
+/* Crown folded into .aurora gradient — keep node for DOM compat, paint nothing extra */
 .aurora-crown{
   display:block!important;
   position:absolute;
   left:0;right:0;top:0;
-  height:calc(env(safe-area-inset-top, 0px) + 56px);
+  height:calc(env(safe-area-inset-top, 0px) + 24px);
   margin:0;padding:0;
   pointer-events:none;
-  background:linear-gradient(
-    180deg,
-    var(--bg) 0%,
-    color-mix(in srgb, var(--bg) 78%, #C4B8FF) 42%,
-    transparent 100%
-  );
+  background:linear-gradient(180deg, var(--bg) 0%, transparent 100%);
   filter:none;
   opacity:1;
 }
@@ -300,8 +287,8 @@ a:hover{text-decoration:underline;text-underline-offset:3px}
 .theme-toggle{
   position:static;transform:none;
   align-self:flex-start;
-  margin-top:6px; /* optical: SVG top pad → glyph tops */
-  height:32px;min-height:32px;width:32px;min-width:32px;padding:0;border-radius:999px;gap:0;
+  margin-top:1px; /* optical raise: face with Moonphase (SVG has tiny top pad) */
+  height:30px;min-height:30px;width:30px;min-width:30px;padding:0;border-radius:999px;gap:0;
   display:inline-flex;align-items:center;justify-content:center;
   border:1px solid var(--line);
   background:var(--control-bg);
@@ -332,14 +319,14 @@ a:hover{text-decoration:underline;text-underline-offset:3px}
   text-align:center;display:flex;flex-direction:column;align-items:center;
 }
 .hero h1{
-  /* Light: clean deep ink + soft violet glow. Dark override → brand #FFFBC1 yellow. */
+  /* Light default: deep ink + brand red Center (#b3402e from hellomoonphase). Dark → white + coral. */
   margin:0 0 12px;
   font-family:var(--display);
   font-size:var(--fs-hero);
   font-weight:400;font-style:normal;
   letter-spacing:-.01em;line-height:1.1;
-  color:#2A2440;
-  text-shadow:0 0 28px rgba(124,110,255,.28), 0 0 56px rgba(168,148,255,.16);
+  color:#1A1917;
+  text-shadow:none;
   text-wrap:balance;
 }
 .hero h1 em{
@@ -347,8 +334,8 @@ a:hover{text-decoration:underline;text-underline-offset:3px}
   font-style:italic;
   font-weight:400;
   letter-spacing:0;
-  color:#6B5FD4; /* soft violet italic */
-  text-shadow:0 0 24px rgba(124,110,255,.22);
+  color:#b3402e; /* Moonphase brand red */
+  text-shadow:none;
 }
 .hero .sub{
   margin:0 0 28px;font-size:16px;font-weight:var(--fw-regular);letter-spacing:-.012em;
@@ -727,10 +714,10 @@ footer{
   color-scheme:light;
 }
 [data-theme="light"] .hero h1{
-  color:#2A2440;
-  text-shadow:0 0 28px rgba(124,110,255,.28), 0 0 56px rgba(168,148,255,.16);
+  color:#1A1917;
+  text-shadow:none;
 }
-[data-theme="light"] .hero h1 em{color:#6B5FD4;text-shadow:0 0 24px rgba(124,110,255,.22)}
+[data-theme="light"] .hero h1 em{color:#b3402e;text-shadow:none}
 /* Light mode card / control polish — cool clean surfaces (match violet wash) */
 [data-theme="light"] .item{
   background:#FFFFFF;
@@ -784,64 +771,82 @@ footer{
 [data-theme="light"] .pill::before{background:#635BFF;box-shadow:0 0 6px rgba(99,91,255,.45)}
 [data-theme="light"] .pill:hover{background:rgba(99,91,255,.14);color:#3730A3}
 
-/* Dark top-curtain aurora — cool violet from TOP center only (Linear-style) */
+/* Dark status chrome: same --bg continuously (never white under island) */
+html[data-theme="dark"],
+html[data-theme="dark"] body,
+[data-theme="dark"],
+[data-theme="dark"] body{
+  background:#0E0F14 !important;
+  background-color:#0E0F14 !important;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]),
+  :root:not([data-theme="light"]) body{
+    background:#0E0F14 !important;
+    background-color:#0E0F14 !important;
+  }
+}
+/* Dark top-curtain aurora — horizontal band from viewport top (not a blob) */
 @media (prefers-color-scheme: dark){
   :root:not([data-theme="light"]) .aurora{
     background:
-      radial-gradient(ellipse 95% 70% at 50% -8%, rgba(110,118,220,.18) 0%, transparent 62%),
-      radial-gradient(ellipse 55% 45% at 50% 0%, rgba(72,80,170,.10) 0%, transparent 55%);
+      linear-gradient(180deg,
+        var(--bg) 0%,
+        var(--bg) env(safe-area-inset-top, 0px),
+        color-mix(in srgb, #5A64C8 26%, var(--bg)) calc(env(safe-area-inset-top, 0px) + 8px),
+        color-mix(in srgb, #4A54B0 12%, var(--bg)) calc(env(safe-area-inset-top, 0px) + 80px),
+        transparent 100%),
+      radial-gradient(ellipse 160% 50% at 50% calc(env(safe-area-inset-top, 0px) + 0px),
+        rgba(100,110,210,.22) 0%, transparent 70%);
     filter:none;
-    opacity:.72;
-  }
-  :root:not([data-theme="light"]) .aurora-crown{
-    background:linear-gradient(
-      180deg,
-      var(--bg) 0%,
-      color-mix(in srgb, var(--bg) 82%, #3A3F78) 55%,
-      transparent 100%
-    );
     opacity:1;
   }
-  /* Dark title: unified brand yellow from hellomoonphase / Flip */
-  :root:not([data-theme="light"]) .hero h1{color:#FFFBC1;text-shadow:none;filter:none}
-  :root:not([data-theme="light"]) .hero h1 em{color:#8A8250;text-shadow:none;opacity:1}
+  :root:not([data-theme="light"]) .aurora-crown{
+    background:linear-gradient(180deg, var(--bg) 0%, transparent 100%);
+    opacity:1;
+  }
+  /* Dark: Beta Q&A white · Center brand coral #ffb3a7 (hellomoonphase) */
+  :root:not([data-theme="light"]) .hero h1{color:#FFFFFF;text-shadow:none;filter:none}
+  :root:not([data-theme="light"]) .hero h1 em{color:#ffb3a7;text-shadow:none;opacity:1}
 }
 [data-theme="dark"] .aurora{
   background:
-    radial-gradient(ellipse 95% 70% at 50% -8%, rgba(110,118,220,.18) 0%, transparent 62%),
-    radial-gradient(ellipse 55% 45% at 50% 0%, rgba(72,80,170,.10) 0%, transparent 55%);
+    linear-gradient(180deg,
+      var(--bg) 0%,
+      var(--bg) env(safe-area-inset-top, 0px),
+      color-mix(in srgb, #5A64C8 26%, var(--bg)) calc(env(safe-area-inset-top, 0px) + 8px),
+      color-mix(in srgb, #4A54B0 12%, var(--bg)) calc(env(safe-area-inset-top, 0px) + 80px),
+      transparent 100%),
+    radial-gradient(ellipse 160% 50% at 50% calc(env(safe-area-inset-top, 0px) + 0px),
+      rgba(100,110,210,.22) 0%, transparent 70%);
   filter:none;
-  opacity:.72;
+  opacity:1;
 }
 [data-theme="dark"] .aurora-crown{
-  background:linear-gradient(
-    180deg,
-    var(--bg) 0%,
-    color-mix(in srgb, var(--bg) 82%, #3A3F78) 55%,
-    transparent 100%
-  );
+  background:linear-gradient(180deg, var(--bg) 0%, transparent 100%);
   opacity:1;
 }
 /* Explicit light reset when user forces light over system dark */
 [data-theme="light"] .aurora{
   background:
-    radial-gradient(ellipse 110% 85% at 50% -10%, rgba(124,110,255,.22) 0%, transparent 58%),
-    radial-gradient(ellipse 70% 55% at 50% 0%, rgba(168,148,255,.14) 0%, transparent 55%),
-    radial-gradient(ellipse 50% 40% at 50% 6%, rgba(255,255,255,.55) 0%, transparent 50%);
+    linear-gradient(180deg,
+      var(--bg) 0%,
+      var(--bg) env(safe-area-inset-top, 0px),
+      color-mix(in srgb, #A898FF 22%, var(--bg)) calc(env(safe-area-inset-top, 0px) + 8px),
+      color-mix(in srgb, #B8A8FF 14%, var(--bg)) calc(env(safe-area-inset-top, 0px) + 72px),
+      color-mix(in srgb, #C8BCFF 6%, var(--bg)) calc(env(safe-area-inset-top, 0px) + 160px),
+      transparent 100%),
+    radial-gradient(ellipse 160% 55% at 50% calc(env(safe-area-inset-top, 0px) + 0px),
+      rgba(124,110,255,.20) 0%, transparent 72%);
   filter:none;
   opacity:1;
 }
 [data-theme="light"] .aurora-crown{
-  background:linear-gradient(
-    180deg,
-    var(--bg) 0%,
-    color-mix(in srgb, var(--bg) 78%, #C4B8FF) 42%,
-    transparent 100%
-  );
+  background:linear-gradient(180deg, var(--bg) 0%, transparent 100%);
   opacity:1;
 }
-[data-theme="dark"] .hero h1{color:#FFFBC1;text-shadow:none;filter:none}
-[data-theme="dark"] .hero h1 em{color:#8A8250;text-shadow:none;opacity:1}
+[data-theme="dark"] .hero h1{color:#FFFFFF;text-shadow:none;filter:none}
+[data-theme="dark"] .hero h1 em{color:#ffb3a7;text-shadow:none;opacity:1}
 [data-theme="dark"] .shell::after{opacity:.05;mix-blend-mode:screen}
 [data-theme="dark"] .fresh span{background:var(--control-bg);border-color:var(--line);color:var(--muted)}
 [data-theme="dark"] .fresh i{background:var(--ok);box-shadow:0 0 0 3px var(--ok-soft)}
@@ -936,8 +941,8 @@ footer{
     box-shadow:0 1px 2px rgba(0,0,0,.2);
   }
   :root:not([data-theme="light"]) ::selection{background:var(--accent-soft);color:var(--ink)}
-  :root:not([data-theme="light"]) .hero h1{color:#FFFBC1;text-shadow:none;filter:none}
-  :root:not([data-theme="light"]) .hero h1 em{color:#8A8250;text-shadow:none;opacity:1}
+  :root:not([data-theme="light"]) .hero h1{color:#FFFFFF;text-shadow:none;filter:none}
+  :root:not([data-theme="light"]) .hero h1 em{color:#ffb3a7;text-shadow:none;opacity:1}
 }
 
 /* —— Mobile rhythm —— */
@@ -953,45 +958,17 @@ footer{
     padding-right:max(18px, env(safe-area-inset-right, 0px));
   }
   .aurora{
-    height:calc(env(safe-area-inset-top, 0px) + min(280px, 38vh));
-    background:
-      radial-gradient(ellipse 115% 90% at 50% -8%, rgba(124,110,255,.20) 0%, transparent 58%),
-      radial-gradient(ellipse 65% 50% at 50% 0%, rgba(168,148,255,.12) 0%, transparent 55%);
-    filter:none;
-    opacity:1;
+    height:calc(env(safe-area-inset-top, 0px) + min(260px, 36vh));
   }
   .aurora-crown{
-    height:calc(env(safe-area-inset-top, 0px) + 48px);
+    height:calc(env(safe-area-inset-top, 0px) + 20px);
   }
-  @media (prefers-color-scheme: dark){
-    :root:not([data-theme="light"]) .aurora{
-      background:
-        radial-gradient(ellipse 100% 75% at 50% -6%, rgba(110,118,220,.16) 0%, transparent 62%),
-        radial-gradient(ellipse 50% 40% at 50% 0%, rgba(72,80,170,.08) 0%, transparent 55%);
-      filter:none;
-      opacity:.70;
-    }
-  }
-  [data-theme="dark"] .aurora{
-    background:
-      radial-gradient(ellipse 100% 75% at 50% -6%, rgba(110,118,220,.16) 0%, transparent 62%),
-      radial-gradient(ellipse 50% 40% at 50% 0%, rgba(72,80,170,.08) 0%, transparent 55%);
-    filter:none;
-    opacity:.70;
-  }
-  [data-theme="light"] .aurora{
-    background:
-      radial-gradient(ellipse 115% 90% at 50% -8%, rgba(124,110,255,.20) 0%, transparent 58%),
-      radial-gradient(ellipse 65% 50% at 50% 0%, rgba(168,148,255,.12) 0%, transparent 55%);
-    filter:none;
-    opacity:1;
-  }
-  .brand{margin:22px 0 24px;min-height:28px;padding:0}
-  .brand-slot{min-height:28px}
+  .brand{margin:22px 0 24px;min-height:28px;padding:0;align-items:flex-start}
+  .brand-slot{min-height:28px;align-items:flex-start}
   .brand .wm{height:28px}
   .theme-toggle{
-    height:28px;min-height:28px;width:28px;min-width:28px;padding:0;gap:0;
-    margin-top:5px;
+    height:26px;min-height:26px;width:26px;min-width:26px;padding:0;gap:0;
+    margin-top:1px; /* face-align with Moonphase */
   }
   .theme-toggle svg{width:13px;height:13px}
   .theme-toggle .tlabel{display:none!important}
