@@ -74,7 +74,7 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/geist-mono@5.2.5/index.min.css" />
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600&display=swap" />
 <style>
-/* Overhaul 2026-10-25 v10.9 — toggle height = Updated badge · clearer liquid glass · keep island continuous --bg */
+/* Overhaul 2026-10-25 v10.10 — aurora from absolute top · thumb-centered icons · high-contrast moon/sun · keep v10.9 glass/height */
 :root{
   /* Surfaces */
   --bg:#F6F5FB;
@@ -200,9 +200,9 @@ body{
   position:relative;
 }
 /* FIXED horizontal top-curtain aurora (Moonphase-style).
-   Starts at EXACT --bg at the visible top (under Dynamic Island) and gradients
-   downward — seamless blend with theme-color + html/body. No hard black band,
-   no fixed veil, no mask dissolve at the crown. */
+   Anchored at ABSOLUTE viewport top (physical screen / under Dynamic Island).
+   Glow begins at y=0 (mostly --bg mix — island stays continuous, no black slab),
+   then washes downward. Never delay color past safe-area (that pushed it mid-hero). */
 .aurora{
   position:fixed;
   top:0;left:0;right:0;
@@ -212,31 +212,29 @@ body{
   pointer-events:none;
   z-index:0;
   overflow:hidden;
-  /* Exact --bg at y=0 → soft wash → transparent. No mask (mask looked dissolved). */
+  /* Color wash from absolute top — --bg-dominant mix keeps theme-color continuity */
   background:linear-gradient(180deg,
-    var(--bg) 0%,
-    var(--bg) max(env(safe-area-inset-top, 0px), 1px),
-    color-mix(in srgb, #A898FF 18%, var(--bg)) calc(env(safe-area-inset-top, 0px) + 28px),
-    color-mix(in srgb, #B8A8FF 10%, var(--bg)) calc(env(safe-area-inset-top, 0px) + 90px),
-    color-mix(in srgb, #C8BCFF 4%, var(--bg)) calc(env(safe-area-inset-top, 0px) + 170px),
+    color-mix(in srgb, #A898FF 20%, var(--bg)) 0%,
+    color-mix(in srgb, #A898FF 16%, var(--bg)) 24px,
+    color-mix(in srgb, #B8A8FF 10%, var(--bg)) 90px,
+    color-mix(in srgb, #C8BCFF 4%, var(--bg)) 170px,
     transparent 100%);
   filter:none;
   opacity:1;
   -webkit-mask-image:none;
   mask-image:none;
 }
-/* Soft crown reinforce — still --bg at top, fades; never a hard slab */
+/* Soft crown reinforce from absolute top; never a hard slab */
 .aurora-crown{
   display:block!important;
   position:absolute;
   left:0;right:0;top:0;
-  height:calc(env(safe-area-inset-top, 0px) + 48px);
+  height:calc(env(safe-area-inset-top, 0px) + 56px);
   margin:0;padding:0;
   pointer-events:none;
   background:linear-gradient(180deg,
-    var(--bg) 0%,
-    var(--bg) max(env(safe-area-inset-top, 0px), 1px),
-    color-mix(in srgb, var(--bg) 70%, transparent) calc(env(safe-area-inset-top, 0px) + 24px),
+    color-mix(in srgb, #A898FF 12%, var(--bg)) 0%,
+    color-mix(in srgb, var(--bg) 80%, transparent) 32px,
     transparent 100%);
   filter:none;
   opacity:1;
@@ -372,21 +370,28 @@ a:hover{text-decoration:underline;text-underline-offset:3px}
   border-radius:inherit;
   overflow:hidden;
 }
+/* Icons occupy the SAME 22×22 box as the thumb rest slots → dead-centered in pill */
 .theme-toggle .tt-icon{
-  position:absolute;top:50%;
-  width:13px;height:13px;
-  margin-top:-6.5px;
-  z-index:1;
+  position:absolute;
+  top:3px;
+  width:22px;height:22px;
+  margin:0;
+  z-index:3; /* above thumb so glyph stays visible when pill covers it */
   pointer-events:none;
-  opacity:.78;
+  display:flex;align-items:center;justify-content:center;
+  opacity:.9;
   transition:opacity .32s var(--ease), color .32s var(--ease), transform .42s var(--ease-spring);
-  color:rgba(230,228,210,.88);
-  filter:drop-shadow(0 0 2px rgba(0,0,0,.35));
+  color:#E8C96A;
+  filter:drop-shadow(0 1px 1px rgba(0,0,0,.35));
 }
-.theme-toggle .tt-icon svg{width:13px;height:13px;display:block;stroke-width:2.25}
-/* Moon LEFT · Sun RIGHT — both always readable, higher contrast */
-.theme-toggle .icon-moon{left:7px;opacity:.88;color:#F5EEC8}
-.theme-toggle .icon-sun{right:7px;opacity:.88;color:#E0B84A}
+.theme-toggle .tt-icon svg{
+  width:13px;height:13px;display:block;
+  stroke-width:2.4;
+  flex:0 0 auto;
+}
+/* Moon LEFT · Sun RIGHT — slot = thumb inset (3px), so glyph is dead-center in pill */
+.theme-toggle .icon-moon{left:3px;right:auto;color:#FFF4C2}
+.theme-toggle .icon-sun{right:3px;left:auto;color:#C9A227}
 .theme-toggle .tt-thumb{
   position:absolute;
   top:3px;left:3px;
@@ -404,7 +409,7 @@ a:hover{text-decoration:underline;text-underline-offset:3px}
   transition:transform .48s var(--ease-spring), background .28s var(--ease), box-shadow .28s var(--ease);
   will-change:transform;
 }
-/* Dark (default): thumb over moon (left); both icons still visible */
+/* Dark (default): thumb over moon (left); moon bright on dark pill, sun gold on track */
 @media (prefers-color-scheme: dark){
   :root:not([data-theme="light"]) .theme-toggle .tt-thumb{
     transform:translateX(0);
@@ -414,8 +419,8 @@ a:hover{text-decoration:underline;text-underline-offset:3px}
       0 4px 12px rgba(0,0,0,.30),
       inset 0 1px 0 rgba(255,255,255,.24);
   }
-  :root:not([data-theme="light"]) .theme-toggle .icon-moon{opacity:1;color:#FFFBC1;transform:scale(1.08);filter:drop-shadow(0 0 3px rgba(255,251,193,.45))}
-  :root:not([data-theme="light"]) .theme-toggle .icon-sun{opacity:.72;color:#E0B84A;transform:scale(1);filter:drop-shadow(0 0 2px rgba(0,0,0,.35))}
+  :root:not([data-theme="light"]) .theme-toggle .icon-moon{opacity:1;color:#FFF8D0;transform:scale(1.06);filter:drop-shadow(0 0 3px rgba(255,248,208,.55))}
+  :root:not([data-theme="light"]) .theme-toggle .icon-sun{opacity:.85;color:#F0C14A;transform:scale(1);filter:drop-shadow(0 0 2px rgba(0,0,0,.45))}
 }
 [data-theme="dark"] .theme-toggle .tt-thumb{
   transform:translateX(0);
@@ -425,9 +430,9 @@ a:hover{text-decoration:underline;text-underline-offset:3px}
     0 4px 12px rgba(0,0,0,.30),
     inset 0 1px 0 rgba(255,255,255,.24);
 }
-[data-theme="dark"] .theme-toggle .icon-moon{opacity:1;color:#FFFBC1;transform:scale(1.08);filter:drop-shadow(0 0 3px rgba(255,251,193,.45))}
-[data-theme="dark"] .theme-toggle .icon-sun{opacity:.72;color:#E0B84A;transform:scale(1);filter:drop-shadow(0 0 2px rgba(0,0,0,.35))}
-/* Light: thumb over sun (right); both icons still visible */
+[data-theme="dark"] .theme-toggle .icon-moon{opacity:1;color:#FFF8D0;transform:scale(1.06);filter:drop-shadow(0 0 3px rgba(255,248,208,.55))}
+[data-theme="dark"] .theme-toggle .icon-sun{opacity:.85;color:#F0C14A;transform:scale(1);filter:drop-shadow(0 0 2px rgba(0,0,0,.45))}
+/* Light: thumb over sun (right); sun dark-gold on white pill (never white-on-white), moon dark on track */
 [data-theme="light"] .theme-toggle .tt-thumb{
   transform:translateX(32px);
   background:linear-gradient(180deg, #FFFFFF 0%, #F4F2FA 100%);
@@ -436,8 +441,8 @@ a:hover{text-decoration:underline;text-underline-offset:3px}
     0 4px 10px rgba(40,28,12,.12),
     inset 0 1px 0 rgba(255,255,255,1);
 }
-[data-theme="light"] .theme-toggle .icon-sun{opacity:1;color:#B8923A;transform:scale(1.08);filter:drop-shadow(0 0 2px rgba(184,146,58,.35))}
-[data-theme="light"] .theme-toggle .icon-moon{opacity:.62;color:#5A5668;transform:scale(1);filter:none}
+[data-theme="light"] .theme-toggle .icon-sun{opacity:1;color:#8A6410;transform:scale(1.06);filter:drop-shadow(0 0 2px rgba(138,100,16,.35))}
+[data-theme="light"] .theme-toggle .icon-moon{opacity:.78;color:#3A3648;transform:scale(1);filter:none}
 [data-theme="light"] .theme-toggle{
   border-color:rgba(255,255,255,.88);
   background:
@@ -970,11 +975,10 @@ html[data-theme="dark"] body,
 @media (prefers-color-scheme: dark){
   :root:not([data-theme="light"]) .aurora{
     background:linear-gradient(180deg,
-      var(--bg) 0%,
-      var(--bg) max(env(safe-area-inset-top, 0px), 1px),
-      color-mix(in srgb, #5B66C4 16%, var(--bg)) calc(env(safe-area-inset-top, 0px) + 28px),
-      color-mix(in srgb, #4A54B0 8%, var(--bg)) calc(env(safe-area-inset-top, 0px) + 90px),
-      color-mix(in srgb, #3A4470 3%, var(--bg)) calc(env(safe-area-inset-top, 0px) + 170px),
+      color-mix(in srgb, #5B66C4 18%, var(--bg)) 0%,
+      color-mix(in srgb, #5B66C4 14%, var(--bg)) 24px,
+      color-mix(in srgb, #4A54B0 8%, var(--bg)) 90px,
+      color-mix(in srgb, #3A4470 3%, var(--bg)) 170px,
       transparent 100%);
     filter:none;
     opacity:1;
@@ -983,9 +987,8 @@ html[data-theme="dark"] body,
   }
   :root:not([data-theme="light"]) .aurora-crown{
     background:linear-gradient(180deg,
-      var(--bg) 0%,
-      var(--bg) max(env(safe-area-inset-top, 0px), 1px),
-      color-mix(in srgb, var(--bg) 70%, transparent) calc(env(safe-area-inset-top, 0px) + 24px),
+      color-mix(in srgb, #5B66C4 10%, var(--bg)) 0%,
+      color-mix(in srgb, var(--bg) 80%, transparent) 32px,
       transparent 100%);
     opacity:1;
   }
@@ -995,11 +998,10 @@ html[data-theme="dark"] body,
 }
 [data-theme="dark"] .aurora{
   background:linear-gradient(180deg,
-    var(--bg) 0%,
-    var(--bg) max(env(safe-area-inset-top, 0px), 1px),
-    color-mix(in srgb, #5B66C4 16%, var(--bg)) calc(env(safe-area-inset-top, 0px) + 28px),
-    color-mix(in srgb, #4A54B0 8%, var(--bg)) calc(env(safe-area-inset-top, 0px) + 90px),
-    color-mix(in srgb, #3A4470 3%, var(--bg)) calc(env(safe-area-inset-top, 0px) + 170px),
+    color-mix(in srgb, #5B66C4 18%, var(--bg)) 0%,
+    color-mix(in srgb, #5B66C4 14%, var(--bg)) 24px,
+    color-mix(in srgb, #4A54B0 8%, var(--bg)) 90px,
+    color-mix(in srgb, #3A4470 3%, var(--bg)) 170px,
     transparent 100%);
   filter:none;
   opacity:1;
@@ -1008,20 +1010,18 @@ html[data-theme="dark"] body,
 }
 [data-theme="dark"] .aurora-crown{
   background:linear-gradient(180deg,
-    var(--bg) 0%,
-    var(--bg) max(env(safe-area-inset-top, 0px), 1px),
-    color-mix(in srgb, var(--bg) 70%, transparent) calc(env(safe-area-inset-top, 0px) + 24px),
+    color-mix(in srgb, #5B66C4 10%, var(--bg)) 0%,
+    color-mix(in srgb, var(--bg) 80%, transparent) 32px,
     transparent 100%);
   opacity:1;
 }
 /* Explicit light reset when user forces light over system dark */
 [data-theme="light"] .aurora{
   background:linear-gradient(180deg,
-    var(--bg) 0%,
-    var(--bg) max(env(safe-area-inset-top, 0px), 1px),
-    color-mix(in srgb, #A898FF 18%, var(--bg)) calc(env(safe-area-inset-top, 0px) + 28px),
-    color-mix(in srgb, #B8A8FF 10%, var(--bg)) calc(env(safe-area-inset-top, 0px) + 90px),
-    color-mix(in srgb, #C8BCFF 4%, var(--bg)) calc(env(safe-area-inset-top, 0px) + 170px),
+    color-mix(in srgb, #A898FF 20%, var(--bg)) 0%,
+    color-mix(in srgb, #A898FF 16%, var(--bg)) 24px,
+    color-mix(in srgb, #B8A8FF 10%, var(--bg)) 90px,
+    color-mix(in srgb, #C8BCFF 4%, var(--bg)) 170px,
     transparent 100%);
   filter:none;
   opacity:1;
@@ -1030,9 +1030,8 @@ html[data-theme="dark"] body,
 }
 [data-theme="light"] .aurora-crown{
   background:linear-gradient(180deg,
-    var(--bg) 0%,
-    var(--bg) max(env(safe-area-inset-top, 0px), 1px),
-    color-mix(in srgb, var(--bg) 70%, transparent) calc(env(safe-area-inset-top, 0px) + 24px),
+    color-mix(in srgb, #A898FF 12%, var(--bg)) 0%,
+    color-mix(in srgb, var(--bg) 80%, transparent) 32px,
     transparent 100%);
   opacity:1;
 }
@@ -1181,10 +1180,10 @@ html[data-theme="dark"] body,
     margin-top:0;
   }
   .theme-toggle .tt-thumb{width:22px;height:22px;top:3px;left:3px}
-  .theme-toggle .tt-icon{width:12px;height:12px;margin-top:-6px}
+  .theme-toggle .tt-icon{width:22px;height:22px;top:3px;margin:0}
   .theme-toggle .tt-icon svg{width:12px;height:12px}
-  .theme-toggle .icon-moon{left:7px}
-  .theme-toggle .icon-sun{right:7px}
+  .theme-toggle .icon-moon{left:3px;right:auto}
+  .theme-toggle .icon-sun{right:3px;left:auto}
   @media (prefers-color-scheme: dark){
     :root:not([data-theme="light"]) .theme-toggle .tt-thumb{transform:translateX(0)}
   }
