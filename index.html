@@ -12,16 +12,17 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 <title>Moonphase Flip — Beta Q&amp;A Center</title>
 <script>
-/* Theme bootstrap v6 — CSS @media (prefers-color-scheme) is the DEFAULT.
-   data-theme ONLY after explicit toggle (manual-v5). Wipe ALL prior keys
-   including manual-v5 so a stuck override cannot block OS follow on phones. */
+/* Theme bootstrap v7 — CSS @media (prefers-color-scheme) is the DEFAULT.
+   data-theme ONLY after explicit user toggle (manual-v7). Wipe ALL prior
+   keys so a stuck override cannot block OS follow (esp. on phones). */
 (function(){
-  var MANUAL='flip-beta-qa-theme-manual-v6';
+  var MANUAL='flip-beta-qa-theme-manual-v7';
   var STALE=[
     'flip-beta-qa-theme','flip-beta-qa-theme-v1','flip-beta-qa-theme-v2',
     'flip-beta-qa-theme-manual','flip-beta-qa-theme-v3','flip-beta-qa-theme-manual-v4',
-    'flip-beta-qa-theme-manual-v5'
+    'flip-beta-qa-theme-manual-v5','flip-beta-qa-theme-manual-v6'
   ];
+  var LIGHT_TC='#F7F5F1', DARK_TC='#0E0F14';
   try{
     for(var i=0;i<STALE.length;i++){
       try{localStorage.removeItem(STALE[i])}catch(e){}
@@ -31,13 +32,32 @@
       var s=localStorage.getItem(MANUAL);
       if(s==='light'||s==='dark') saved=s;
     }catch(e){}
+    var meta=document.getElementById('themeColorMeta');
+    var metaL=document.getElementById('themeColorMetaLight');
+    var metaD=document.getElementById('themeColorMetaDark');
+    function setTC(theme, manual){
+      var tc=theme==='dark'?DARK_TC:LIGHT_TC;
+      if(meta) meta.setAttribute('content', tc);
+      if(manual){
+        if(metaL) metaL.setAttribute('content', tc);
+        if(metaD) metaD.setAttribute('content', tc);
+        document.documentElement.style.backgroundColor=tc;
+      }else{
+        if(metaL) metaL.setAttribute('content', LIGHT_TC);
+        if(metaD) metaD.setAttribute('content', DARK_TC);
+        document.documentElement.style.backgroundColor='';
+      }
+    }
     if(saved){
       document.documentElement.setAttribute('data-theme', saved);
       document.documentElement.style.colorScheme=saved;
+      setTC(saved, true);
     }else{
       document.documentElement.removeAttribute('data-theme');
       document.documentElement.style.colorScheme='light dark';
-      document.documentElement.style.backgroundColor='';
+      var sys='light';
+      try{if(window.matchMedia('(prefers-color-scheme: dark)').matches) sys='dark'}catch(e){}
+      setTC(sys, false);
     }
   }catch(e){
     try{document.documentElement.removeAttribute('data-theme')}catch(_){}
@@ -52,7 +72,7 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/geist-mono@5.2.5/index.min.css" />
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600&display=swap" />
 <style>
-/* Overhaul 2026-10-25 — type tokens · soft top aurora (8a41356 lineage) · system dark v6 */
+/* Overhaul 2026-10-25 v7 — system theme · stable dual-col · soft cream aurora · type */
 :root{
   /* Surfaces */
   --bg:#F7F5F1;
@@ -61,7 +81,7 @@
   /* Ink hierarchy */
   --ink:#1A1917;
   --ink-soft:#2A2825;
-  --title:#141210;
+  --title:#2A2520;
   --muted:#7C766E;
   --faint:#A8A29A;
   /* Lines & accents */
@@ -81,11 +101,11 @@
   --shadow-md:
     0 1px 2px rgba(24,18,12,.028),
     0 6px 18px rgba(24,18,12,.045),
-    0 18px 40px rgba(90,70,180,.04);
+    0 18px 40px rgba(24,18,12,.04);
   --shadow-lg:
     0 2px 4px rgba(24,18,12,.03),
     0 14px 36px rgba(24,18,12,.06),
-    0 32px 64px rgba(90,70,180,.055);
+    0 32px 64px rgba(24,18,12,.05);
   --control-bg:rgba(255,255,255,.78);
   --ease:cubic-bezier(.22,1,.36,1);
   --dur:180ms;
@@ -139,21 +159,22 @@ body{
   top:calc(-1 * env(safe-area-inset-top, 0px));
   left:0;right:0;
   width:100%;
-  height:calc(env(safe-area-inset-top, 0px) + min(280px, 38dvh));
+  height:calc(env(safe-area-inset-top, 0px) + min(300px, 42dvh));
   margin:0;padding:0;
   pointer-events:none;
   z-index:0;
   overflow:visible;
+  /* Soft cream wash — warm peach + champagne + whisper of sky; no muddy purple */
   background:
-    radial-gradient(ellipse 100% 80% at 50% -20%, rgba(168,145,255,.38), transparent 70%),
-    radial-gradient(ellipse 75% 65% at 10% -15%, rgba(255,160,195,.26), transparent 68%),
-    radial-gradient(ellipse 70% 60% at 90% -12%, rgba(255,200,160,.22), transparent 66%),
-    radial-gradient(ellipse 55% 50% at 70% -5%, rgba(255,230,190,.14), transparent 62%),
-    radial-gradient(ellipse 50% 45% at 30% -8%, rgba(170,205,255,.16), transparent 66%);
-  filter:blur(52px) saturate(110%);
-  opacity:.88;
-  -webkit-mask-image:linear-gradient(180deg,#000 0%,#000 50%,transparent 100%);
-  mask-image:linear-gradient(180deg,#000 0%,#000 50%,transparent 100%);
+    radial-gradient(ellipse 110% 90% at 50% -25%, rgba(255,236,214,.72), transparent 72%),
+    radial-gradient(ellipse 80% 70% at 8% -10%, rgba(255,214,198,.38), transparent 68%),
+    radial-gradient(ellipse 75% 65% at 92% -8%, rgba(232,224,210,.45), transparent 66%),
+    radial-gradient(ellipse 60% 55% at 70% 0%, rgba(255,248,236,.5), transparent 64%),
+    radial-gradient(ellipse 55% 50% at 28% -5%, rgba(210,225,240,.22), transparent 66%);
+  filter:blur(44px) saturate(102%);
+  opacity:.95;
+  -webkit-mask-image:linear-gradient(180deg,#000 0%,#000 45%,transparent 100%);
+  mask-image:linear-gradient(180deg,#000 0%,#000 45%,transparent 100%);
 }
 /* Keep crown node inert — no solid bar paint */
 .aurora-crown{display:none!important}
@@ -263,9 +284,15 @@ a:hover{text-decoration:underline;text-underline-offset:3px}
   font-family:var(--display);
   font-size:var(--fs-hero);
   font-weight:var(--fw-regular);font-style:normal;
-  letter-spacing:-.02em;line-height:1.06;
+  letter-spacing:-.025em;line-height:1.05;
   color:var(--title);
   text-wrap:balance;
+}
+.hero h1 em{
+  font-style:italic;
+  font-weight:var(--fw-regular);
+  letter-spacing:-.02em;
+  color:#6B635A;
 }
 .hero .sub{
   margin:0 0 28px;font-size:16px;font-weight:var(--fw-regular);letter-spacing:-.012em;
@@ -319,16 +346,17 @@ a:hover{text-decoration:underline;text-underline-offset:3px}
 
 .toolbar{
   display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap;
-  margin:0;
+  margin:0;width:100%;max-width:720px;
 }
 .search{
   position:relative;display:flex;align-items:center;
-  width:280px;height:var(--control-h);padding:0 14px 0 36px;
+  width:min(420px,100%);height:var(--control-h);padding:0 14px 0 36px;
   border-radius:999px;border:1px solid var(--line);
   background:var(--control-bg);
   backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
   box-shadow:var(--shadow-sm);
   transition:border-color var(--dur) var(--ease), box-shadow var(--dur) var(--ease);
+  flex:1 1 280px;max-width:440px;
 }
 .search:focus-within{
   border-color:color-mix(in srgb, var(--accent) 36%, var(--line));
@@ -339,7 +367,8 @@ a:hover{text-decoration:underline;text-underline-offset:3px}
 }
 .search input{
   width:100%;height:100%;border:0;outline:0;background:transparent;
-  font-size:13.5px;letter-spacing:-.01em;color:var(--ink);
+  font-size:13px;letter-spacing:-.01em;color:var(--ink);
+  min-width:0;
 }
 .search input::placeholder{color:var(--faint)}
 .search input::-webkit-search-cancel-button{-webkit-appearance:none}
@@ -369,37 +398,51 @@ a:hover{text-decoration:underline;text-underline-offset:3px}
 }
 
 /* —— Cards —— */
-/* CSS columns: expand only pushes cards in the same column (not both). */
+/* Stable dual columns: expand only grows its own column; no reflow flicker. */
 #list{
-  display:block;
-  column-count:1;
-  column-gap:16px;
+  display:grid;
+  grid-template-columns:1fr;
+  gap:16px;
+  align-items:start;
+}
+#list.has-cols{
+  grid-template-columns:1fr;
+}
+@media (min-width:720px){
+  #list.has-cols{grid-template-columns:1fr 1fr;gap:16px}
 }
 #list.is-filtering{opacity:.4;transition:opacity var(--dur) var(--ease)}
+.list-col{
+  display:flex;flex-direction:column;gap:16px;min-width:0;
+}
 .item{
-  display:inline-block;
+  display:block;
   width:100%;
   max-width:100%;
-  vertical-align:top;
-  margin:0 0 16px;
+  margin:0;
   border-radius:var(--r);border:1px solid var(--line);
   background:var(--surface);
   box-shadow:var(--shadow-md);
   overflow:hidden;
-  break-inside:avoid;
-  -webkit-column-break-inside:avoid;
-  page-break-inside:avoid;
   transition:border-color var(--dur) var(--ease), box-shadow var(--dur) var(--ease), transform var(--dur) var(--ease);
   animation:cardIn 200ms var(--ease) both;
 }
-@media (min-width:720px){#list{column-count:2}}
 .item:hover{
   border-color:var(--line2);
   box-shadow:var(--shadow-lg);
   transform:translateY(-1.5px);
 }
+/* is-new: subtle left accent bar — consistent, no random purple ring */
 .item.is-new{
-  box-shadow:var(--shadow-md), 0 0 0 1px color-mix(in srgb, var(--accent) 18%, transparent);
+  border-color:var(--line);
+  box-shadow:var(--shadow-md);
+  position:relative;
+}
+.item.is-new::before{
+  content:"";position:absolute;left:0;top:14px;bottom:14px;width:3px;
+  border-radius:0 3px 3px 0;
+  background:color-mix(in srgb, var(--accent) 55%, transparent);
+  pointer-events:none;
 }
 @keyframes cardIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
 .item:nth-child(1){animation-delay:0ms}
@@ -493,7 +536,7 @@ a:hover{text-decoration:underline;text-underline-offset:3px}
 
 footer{
   display:flex;align-items:center;justify-content:center;gap:24px;flex-wrap:wrap;
-  margin:48px 0 0;padding:24px 0 0;border-top:1px solid var(--line);
+  margin:56px 0 0;padding:0;border-top:0;border:0;box-shadow:none;
   font-size:12.5px;color:var(--faint);
 }
 
@@ -578,12 +621,10 @@ footer{
     --shadow-sm:0 1px 2px rgba(0,0,0,.35), 0 3px 10px rgba(0,0,0,.25);
     --shadow-md:
       0 1px 2px rgba(0,0,0,.35),
-      0 8px 24px rgba(0,0,0,.38),
-      0 0 0 1px rgba(140,130,255,.04);
+      0 8px 24px rgba(0,0,0,.38);
     --shadow-lg:
       0 2px 6px rgba(0,0,0,.35),
-      0 16px 40px rgba(0,0,0,.45),
-      0 0 0 1px rgba(140,130,255,.06);
+      0 16px 40px rgba(0,0,0,.45);
   }
 }
 [data-theme="dark"]{
@@ -611,40 +652,39 @@ footer{
   --shadow-sm:0 1px 2px rgba(0,0,0,.35), 0 3px 10px rgba(0,0,0,.25);
   --shadow-md:
     0 1px 2px rgba(0,0,0,.35),
-    0 8px 24px rgba(0,0,0,.38),
-    0 0 0 1px rgba(140,130,255,.04);
+    0 8px 24px rgba(0,0,0,.38);
   --shadow-lg:
     0 2px 6px rgba(0,0,0,.35),
-    0 16px 40px rgba(0,0,0,.45),
-    0 0 0 1px rgba(140,130,255,.06);
+    0 16px 40px rgba(0,0,0,.45);
 }
 [data-theme="light"]{
   color-scheme:light;
 }
+[data-theme="light"] .hero h1 em{color:#6B635A}
 
-/* Dark soft top aurora — restrained, never opaque black/purple bar */
+/* Dark soft top aurora — cool violet + night blue, never opaque bar */
 @media (prefers-color-scheme: dark){
   :root:not([data-theme="light"]) .aurora{
     background:
-      radial-gradient(ellipse 100% 80% at 50% -20%, rgba(120,105,255,.42), transparent 70%),
-      radial-gradient(ellipse 75% 65% at 10% -15%, rgba(210,100,165,.24), transparent 68%),
-      radial-gradient(ellipse 70% 60% at 90% -12%, rgba(255,160,110,.14), transparent 66%),
-      radial-gradient(ellipse 55% 50% at 70% -5%, rgba(255,200,130,.10), transparent 62%),
-      radial-gradient(ellipse 50% 45% at 30% -8%, rgba(110,160,255,.16), transparent 66%);
-    filter:blur(56px) saturate(115%);
-    opacity:.82;
+      radial-gradient(ellipse 100% 85% at 50% -22%, rgba(110,100,220,.36), transparent 72%),
+      radial-gradient(ellipse 70% 60% at 12% -12%, rgba(160,90,150,.18), transparent 68%),
+      radial-gradient(ellipse 65% 55% at 88% -10%, rgba(80,120,200,.16), transparent 66%),
+      radial-gradient(ellipse 50% 45% at 50% 0%, rgba(40,45,80,.22), transparent 64%);
+    filter:blur(52px) saturate(108%);
+    opacity:.78;
   }
+  :root:not([data-theme="light"]) .hero h1 em{color:#A8A29A}
 }
 [data-theme="dark"] .aurora{
   background:
-    radial-gradient(ellipse 100% 80% at 50% -20%, rgba(120,105,255,.42), transparent 70%),
-    radial-gradient(ellipse 75% 65% at 10% -15%, rgba(210,100,165,.24), transparent 68%),
-    radial-gradient(ellipse 70% 60% at 90% -12%, rgba(255,160,110,.14), transparent 66%),
-    radial-gradient(ellipse 55% 50% at 70% -5%, rgba(255,200,130,.10), transparent 62%),
-    radial-gradient(ellipse 50% 45% at 30% -8%, rgba(110,160,255,.16), transparent 66%);
-  filter:blur(56px) saturate(115%);
-  opacity:.82;
+    radial-gradient(ellipse 100% 85% at 50% -22%, rgba(110,100,220,.36), transparent 72%),
+    radial-gradient(ellipse 70% 60% at 12% -12%, rgba(160,90,150,.18), transparent 68%),
+    radial-gradient(ellipse 65% 55% at 88% -10%, rgba(80,120,200,.16), transparent 66%),
+    radial-gradient(ellipse 50% 45% at 50% 0%, rgba(40,45,80,.22), transparent 64%);
+  filter:blur(52px) saturate(108%);
+  opacity:.78;
 }
+[data-theme="dark"] .hero h1 em{color:#A8A29A}
 [data-theme="dark"] .shell::after{opacity:.05;mix-blend-mode:screen}
 [data-theme="dark"] .fresh span{background:var(--control-bg);border-color:var(--line);color:var(--muted)}
 [data-theme="dark"] .fresh i{background:var(--ok);box-shadow:0 0 0 3px var(--ok-soft)}
@@ -691,6 +731,55 @@ footer{
 [data-theme="dark"] ::selection{background:var(--accent-soft);color:var(--ink)}
 [data-theme="dark"] .hero h1{color:#FFFFFF}
 
+/* System-dark twins (no data-theme) — same as [data-theme="dark"] overrides */
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]) .shell::after{opacity:.05;mix-blend-mode:screen}
+  :root:not([data-theme="light"]) .fresh span{background:var(--control-bg);border-color:var(--line);color:var(--muted)}
+  :root:not([data-theme="light"]) .fresh i{background:var(--ok);box-shadow:0 0 0 3px var(--ok-soft)}
+  :root:not([data-theme="light"]) .theme-toggle{background:var(--control-bg);color:var(--muted)}
+  :root:not([data-theme="light"]) .theme-toggle:hover{background:var(--surface);color:var(--ink);border-color:var(--line2)}
+  :root:not([data-theme="light"]) .chip{background:var(--control-bg);color:var(--ink-soft)}
+  :root:not([data-theme="light"]) .chip:hover{background:var(--surface)}
+  :root:not([data-theme="light"]) .chip[aria-selected="true"]{
+    background:color-mix(in srgb, var(--accent) 18%, var(--surface));
+    border-color:color-mix(in srgb, var(--accent) 36%, transparent);
+    color:var(--accent-deep);
+    box-shadow:0 4px 16px rgba(99,91,255,.14);
+  }
+  :root:not([data-theme="light"]) .search,
+  :root:not([data-theme="light"]) .sort{background:var(--control-bg)}
+  :root:not([data-theme="light"]) .sort button[aria-pressed="true"]{
+    background:color-mix(in srgb, var(--accent) 18%, var(--surface));
+    color:var(--accent-deep);
+  }
+  :root:not([data-theme="light"]) .ask-cta{
+    background:var(--cta);color:var(--cta-ink);border-color:var(--cta-border);
+    box-shadow:0 1px 2px rgba(0,0,0,.2);
+  }
+  :root:not([data-theme="light"]) .item{background:var(--surface);border-color:var(--line)}
+  :root:not([data-theme="light"]) .item summary::after{border-color:var(--faint)}
+  :root:not([data-theme="light"]) .item[open] summary::after{border-color:var(--muted)}
+  :root:not([data-theme="light"]) .pill{
+    background:rgba(46,160,67,.14);color:#3FB950;
+    box-shadow:none!important;filter:none!important;
+  }
+  :root:not([data-theme="light"]) .pill::before{background:#3FB950;box-shadow:none!important;filter:none!important}
+  :root:not([data-theme="light"]) .pill:hover{background:rgba(46,160,67,.22);color:#56D364}
+  :root:not([data-theme="light"]) .item .body code{
+    background:rgba(139,132,255,.12);border-color:rgba(139,132,255,.2);color:var(--accent-deep);
+  }
+  :root:not([data-theme="light"]) .empty{background:rgba(23,24,34,.55)}
+  :root:not([data-theme="light"]) .modal{background:var(--surface)}
+  :root:not([data-theme="light"]) .modal select,
+  :root:not([data-theme="light"]) .modal textarea{background:var(--bg-deep);color:var(--ink-soft)}
+  :root:not([data-theme="light"]) .btn.primary{
+    background:var(--cta);color:var(--cta-ink);border-color:var(--cta-border);
+    box-shadow:0 1px 2px rgba(0,0,0,.2);
+  }
+  :root:not([data-theme="light"]) ::selection{background:var(--accent-soft);color:var(--ink)}
+  :root:not([data-theme="light"]) .hero h1{color:#FFFFFF}
+}
+
 /* —— Mobile rhythm —— */
 @media (max-width:719px){
   .fresh{
@@ -704,7 +793,8 @@ footer{
     padding-right:max(18px, env(safe-area-inset-right, 0px));
   }
   .aurora{
-    height:calc(env(safe-area-inset-top, 0px) + min(240px, 34dvh));
+    height:calc(env(safe-area-inset-top, 0px) + min(260px, 36dvh));
+    opacity:.92;
   }
   .brand{margin:22px 0 24px;min-height:28px;padding:0}
   .brand-slot{min-height:28px}
@@ -720,16 +810,19 @@ footer{
   .hero .sub{font-size:14.5px;max-width:320px;margin-bottom:24px}
   .controls{padding:0;margin:0 auto 28px;gap:12px}
   .chips{gap:8px}
-  .search{width:min(100%,320px)}
+  .search{width:100%;max-width:100%;flex:1 1 100%}
+  .toolbar{flex-direction:column;align-items:stretch}
+  .sort{align-self:center}
   .sec{margin:0 0 12px}
-  #list{column-gap:12px}
-  .item{border-radius:18px;margin-bottom:12px}
+  #list{gap:12px}
+  .list-col{gap:12px}
+  .item{border-radius:18px;margin:0}
   .item summary{padding:20px 40px 18px 20px}
   .item summary::after{right:16px;top:24px}
   .item[open] summary::after{top:28px}
   .item .body{padding:4px 20px 20px}
   .item .q{margin:0 0 10px}
-  footer{margin:40px 0 0;padding:20px 0 0}
+  footer{margin:40px 0 0;padding:0;border:0}
 }
 </style>
 </head>
@@ -754,7 +847,7 @@ footer{
     </div>
   </div>
   <div class="hero">
-    <h1>Beta Q&amp;A Center</h1>
+    <h1>Beta Q&amp;A <em>Center</em></h1>
     <p class="sub">Answers for Flip beta testers — search a topic, or open a card.</p>
     <button type="button" class="ask-cta" id="askOpen">Submit a question…</button>
   </div>
@@ -773,7 +866,7 @@ footer{
       <div class="toolbar">
         <div class="search">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
-          <input id="q" type="search" placeholder="Search shipping, firmware, calendar, MCP…" autocomplete="off" />
+          <input id="q" type="search" placeholder="Search shipping, firmware, calendar, MCP" autocomplete="off" />
         </div>
         <div class="sort" role="group" aria-label="Sort order">
           <button type="button" data-sort="newest" aria-pressed="true">Newest</button>
@@ -782,7 +875,7 @@ footer{
       </div>
       </div>
       <div class="sec" id="sec">11 answers</div>
-      <div id="list"></div>
+      <div id="list" class="has-cols"><div id="list-left" class="list-col" aria-hidden="false"></div><div id="list-right" class="list-col" aria-hidden="false"></div></div>
       <footer>
         <span>Moonphase Flip beta support</span>
         <a href="https://hellomoonphase.com/" target="_blank" rel="noopener noreferrer">Official website</a>
@@ -816,13 +909,19 @@ footer{
 <script>
 
 
-const PAGE_UPDATED="2026-10-24";
+const PAGE_UPDATED="2026-10-25";
 const LABELS={"all":"All answers","getting-started":"Getting started","device":"Device","app-firmware":"App & firmware","recording-ai":"Recording & AI","privacy":"Privacy","feedback":"Reporting"};
 const DATA=[{"id":"FB-004","cat":"getting-started","tag":"Getting started","sortKey":"2026-10-22","q":"How do I track shipping, and where do I report bugs?","teaser":"UPS delivery; tracking arrives by email. Report bugs in General or Beta Support.","teaserHtml":"<mark>UPS</mark> delivery; tracking arrives by email. Report bugs in <mark>General</mark> or <mark>Beta Support</mark>.","a":"<p>Devices ship with <code>UPS</code>. You’ll get an email from the team; tracking can take a little while to appear.</p><p>For bugs, post in <strong>General</strong> or your personal <strong>Beta Support</strong> group.</p>","alwaysOpen":false,"tags":["Getting started","Shipping"]},{"id":"FB-035","cat":"getting-started","tag":"Getting started","sortKey":"2026-10-24","q":"My device just arrived — what should I do first?","teaser":"Follow Checklist_revised.pdf steps 1–7 (share SN), wait for us to remind you, then continue from step 8.","teaserHtml":"Follow <mark>Checklist_revised.pdf</mark> steps 1–7 (share SN), wait for us to remind you, then continue from step 8.","a":"<p>In the WhatsApp beta community, open <strong>Announcements</strong> and use <code>Checklist_revised.pdf</code> and <code>QuickStartGuide.pdf</code> as your guides.</p><p>Follow <code>Checklist_revised.pdf</code> step by step through <strong>steps 1–7</strong> (including sharing your <strong>serial number (<code>SN</code>)</strong>). Then <strong>stop</strong> and wait for us to remind you.</p><p>After our reminder, continue from <strong>step 8</strong> and set up the device.</p>","alwaysOpen":false,"tags":["Getting started","Setup"]},{"id":"FB-014","cat":"device","tag":"Device","sortKey":"2026-10-24","q":"Recording shows activity, but nothing returns — or I’m stuck on firmware 1.0.68?","teaser":"Share your SN, wait for our firmware-push notice, then follow Checklist_revised.pdf.","teaserHtml":"Share your <mark>SN</mark>, wait for our firmware-push notice, then follow <mark>Checklist_revised.pdf</mark>.","a":"<p>Devices often ship on older firmware (including <code>1.0.68</code>). Send your <strong>serial number (<code>SN</code>)</strong> in <strong>General</strong> or your private <strong>Beta Support</strong> group.</p><p><strong>Wait</strong> for our notice that new firmware was pushed to your device. The app’s Firmware Update screen may not show it right away.</p><p>After that notice, open <strong>Announcements</strong> and follow <code>Checklist_revised.pdf</code> (use the <code>TestFlight</code> build the checklist names). Then keep app and firmware current, and <strong>unbind and re-pair</strong> if data still needs to sync to the Flip screen.</p>","alwaysOpen":false,"tags":["Device","Firmware"]},{"id":"FB-034","cat":"app-firmware","tag":"App & firmware","sortKey":"2026-10-24","q":"Which iOS app build should I install?","teaser":"Use the listed TestFlight build for iOS beta.","teaserHtml":"Use the listed <mark>TestFlight</mark> build for iOS beta.","a":"<p>Install via <code>TestFlight</code>.</p><p>Current build: <strong>1.0.1 (1217)</strong>.</p>","alwaysOpen":false,"tags":["App & firmware","iOS"]},{"id":"FB-009","cat":"app-firmware","tag":"App & firmware","sortKey":"2026-10-24","q":"Calendar shows in the app but not on the device — or Bluetooth is connected with no voice actions?","teaser":"Usually an app + firmware mismatch — share SN if asked, then wait for our push.","teaserHtml":"Usually an <mark>app + firmware</mark> mismatch — share SN if asked, then wait for our push.","a":"<p>This is usually an <strong>app and firmware version</strong> mismatch.</p><p>Send your <strong>serial number (<code>SN</code>)</strong> if asked, then <strong>wait for our notification</strong> that a firmware update has been pushed. After the push, calendars listed in the app should be able to sync to the device.</p><p>Android / Fold calendar feedback is noted; <strong>no commitment yet</strong>.</p>","alwaysOpen":false,"tags":["App & firmware","Sync"]},{"id":"FB-028","cat":"app-firmware","tag":"App & firmware","sortKey":"2026-10-24","q":"Why do I see characters in other languages in the UI or AI output?","teaser":"AI language/prompt issue under fix — send a screenshot if it returns.","teaserHtml":"AI language/prompt issue under fix — send a screenshot if it returns.","a":"<p>Characters in other languages in the UI or AI output are treated as an <strong>AI language / prompt</strong> issue. The team is refining prompts.</p><p>If it continues, send a screenshot in <strong>General</strong> or your personal <strong>Beta Support</strong> group.</p>","alwaysOpen":false,"tags":["App & firmware","AI"]},{"id":"FB-015","cat":"recording-ai","tag":"Recording & AI","sortKey":"2026-10-23","q":"Can I leave recording on all day?","teaser":"Yes — leave it on all day. It only saves when someone speaks; auto-clears after phone sync.","teaserHtml":"Yes — leave it on all day. It only saves when someone speaks; auto-clears after phone sync.","a":"<p>Yes — you can leave recording on all day.</p><p>It <strong>only saves when someone is speaking</strong>. After sync to the phone, the device <strong>auto-clears</strong> (no manual purge).</p>","alwaysOpen":false,"tags":["Recording & AI","Battery"]},{"id":"FB-024","cat":"privacy","tag":"Privacy","sortKey":"2026-10-24","q":"Can I use Flip with other AIs via MCP under the NDA?","teaser":"Yes — MCP with other AIs is allowed in this beta.","teaserHtml":"Yes — <mark>MCP</mark> with other AIs is allowed in this beta.","a":"<p><code>MCP</code> is part of the beta. You’re free to try it with other AIs.</p>","alwaysOpen":false,"tags":["Privacy","MCP"]},{"id":"R1","cat":"feedback","tag":"Reporting","sortKey":"2026-10-22","q":"General channel","teaser":"Shared questions, announcements, and group bug reports.","teaserHtml":"Shared questions, announcements, and group bug reports.","a":"<p>Use <strong>General</strong> for shared questions, announcements, and bug reports the whole beta group can see.</p>","alwaysOpen":false,"tags":["Reporting","General"]},{"id":"R2","cat":"feedback","tag":"Reporting","sortKey":"2026-10-22","q":"Personal Beta Support group","teaser":"Private thread for shipment, SN, and one-to-one issues.","teaserHtml":"Private thread for shipment, <mark>SN</mark>, and one-to-one issues.","a":"<p>Your private thread for shipment details, <strong>serial number (<code>SN</code>)</strong>, and one-to-one issues.</p>","alwaysOpen":false,"tags":["Reporting","Support"]},{"id":"R3","cat":"feedback","tag":"Reporting","sortKey":"2026-10-24","q":"Which docs matter, and what should I include when reporting?","teaser":"Include SN, versions, and a screenshot; QuickStartGuide.pdf and Checklist_revised.pdf live in Announcements.","teaserHtml":"Include SN, versions, and a screenshot; <mark>QuickStartGuide.pdf</mark> and <mark>Checklist_revised.pdf</mark> live in Announcements.","a":"<p><strong>Announcements</strong> includes <code>QuickStartGuide.pdf</code> and <code>Checklist_revised.pdf</code>.</p><p>Helpful reports include repro steps, your <strong>serial number (<code>SN</code>)</strong>, app and firmware versions, and a screenshot or short video.</p>","alwaysOpen":false,"tags":["Reporting","Docs"]}];
 let tab="all", sortDir="newest";
 const list=document.getElementById("list"), qEl=document.getElementById("q"), sec=document.getElementById("sec");
 function esc(s){return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")}
 function pills(i){const tags=(i.tags&&i.tags.length)?i.tags:[i.tag||LABELS[i.cat]||i.cat];return tags.map(t=>`<span class="pill">${esc(t)}</span>`).join("")}
+function cardHtml(i, openIds){
+  const teaser=i.teaserHtml||esc(i.teaser);
+  const neu=i.sortKey===PAGE_UPDATED?" is-new":"";
+  const isOpen=openIds.has(i.id)?" open":"";
+  return `<details class="item${neu}" data-id="${esc(i.id)}" data-cat="${esc(i.cat)}"${isOpen}><summary><div class="q">${esc(i.q)}</div><p class="teaser">${teaser}</p><div class="meta">${pills(i)}</div></summary><div class="body">${i.a}</div></details>`;
+}
 function paint(){
   const q=(qEl.value||"").trim().toLowerCase();
   let items=DATA.slice();
@@ -831,13 +930,26 @@ function paint(){
   items.sort((a,b)=> sortDir==="newest" ? (b.sortKey||"").localeCompare(a.sortKey||"") : (a.sortKey||"").localeCompare(b.sortKey||""));
   sec.textContent=(tab==="all"?`${items.length} answers`:`${items.length} in ${LABELS[tab]||"topic"}`);
   const openIds=new Set(Array.from(list.querySelectorAll("details.item[open]")).map(el=>el.dataset.id).filter(Boolean));
-  if(!items.length){list.innerHTML='<div class="empty">No matches — try another word or topic.</div>';return}
-  list.innerHTML=items.map(i=>{
-    const teaser=i.teaserHtml||esc(i.teaser);
-    const neu=i.sortKey===PAGE_UPDATED?" is-new":"";
-    const isOpen=openIds.has(i.id)?" open":"";
-    return `<details class="item${neu}" data-id="${esc(i.id)}" data-cat="${esc(i.cat)}"${isOpen}><summary><div class="q">${esc(i.q)}</div><p class="teaser">${teaser}</p><div class="meta">${pills(i)}</div></summary><div class="body">${i.a}</div></details>`;
-  }).join("");
+  let left=list.querySelector("#list-left");
+  let right=list.querySelector("#list-right");
+  if(!left||!right){
+    list.innerHTML='<div id="list-left" class="list-col"></div><div id="list-right" class="list-col"></div>';
+    left=list.querySelector("#list-left");
+    right=list.querySelector("#list-right");
+  }
+  list.classList.add("has-cols");
+  if(!items.length){
+    left.innerHTML='';
+    right.innerHTML='';
+    list.classList.remove("has-cols");
+    list.innerHTML='<div class="empty">No matches — try another word or topic.</div>';
+    return;
+  }
+  /* Odd/even split: stable columns — open only pushes within its column */
+  const L=[], R=[];
+  items.forEach((it,idx)=>{(idx%2===0?L:R).push(it)});
+  left.innerHTML=L.map(i=>cardHtml(i,openIds)).join("");
+  right.innerHTML=R.map(i=>cardHtml(i,openIds)).join("");
 }
 function render(opts){if(opts&&opts.soft){list.classList.add("is-filtering");setTimeout(()=>{paint();list.classList.remove("is-filtering")},150)}else paint()}
 document.querySelectorAll(".sort button").forEach(btn=>btn.addEventListener("click",()=>{sortDir=btn.dataset.sort;document.querySelectorAll(".sort button").forEach(b=>b.setAttribute("aria-pressed",b===btn?"true":"false"));render({soft:true})}));
@@ -860,11 +972,11 @@ document.getElementById("askSubmit").addEventListener("click",()=>{
 });
 /* fresh bar is non-sticky silk — no scroll hide */
 
-/* Theme toggle v6 — CSS @media is the default (no data-theme).
-   data-theme + manual-v6 ONLY after an explicit click. All stale keys wiped (incl v5). */
+/* Theme toggle v7 — CSS @media is the default (no data-theme).
+   data-theme + manual-v7 ONLY after an explicit click. All stale keys wiped (incl v6). */
 (function(){
-  const MANUAL='flip-beta-qa-theme-manual-v6';
-  const STALE=['flip-beta-qa-theme','flip-beta-qa-theme-v1','flip-beta-qa-theme-v2','flip-beta-qa-theme-manual','flip-beta-qa-theme-v3','flip-beta-qa-theme-manual-v4','flip-beta-qa-theme-manual-v5'];
+  const MANUAL='flip-beta-qa-theme-manual-v7';
+  const STALE=['flip-beta-qa-theme','flip-beta-qa-theme-v1','flip-beta-qa-theme-v2','flip-beta-qa-theme-manual','flip-beta-qa-theme-v3','flip-beta-qa-theme-manual-v4','flip-beta-qa-theme-manual-v5','flip-beta-qa-theme-manual-v6'];
   const root=document.documentElement;
   const btn=document.getElementById('themeToggle');
   const meta=document.getElementById('themeColorMeta');
