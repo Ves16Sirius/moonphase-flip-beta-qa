@@ -4,10 +4,10 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 <meta name="color-scheme" content="light dark" />
-<!-- theme-color MUST match page --bg wash (light #F6F5FB / dark #0E0F14). Never black chrome on light or vice versa. -->
-<meta name="theme-color" content="#F6F5FB" media="(prefers-color-scheme: light)" id="themeColorMetaLight" />
-<meta name="theme-color" content="#0E0F14" media="(prefers-color-scheme: dark)" id="themeColorMetaDark" />
-<meta name="theme-color" content="#0E0F14" id="themeColorMeta" />
+<!-- theme-color MUST match aurora START (island wash), not pure black/white — continuous with .aurora 0%. -->
+<meta name="theme-color" content="#E0DBFC" media="(prefers-color-scheme: light)" id="themeColorMetaLight" />
+<meta name="theme-color" content="#333968" media="(prefers-color-scheme: dark)" id="themeColorMetaDark" />
+<meta name="theme-color" content="#333968" id="themeColorMeta" />
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 <title>Moonphase Flip — Beta Q&amp;A Center</title>
@@ -21,7 +21,7 @@
     'flip-beta-qa-theme-manual','flip-beta-qa-theme-v3','flip-beta-qa-theme-manual-v4',
     'flip-beta-qa-theme-manual-v5','flip-beta-qa-theme-manual-v6','flip-beta-qa-theme-manual-v7'
   ];
-  var LIGHT_TC='#F6F5FB', DARK_TC='#0E0F14';
+  var LIGHT_TC='#E0DBFC', DARK_TC='#333968';
   try{
     for(var i=0;i<STALE.length;i++){
       try{localStorage.removeItem(STALE[i])}catch(e){}
@@ -74,11 +74,13 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/geist-mono@5.2.5/index.min.css" />
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600&display=swap" />
 <style>
-/* Overhaul 2026-10-25 v10.11 — aurora negative safe-area + accent@0% · toggle glass track + thumb-contained icons · dims via --tt-* */
+/* Overhaul 2026-10-25 v10.12 — aurora y=0 continuous (theme-color=aurora-top) · toggle top flush with MOONPHASE · no hard island edge */
 :root{
   /* Surfaces */
   --bg:#F6F5FB;
   --bg-deep:#EEECF6;
+  /* Island / status wash — MUST equal theme-color + aurora gradient 0% (never pure black) */
+  --aurora-top:#E0DBFC;
   --surface:#FFFFFF;
   /* Ink hierarchy */
   --ink:#1A1917;
@@ -144,105 +146,91 @@
 html{
   scroll-behavior:smooth;overflow-x:hidden;width:100%;max-width:100%;
   color-scheme:light dark;
-  /* Continuous --bg through safe-area-inset-top (viewport-fit=cover) — no black gap under island */
-  background-color:var(--bg);
-  background:var(--bg);
+  /* Island chrome = aurora start (--aurora-top), never pure black then sudden wash */
+  background-color:var(--aurora-top);
+  background:var(--aurora-top);
   min-height:100%;
   min-height:100dvh;
-  /* Extend paint into notch / Dynamic Island */
   padding:0;
   margin:0;
 }
 html,body{-webkit-overflow-scrolling:touch;overscroll-behavior-y:none}
-/* NO html::before island veil — a solid fixed strip under Dynamic Island
-   reads as a black/broken slab. Continuity comes from:
-   theme-color + html/body/--bg + html::after underlay + aurora gradient from --bg. */
-/* Full-viewport fixed underlay — overscroll / rubber-band always shows --bg (never white/black gap) */
+/* Continuity under Dynamic Island:
+   theme-color == --aurora-top == html/body top wash == .aurora gradient 0%.
+   Soft fade only — no hard black band then sudden light. */
+/* Full-viewport underlay — overscroll shows aurora-top (matches status chrome) */
 html::after{
   content:"";
   position:fixed;
   inset:0;
-  background:var(--bg);
-  background-color:var(--bg);
+  background:var(--aurora-top);
+  background-color:var(--aurora-top);
   pointer-events:none;
   z-index:-1;
 }
-html[data-theme="light"]::after{background:#F6F5FB!important;background-color:#F6F5FB!important}
-html[data-theme="dark"]::after{background:#0E0F14!important;background-color:#0E0F14!important}
+html[data-theme="light"]::after{background:#E0DBFC!important;background-color:#E0DBFC!important}
+html[data-theme="dark"]::after{background:#333968!important;background-color:#333968!important}
 @media (prefers-color-scheme: light){
-  :root:not([data-theme="dark"])::after{background:#F6F5FB!important;background-color:#F6F5FB!important}
+  :root:not([data-theme="dark"])::after{background:#E0DBFC!important;background-color:#E0DBFC!important}
 }
 @media (prefers-color-scheme: dark){
-  :root:not([data-theme="light"])::after{background:#0E0F14!important;background-color:#0E0F14!important}
-}
-/* Force --bg into status chrome; never a white strip under the island */
-html[data-theme="light"],
-html[data-theme="light"] body,
-[data-theme="light"],
-[data-theme="light"] body{
-  background:#F6F5FB !important;
-  background-color:#F6F5FB !important;
-}
-@media (prefers-color-scheme: light){
-  :root:not([data-theme="dark"]),
-  :root:not([data-theme="dark"]) body{
-    background:#F6F5FB !important;
-    background-color:#F6F5FB !important;
-  }
+  :root:not([data-theme="light"])::after{background:#333968!important;background-color:#333968!important}
 }
 body{
   margin:0;min-height:100vh;min-height:100dvh;color:var(--ink-soft);
-  background-color:var(--bg);
-  background:var(--bg);
+  /* Same --aurora-top as theme-color from y=0; soft fade to --bg — no hard hold/cliff */
+  background-color:var(--aurora-top);
+  background:
+    linear-gradient(180deg,
+      var(--aurora-top) 0%,
+      color-mix(in srgb, var(--aurora-top) 55%, var(--bg)) 28%,
+      var(--bg) 62%,
+      var(--bg) 100%);
   font-family:var(--font);font-size:15px;line-height:1.55;font-weight:var(--fw-regular);
   letter-spacing:-.011em;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;
   width:100%;max-width:100%;
   position:relative;
 }
-/* FIXED top-curtain aurora — paints from PHYSICAL screen top (under Dynamic Island).
-   top: -safe-area so element origin sits above the layout inset; height covers
-   safe-area + glow so the visible band reaches the phone edge. Gradient 0% =
-   accent wash at the very top (held through safe-area), never a hard black strip. */
+/* FIXED top-curtain aurora — top:0 = physical screen top (viewport-fit=cover).
+   Gradient 0% = var(--aurora-top) === theme-color/html/body top. Soft % fade only;
+   never hold a solid band through safe-area then cliff to a lighter wash. */
 .aurora{
   position:fixed;
-  top:calc(-1 * env(safe-area-inset-top, 0px));
-  left:0;right:0;
+  top:0;left:0;right:0;
   width:100%;
-  height:calc(env(safe-area-inset-top, 0px) + min(320px, 42vh));
+  height:min(340px, 46vh);
   margin:0;padding:0;
   pointer-events:none;
   z-index:0;
   overflow:hidden;
+  /* 0% = --aurora-top (= theme-color). Only softens toward --bg — never a brighter strip. */
   background:
-    radial-gradient(ellipse 130% 90% at 50% 0%,
-      color-mix(in srgb, #A898FF 48%, transparent) 0%,
-      color-mix(in srgb, #A898FF 22%, transparent) 42%,
-      transparent 72%),
+    radial-gradient(ellipse 150% 100% at 50% -5%,
+      color-mix(in srgb, #A898FF 28%, transparent) 0%,
+      transparent 58%),
     linear-gradient(180deg,
-      color-mix(in srgb, #A898FF 46%, var(--bg)) 0%,
-      color-mix(in srgb, #A898FF 46%, var(--bg)) env(safe-area-inset-top, 0px),
-      color-mix(in srgb, #A898FF 28%, var(--bg)) calc(env(safe-area-inset-top, 0px) + 36px),
-      color-mix(in srgb, #B8A8FF 14%, var(--bg)) calc(env(safe-area-inset-top, 0px) + 110px),
-      color-mix(in srgb, #C8BCFF 5%, var(--bg)) calc(env(safe-area-inset-top, 0px) + 190px),
+      var(--aurora-top) 0%,
+      color-mix(in srgb, var(--aurora-top) 72%, var(--bg)) 22%,
+      color-mix(in srgb, var(--aurora-top) 38%, var(--bg)) 48%,
+      var(--bg) 72%,
       transparent 100%);
   filter:none;
   opacity:1;
   -webkit-mask-image:none;
   mask-image:none;
 }
-/* Crown reinforces accent at physical top; same negative offset as .aurora */
+/* Crown: same family as aurora-top, only softens — no luminance jump */
 .aurora-crown{
   display:block!important;
   position:absolute;
   left:0;right:0;
   top:0;
-  height:calc(env(safe-area-inset-top, 0px) + 64px);
+  height:min(100px, 16vh);
   margin:0;padding:0;
   pointer-events:none;
   background:linear-gradient(180deg,
-    color-mix(in srgb, #A898FF 38%, var(--bg)) 0%,
-    color-mix(in srgb, #A898FF 38%, var(--bg)) env(safe-area-inset-top, 0px),
-    color-mix(in srgb, #A898FF 16%, var(--bg)) calc(env(safe-area-inset-top, 0px) + 28px),
+    var(--aurora-top) 0%,
+    color-mix(in srgb, var(--aurora-top) 40%, transparent) 55%,
     transparent 100%);
   filter:none;
   opacity:1;
@@ -302,6 +290,7 @@ a:hover{text-decoration:underline;text-underline-offset:3px}
 
 /* —— Brand row —— */
 .brand{
+  /* Toggle TOP == MOONPHASE wordmark TOP */
   display:flex;align-items:flex-start;justify-content:space-between;gap:8px;
   margin:24px 0 32px;position:relative;min-height:32px;
 }
@@ -324,7 +313,7 @@ a:hover{text-decoration:underline;text-underline-offset:3px}
   --tt-travel:calc(var(--tt-w) - (var(--tt-pad) * 2) - var(--tt-thumb));
   position:relative;transform:none;isolation:isolate;
   align-self:flex-start;
-  margin-top:0;
+  margin-top:0; /* TOP edge flush with MOONPHASE letter tops */
   height:var(--tt-h);min-height:var(--tt-h);
   width:var(--tt-w);min-width:var(--tt-w);
   padding:0;border-radius:999px;gap:0;
@@ -846,6 +835,7 @@ footer{
   :root:not([data-theme="light"]){
     --bg:#0E0F14;
     --bg-deep:#090A0E;
+    --aurora-top:#333968;
     --surface:#171822;
     --ink:#FFFFFF;
     --ink-soft:#FFFFFF;
@@ -877,6 +867,7 @@ footer{
 [data-theme="dark"]{
   --bg:#0E0F14;
   --bg-deep:#090A0E;
+  --aurora-top:#333968;
   --surface:#171822;
   --ink:#FFFFFF;
   --ink-soft:#FFFFFF;
@@ -980,105 +971,78 @@ footer{
 [data-theme="light"] .pill::before{background:#635BFF;box-shadow:0 0 6px rgba(99,91,255,.45)}
 [data-theme="light"] .pill:hover{background:rgba(99,91,255,.14);color:#3730A3}
 
-/* Dark status chrome: same --bg continuously (never white under island) */
-html[data-theme="dark"],
-html[data-theme="dark"] body,
-[data-theme="dark"],
-[data-theme="dark"] body{
-  background:#0E0F14 !important;
-  background-color:#0E0F14 !important;
-}
-@media (prefers-color-scheme: dark){
-  :root:not([data-theme="light"]),
-  :root:not([data-theme="light"]) body{
-    background:#0E0F14 !important;
-    background-color:#0E0F14 !important;
-  }
-}
-/* Dark top-curtain aurora — accent wash from physical top (no black strip under island) */
+/* REMOVED v10.12: solid #0E0F14 !important body overrides fought aurora-top — hard seam under island */
+/* Dark aurora — same --aurora-top at 0%, soft fade only (NO safe-area hard stops) */
 @media (prefers-color-scheme: dark){
   :root:not([data-theme="light"]) .aurora{
     background:
-      radial-gradient(ellipse 130% 90% at 50% 0%,
-        color-mix(in srgb, #6B78E8 52%, transparent) 0%,
-        color-mix(in srgb, #5B66C4 24%, transparent) 42%,
-        transparent 72%),
+      radial-gradient(ellipse 150% 100% at 50% -5%,
+        color-mix(in srgb, #5B66C4 30%, transparent) 0%,
+        transparent 58%),
       linear-gradient(180deg,
-        color-mix(in srgb, #5B66C4 48%, var(--bg)) 0%,
-        color-mix(in srgb, #5B66C4 48%, var(--bg)) env(safe-area-inset-top, 0px),
-        color-mix(in srgb, #5B66C4 30%, var(--bg)) calc(env(safe-area-inset-top, 0px) + 36px),
-        color-mix(in srgb, #4A54B0 14%, var(--bg)) calc(env(safe-area-inset-top, 0px) + 110px),
-        color-mix(in srgb, #3A4470 5%, var(--bg)) calc(env(safe-area-inset-top, 0px) + 190px),
+        var(--aurora-top) 0%,
+        color-mix(in srgb, var(--aurora-top) 72%, var(--bg)) 22%,
+        color-mix(in srgb, var(--aurora-top) 38%, var(--bg)) 48%,
+        var(--bg) 72%,
         transparent 100%);
-    filter:none;
-    opacity:1;
-    -webkit-mask-image:none;
-    mask-image:none;
+    filter:none;opacity:1;
+    -webkit-mask-image:none;mask-image:none;
   }
   :root:not([data-theme="light"]) .aurora-crown{
     background:linear-gradient(180deg,
-      color-mix(in srgb, #5B66C4 40%, var(--bg)) 0%,
-      color-mix(in srgb, #5B66C4 40%, var(--bg)) env(safe-area-inset-top, 0px),
-      color-mix(in srgb, #5B66C4 16%, var(--bg)) calc(env(safe-area-inset-top, 0px) + 28px),
+      var(--aurora-top) 0%,
+      color-mix(in srgb, var(--aurora-top) 40%, transparent) 55%,
       transparent 100%);
     opacity:1;
   }
-  /* Dark: h1 #FFFBC1; Center (em) deeper gold #C4B46A */
   :root:not([data-theme="light"]) .hero h1{color:#FFFBC1;text-shadow:0 0 28px rgba(255,251,193,.18);filter:none}
   :root:not([data-theme="light"]) .hero h1 em{color:#C4B46A;text-shadow:none;opacity:1}
 }
 [data-theme="dark"] .aurora{
   background:
-    radial-gradient(ellipse 130% 90% at 50% 0%,
-      color-mix(in srgb, #6B78E8 52%, transparent) 0%,
-      color-mix(in srgb, #5B66C4 24%, transparent) 42%,
-      transparent 72%),
+    radial-gradient(ellipse 150% 100% at 50% -5%,
+      color-mix(in srgb, #5B66C4 30%, transparent) 0%,
+      transparent 58%),
     linear-gradient(180deg,
-      color-mix(in srgb, #5B66C4 48%, var(--bg)) 0%,
-      color-mix(in srgb, #5B66C4 48%, var(--bg)) env(safe-area-inset-top, 0px),
-      color-mix(in srgb, #5B66C4 30%, var(--bg)) calc(env(safe-area-inset-top, 0px) + 36px),
-      color-mix(in srgb, #4A54B0 14%, var(--bg)) calc(env(safe-area-inset-top, 0px) + 110px),
-      color-mix(in srgb, #3A4470 5%, var(--bg)) calc(env(safe-area-inset-top, 0px) + 190px),
+      var(--aurora-top) 0%,
+      color-mix(in srgb, var(--aurora-top) 72%, var(--bg)) 22%,
+      color-mix(in srgb, var(--aurora-top) 38%, var(--bg)) 48%,
+      var(--bg) 72%,
       transparent 100%);
-  filter:none;
-  opacity:1;
-  -webkit-mask-image:none;
-  mask-image:none;
+  filter:none;opacity:1;
+  -webkit-mask-image:none;mask-image:none;
 }
 [data-theme="dark"] .aurora-crown{
   background:linear-gradient(180deg,
-    color-mix(in srgb, #5B66C4 40%, var(--bg)) 0%,
-    color-mix(in srgb, #5B66C4 40%, var(--bg)) env(safe-area-inset-top, 0px),
-    color-mix(in srgb, #5B66C4 16%, var(--bg)) calc(env(safe-area-inset-top, 0px) + 28px),
+    var(--aurora-top) 0%,
+    color-mix(in srgb, var(--aurora-top) 40%, transparent) 55%,
     transparent 100%);
   opacity:1;
 }
-/* Explicit light reset when user forces light over system dark */
+/* Light aurora — --aurora-top at 0%, soft fade (no safe-area plateau / pale strip) */
 [data-theme="light"] .aurora{
   background:
-    radial-gradient(ellipse 130% 90% at 50% 0%,
-      color-mix(in srgb, #A898FF 48%, transparent) 0%,
-      color-mix(in srgb, #A898FF 22%, transparent) 42%,
-      transparent 72%),
+    radial-gradient(ellipse 150% 100% at 50% -5%,
+      color-mix(in srgb, #A898FF 28%, transparent) 0%,
+      transparent 58%),
     linear-gradient(180deg,
-      color-mix(in srgb, #A898FF 46%, var(--bg)) 0%,
-      color-mix(in srgb, #A898FF 46%, var(--bg)) env(safe-area-inset-top, 0px),
-      color-mix(in srgb, #A898FF 28%, var(--bg)) calc(env(safe-area-inset-top, 0px) + 36px),
-      color-mix(in srgb, #B8A8FF 14%, var(--bg)) calc(env(safe-area-inset-top, 0px) + 110px),
-      color-mix(in srgb, #C8BCFF 5%, var(--bg)) calc(env(safe-area-inset-top, 0px) + 190px),
+      var(--aurora-top) 0%,
+      color-mix(in srgb, var(--aurora-top) 72%, var(--bg)) 22%,
+      color-mix(in srgb, var(--aurora-top) 38%, var(--bg)) 48%,
+      var(--bg) 72%,
       transparent 100%);
-  filter:none;
-  opacity:1;
-  -webkit-mask-image:none;
-  mask-image:none;
+  filter:none;opacity:1;
+  -webkit-mask-image:none;mask-image:none;
 }
 [data-theme="light"] .aurora-crown{
   background:linear-gradient(180deg,
-    color-mix(in srgb, #A898FF 38%, var(--bg)) 0%,
-    color-mix(in srgb, #A898FF 38%, var(--bg)) env(safe-area-inset-top, 0px),
-    color-mix(in srgb, #A898FF 16%, var(--bg)) calc(env(safe-area-inset-top, 0px) + 28px),
+    var(--aurora-top) 0%,
+    color-mix(in srgb, var(--aurora-top) 40%, transparent) 55%,
     transparent 100%);
   opacity:1;
+}
+[data-theme="light"]{
+  --aurora-top:#E0DBFC;
 }
 [data-theme="dark"] .hero h1{color:#FFFBC1;text-shadow:0 0 28px rgba(255,251,193,.18);filter:none}
 [data-theme="dark"] .hero h1 em{color:#C4B46A;text-shadow:none;opacity:1}
@@ -1211,11 +1175,11 @@ html[data-theme="dark"] body,
     padding-right:max(18px, env(safe-area-inset-right, 0px));
   }
   .aurora{
-    top:calc(-1 * env(safe-area-inset-top, 0px));
-    height:calc(env(safe-area-inset-top, 0px) + min(280px, 38vh));
+    top:0;
+    height:min(300px, 42vh);
   }
   .aurora-crown{
-    height:calc(env(safe-area-inset-top, 0px) + 56px);
+    height:min(88px, 14vh);
   }
   .brand{margin:22px 0 24px;min-height:28px;padding:0;align-items:flex-start}
   .brand-slot{min-height:28px;align-items:flex-start}
@@ -1469,8 +1433,8 @@ document.getElementById("askSubmit").addEventListener("click",()=>{
   const meta=document.getElementById('themeColorMeta');
   const metaL=document.getElementById('themeColorMetaLight');
   const metaD=document.getElementById('themeColorMetaDark');
-  const LIGHT_TC='#F6F5FB'; /* soft violet page wash — matches --bg */
-  const DARK_TC='#0E0F14';
+  const LIGHT_TC='#E0DBFC'; /* = --aurora-top / theme-color / aurora 0% */
+  const DARK_TC='#333968';
   for(const k of STALE){try{localStorage.removeItem(k)}catch(e){}}
   function manualPref(){
     try{
