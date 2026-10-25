@@ -4,21 +4,23 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 <meta name="color-scheme" content="light dark" />
-<meta name="theme-color" content="#F7F5F1" id="themeColorMeta" />
+<!-- theme-color: aurora-matching so iOS Safari status bar has no hard cream/black seam -->
+<meta name="theme-color" content="#E8E0F5" media="(prefers-color-scheme: light)" id="themeColorMetaLight" />
+<meta name="theme-color" content="#1A1428" media="(prefers-color-scheme: dark)" id="themeColorMetaDark" />
+<meta name="theme-color" content="#E8E0F5" id="themeColorMeta" />
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 <title>Moonphase Flip — Beta Q&amp;A Center</title>
 <script>
-/* Theme bootstrap v3 — ALWAYS follow OS prefers-color-scheme until the user
-   explicitly clicks the toggle. Clears EVERY prior theme key (legacy + v2)
-   so a stuck "light" from earlier builds cannot block system follow. */
+/* Theme bootstrap v4 — CSS @media (prefers-color-scheme) is the DEFAULT.
+   data-theme is set ONLY when the user has explicitly toggled (manual-v4 key).
+   All prior theme keys are wiped so a stuck "light" cannot block OS follow. */
 (function(){
-  var MANUAL='flip-beta-qa-theme-manual';
-  var STALE=['flip-beta-qa-theme','flip-beta-qa-theme-v2','flip-beta-qa-theme-v1'];
-  function systemTheme(){
-    try{return window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'}
-    catch(e){return 'light'}
-  }
+  var MANUAL='flip-beta-qa-theme-manual-v4';
+  var STALE=[
+    'flip-beta-qa-theme','flip-beta-qa-theme-v1','flip-beta-qa-theme-v2',
+    'flip-beta-qa-theme-manual','flip-beta-qa-theme-v3'
+  ];
   try{
     for(var i=0;i<STALE.length;i++){
       try{localStorage.removeItem(STALE[i])}catch(e){}
@@ -28,13 +30,15 @@
       var s=localStorage.getItem(MANUAL);
       if(s==='light'||s==='dark') saved=s;
     }catch(e){}
-    var theme=saved||systemTheme();
-    document.documentElement.setAttribute('data-theme', theme);
-    document.documentElement.style.colorScheme=theme;
+    if(saved){
+      document.documentElement.setAttribute('data-theme', saved);
+      document.documentElement.style.colorScheme=saved;
+    }else{
+      document.documentElement.removeAttribute('data-theme');
+      document.documentElement.style.colorScheme='light dark';
+    }
   }catch(e){
-    var d=systemTheme();
-    document.documentElement.setAttribute('data-theme', d);
-    try{document.documentElement.style.colorScheme=d}catch(_){}
+    try{document.documentElement.removeAttribute('data-theme')}catch(_){}
   }
 })();
 </script>
@@ -47,8 +51,8 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600&display=swap" />
 <style>
 /* Blank-slate v4 — luminous chromatic + voice polish
-   System theme v3 (manual key only after toggle) · Instrument Serif · soft iris CTA
-   Aurora bleeds under status bar · Flip wordmark-matched toggle · gallery cards */
+   System theme v4: CSS @media prefers-color-scheme DEFAULT; data-theme = manual only
+   Aurora under status bar (no seam) · top-aligned toggle · status-dot tags · tight controls */
 :root{
   --bg:#F7F5F1;
   --bg-deep:#EFEBE4;
@@ -79,19 +83,30 @@
     0 14px 36px rgba(24,18,12,.06),
     0 32px 64px rgba(90,70,180,.055);
   --control-bg:rgba(255,255,255,.72);
-  --control-h:34px;
   --ease:cubic-bezier(.22,1,.36,1);
   --dur:180ms;
   --r:24px;
   --font:"Geist Sans",Geist,Inter,ui-sans-serif,system-ui,-apple-system,sans-serif;
   --display:"Instrument Serif",ui-serif,Georgia,"Times New Roman",serif;
   --mono:"Geist Mono",ui-monospace,"SF Mono",Menlo,Consolas,monospace;
-  color-scheme:light;
+  --control-h:30px;
+  color-scheme:light dark;
 }
 *,*::before,*::after{box-sizing:border-box}
-html{scroll-behavior:smooth;background:var(--bg);color-scheme:light dark;overflow-x:hidden;width:100%;max-width:100%}
+html{
+  scroll-behavior:smooth;overflow-x:hidden;width:100%;max-width:100%;
+  color-scheme:light dark;
+  /* Transparent at the crown so fixed aurora + iOS status bar composite continuously —
+     solid --bg only via body below the fold would reseam the status bar. */
+  background:transparent;
+}
 body{
-  margin:0;min-height:100vh;min-height:100dvh;color:var(--ink-soft);background:var(--bg);
+  margin:0;min-height:100vh;min-height:100dvh;color:var(--ink-soft);
+  /* Soft crown wash matching aurora / theme-color — no hard opaque band under status bar */
+  background:
+    linear-gradient(180deg, rgba(168,145,255,.20) 0%, rgba(168,145,255,.08) 12%, var(--bg) 34%),
+    var(--bg);
+  background-color:var(--bg);
   font-family:var(--font);font-size:15px;line-height:1.55;font-weight:400;
   letter-spacing:-.011em;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;
   width:100%;max-width:100%;
@@ -101,29 +116,29 @@ body{
    Hotspots sit at/above the top edge so the glow is strongest at the phone crown —
    not a mid-band between Updated and the wordmark. */
 .aurora{
-  /* Bleed UNDER the phone status bar (time/battery): negative top into
-     safe-area + extra headroom so blur still paints at visual y=0. */
+  /* Full-bleed under iOS status bar: start ABOVE y=0, no top mask fade (mask was
+     causing a visible horizontal seam at the status-bar edge). */
   position:fixed;
-  top:calc(-1 * env(safe-area-inset-top, 0px) - 56px);
+  top:calc(-1 * env(safe-area-inset-top, 0px) - 80px);
   left:0;right:0;
   width:100vw;
-  height:calc(min(560px, 74dvh) + env(safe-area-inset-top, 0px) + 56px);
+  height:calc(min(560px, 74dvh) + env(safe-area-inset-top, 0px) + 80px);
   margin:0;padding:0;
   pointer-events:none;
   z-index:0;
   overflow:visible;
   background:
-    /* solid-ish crown wash so status-bar region isn't empty cream/ink */
-    linear-gradient(180deg, rgba(168,145,255,.22) 0%, rgba(168,145,255,.10) 18%, transparent 42%),
-    radial-gradient(ellipse 110% 85% at 50% -22%, rgba(168,145,255,.52), transparent 70%),
-    radial-gradient(ellipse 80% 70% at 8% -10%, rgba(255,160,195,.34), transparent 68%),
-    radial-gradient(ellipse 75% 65% at 92% -8%, rgba(255,200,160,.30), transparent 66%),
-    radial-gradient(ellipse 60% 55% at 72% -2%, rgba(255,230,190,.22), transparent 62%),
-    radial-gradient(ellipse 55% 50% at 28% -4%, rgba(170,205,255,.24), transparent 66%);
-  filter:blur(52px) saturate(114%);
-  opacity:.9;
-  mask-image:linear-gradient(180deg,#000 0%,#000 58%,transparent 100%);
-  -webkit-mask-image:linear-gradient(180deg,#000 0%,#000 58%,transparent 100%);
+    linear-gradient(180deg, rgba(168,145,255,.34) 0%, rgba(168,145,255,.16) 14%, transparent 40%),
+    radial-gradient(ellipse 120% 90% at 50% -28%, rgba(168,145,255,.58), transparent 72%),
+    radial-gradient(ellipse 85% 75% at 6% -14%, rgba(255,160,195,.38), transparent 70%),
+    radial-gradient(ellipse 80% 70% at 94% -12%, rgba(255,200,160,.32), transparent 68%),
+    radial-gradient(ellipse 65% 58% at 72% -4%, rgba(255,230,190,.24), transparent 64%),
+    radial-gradient(ellipse 60% 54% at 28% -6%, rgba(170,205,255,.26), transparent 68%);
+  filter:blur(48px) saturate(116%);
+  opacity:.95;
+  /* Fade only at the BOTTOM — never at the top (top fade = status-bar seam) */
+  mask-image:linear-gradient(180deg,#000 0%,#000 62%,transparent 100%);
+  -webkit-mask-image:linear-gradient(180deg,#000 0%,#000 62%,transparent 100%);
 }
 /* Content above the fixed aurora */
 .fresh,.shell,.modal-backdrop{position:relative;z-index:1}
@@ -134,12 +149,11 @@ a{color:var(--accent-deep);text-decoration:none}
 a:hover{text-decoration:underline;text-underline-offset:3px}
 ::selection{background:var(--accent-soft);color:var(--ink)}
 
-/* Updated bar — quiet silk chip */
+/* Updated bar — quiet silk chip; transparent so aurora shows through status-bar region */
 .fresh{
   display:flex;justify-content:center;align-items:center;
-  padding:max(0px, env(safe-area-inset-top, 0px)) 0 0;
+  padding:max(6px, env(safe-area-inset-top, 0px)) 0 0;
   background:transparent;border:0;box-shadow:none;
-  /* sits ON TOP of fixed .aurora — do not paint an opaque full-bleed bar */
 }
 .fresh span{
   display:inline-flex;align-items:center;gap:7px;
@@ -216,24 +230,27 @@ a:hover{text-decoration:underline;text-underline-offset:3px}
   .fresh span{margin:4px 0 0}
 }
 
-/* Brand row — Flip wordmark + theme toggle on ONE horizontally aligned row */
+/* Brand row — Flip wordmark + theme toggle; TOP-aligned to MOONPHASE glyph row.
+   SVG viewBox has ~5/21 top pad — optical margin-top puts toggle with letter tops. */
 .brand{
-  display:flex;align-items:center;justify-content:space-between;gap:8px;
-  margin:6px 0 28px;position:relative;min-height:30px;
+  display:flex;align-items:flex-start;justify-content:space-between;gap:8px;
+  margin:10px 0 24px;position:relative;min-height:30px;
 }
 .brand-slot{
-  flex:1 1 0;display:flex;align-items:center;min-width:0;min-height:30px;
+  flex:1 1 0;display:flex;align-items:flex-start;min-width:0;min-height:30px;
 }
 .brand-slot-start{justify-content:flex-start}
 .brand-slot-end{justify-content:flex-end}
 .brand-mark{
-  flex:0 0 auto;display:flex;align-items:center;justify-content:center;
+  flex:0 0 auto;display:flex;align-items:flex-start;justify-content:center;
 }
 .brand .wm{height:30px;width:auto;display:block}
 .theme-toggle{
   position:static;transform:none;
-  /* Match Flip wordmark height (30px desktop / 24px mobile) */
-  height:30px;min-height:30px;padding:0 10px 0 8px;border-radius:999px;gap:5px;
+  align-self:flex-start;
+  /* Optical: SVG glyph top ≈ 5/21 of box → ~7px at 30px height */
+  margin-top:7px;
+  height:22px;min-height:22px;padding:0 9px 0 7px;border-radius:999px;gap:5px;
   display:inline-flex;align-items:center;justify-content:center;
   border:1px solid var(--line);
   background:var(--control-bg);
@@ -252,17 +269,26 @@ a:hover{text-decoration:underline;text-underline-offset:3px}
 .theme-toggle .tlabel{display:inline-block;line-height:1}
 .theme-toggle .icon-sun{display:none}
 .theme-toggle .icon-moon{display:block}
+.theme-toggle .tlabel-light{display:none}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]) .theme-toggle .icon-sun{display:block}
+  :root:not([data-theme="light"]) .theme-toggle .icon-moon{display:none}
+  :root:not([data-theme="light"]) .theme-toggle .tlabel-dark{display:none}
+  :root:not([data-theme="light"]) .theme-toggle .tlabel-light{display:inline}
+}
 [data-theme="dark"] .theme-toggle .icon-sun{display:block}
 [data-theme="dark"] .theme-toggle .icon-moon{display:none}
 [data-theme="dark"] .theme-toggle .tlabel-dark{display:none}
 [data-theme="dark"] .theme-toggle .tlabel-light{display:inline}
-.theme-toggle .tlabel-light{display:none}
 @media (max-width:719px){
-  .brand{margin:4px 0 18px;min-height:24px}
+  .brand{margin:8px 0 16px;min-height:24px}
   .brand-slot{min-height:24px}
   .brand .wm{height:24px}
-  .theme-toggle{height:24px;min-height:24px;min-width:24px;padding:0 6px;gap:0}
-  .theme-toggle svg{width:12px;height:12px}
+  .theme-toggle{
+    height:20px;min-height:20px;min-width:20px;padding:0 5px;gap:0;
+    margin-top:5px; /* 5/21 * 24 ≈ 5.7 → optical to MOONPHASE top */
+  }
+  .theme-toggle svg{width:11px;height:11px}
   .theme-toggle .tlabel{display:none!important}
 }
 
@@ -285,10 +311,10 @@ a:hover{text-decoration:underline;text-underline-offset:3px}
   line-height:1.5;color:var(--muted);max-width:380px;
 }
 .ask-cta{
-  display:inline-flex;align-items:center;justify-content:center;height:38px;padding:0 18px;
+  display:inline-flex;align-items:center;justify-content:center;height:32px;padding:0 14px;
   border-radius:999px;
   background:var(--cta);color:var(--cta-ink);
-  font-size:13.5px;font-weight:500;letter-spacing:-.014em;
+  font-size:13px;font-weight:500;letter-spacing:-.014em;
   border:1px solid var(--cta-border);
   box-shadow:0 1px 2px rgba(24,18,12,.03);
   backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
@@ -319,10 +345,10 @@ a:hover{text-decoration:underline;text-underline-offset:3px}
   margin:0;padding:0;max-width:640px;
 }
 .chip{
-  flex:0 0 auto;height:var(--control-h);padding:0 14px;border-radius:999px;
+  flex:0 0 auto;height:var(--control-h);padding:0 11px;border-radius:999px;
   border:1px solid var(--line);background:var(--control-bg);
   backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
-  font-size:12.5px;font-weight:500;letter-spacing:-.011em;color:var(--ink-soft);
+  font-size:12px;font-weight:500;letter-spacing:-.011em;color:var(--ink-soft);
   white-space:nowrap;box-shadow:var(--shadow-sm);
   transition:background var(--dur) var(--ease), border-color var(--dur) var(--ease), color var(--dur) var(--ease), box-shadow var(--dur) var(--ease), transform var(--dur) var(--ease);
 }
@@ -450,43 +476,33 @@ a:hover{text-decoration:underline;text-underline-offset:3px}
 }
 .meta{display:flex;flex-wrap:wrap;gap:6px}
 
-/* Card tags — luminous neon/code badges (Vercel/Neon glow), no leading dot */
+/* Card tags — GitHub label craft + tiny Ready dot (Linear/Vercel/Neon).
+   Soft filled label, crisp type, 5px solid green dot. Zero outward glow/halo. */
 .pill{
-  display:inline-flex;align-items:center;gap:0;
-  height:auto;padding:5px 11px;
+  display:inline-flex;align-items:center;gap:6px;
+  height:22px;padding:0 8px 0 7px;
   border-radius:999px;
-  /* glass-green fill + soft outer glow, not a flat stroke chip */
-  border:1px solid rgba(47,158,107,.42);
-  background:
-    linear-gradient(180deg, rgba(47,158,107,.22) 0%, rgba(47,158,107,.10) 100%),
-    rgba(255,255,255,.55);
-  backdrop-filter:blur(10px) saturate(140%);
-  -webkit-backdrop-filter:blur(10px) saturate(140%);
-  box-shadow:
-    0 0 0 1px rgba(47,158,107,.08),
-    0 0 14px rgba(47,158,107,.28),
-    0 0 28px rgba(47,158,107,.12),
-    inset 0 1px 0 rgba(255,255,255,.55);
-  font-family:var(--mono);font-size:11px;font-weight:600;
-  letter-spacing:.015em;text-transform:none;
-  /* deep emerald — readable on luminous green glass in light mode */
-  color:#0B6B42;
-  line-height:1.2;
-  text-shadow:0 0 12px rgba(47,158,107,.25);
-  transition:background 150ms var(--ease), border-color 150ms var(--ease), color 150ms var(--ease), box-shadow 150ms var(--ease);
+  border:0;
+  background:#DFF6E7;
+  box-shadow:none;
+  backdrop-filter:none;-webkit-backdrop-filter:none;
+  font-family:var(--mono);font-size:11px;font-weight:500;
+  letter-spacing:.005em;text-transform:none;
+  color:#0E6B38;
+  line-height:1;
+  text-shadow:none;
+  transition:background 150ms var(--ease), color 150ms var(--ease);
 }
-.pill::before{content:none;display:none}
+.pill::before{
+  content:"";
+  width:5px;height:5px;border-radius:50%;
+  background:#2EA043;
+  display:inline-block;flex:0 0 auto;
+  box-shadow:none;
+}
 .pill:hover{
-  color:#085536;
-  border-color:rgba(47,158,107,.55);
-  background:
-    linear-gradient(180deg, rgba(47,158,107,.30) 0%, rgba(47,158,107,.14) 100%),
-    rgba(255,255,255,.65);
-  box-shadow:
-    0 0 0 1px rgba(47,158,107,.12),
-    0 0 18px rgba(47,158,107,.38),
-    0 0 36px rgba(47,158,107,.18),
-    inset 0 1px 0 rgba(255,255,255,.65);
+  background:#CFEFD9;
+  color:#0A5A2E;
 }
 
 .item .body{
@@ -559,20 +575,58 @@ footer{
   .item:hover{transform:none}
 }
 
-/* Dual wordmark */
+/* Dual wordmark — system dark OR manual dark */
 .brand .wm-dark{display:none}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]) .brand .wm-light{display:none}
+  :root:not([data-theme="light"]) .brand .wm-dark{display:block}
+}
 [data-theme="dark"] .brand .wm-light{display:none}
 [data-theme="dark"] .brand .wm-dark{display:block}
 
-/* Dark — luminous, not muddy */
+/* ---- Dark tokens: CSS media = DEFAULT; [data-theme] = manual override ---- */
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0E0F14;
+    --bg-deep:#090A0E;
+    --surface:#171822;
+    --ink:#FFFFFF;
+    --ink-soft:#FFFFFF;
+    --title:#FFFFFF;
+    --muted:#A8A8B3;
+    --faint:#7A7A86;
+    --line:rgba(246,244,239,.075);
+    --line2:rgba(246,244,239,.13);
+    --accent:#8B84FF;
+    --accent-deep:#B0AAFF;
+    --accent-soft:rgba(139,132,255,.18);
+    --cta:rgba(139,132,255,.14);
+    --cta-ink:#C4BFFF;
+    --cta-border:rgba(139,132,255,.28);
+    --cta-hover:rgba(139,132,255,.22);
+    --control-bg:rgba(23,24,34,.78);
+    --ok:#3DB87A;
+    --ok-soft:rgba(61,184,122,.2);
+    color-scheme:dark;
+    --shadow-sm:0 1px 2px rgba(0,0,0,.35), 0 3px 10px rgba(0,0,0,.25);
+    --shadow-md:
+      0 1px 2px rgba(0,0,0,.35),
+      0 8px 24px rgba(0,0,0,.38),
+      0 0 0 1px rgba(140,130,255,.04);
+    --shadow-lg:
+      0 2px 6px rgba(0,0,0,.35),
+      0 16px 40px rgba(0,0,0,.45),
+      0 0 0 1px rgba(140,130,255,.06);
+  }
+}
 [data-theme="dark"]{
   --bg:#0E0F14;
   --bg-deep:#090A0E;
   --surface:#171822;
-  --ink:#FFFFFF; /* pure white — no warm/yellow cast */
+  --ink:#FFFFFF;
   --ink-soft:#FFFFFF;
   --title:#FFFFFF;
-  --muted:#A8A8B3; /* cool soft gray secondary (not yellowish) */
+  --muted:#A8A8B3;
   --faint:#7A7A86;
   --line:rgba(246,244,239,.075);
   --line2:rgba(246,244,239,.13);
@@ -597,37 +651,105 @@ footer{
     0 16px 40px rgba(0,0,0,.45),
     0 0 0 1px rgba(140,130,255,.06);
 }
-[data-theme="dark"] html,
-[data-theme="dark"] body{background:var(--bg)}
+/* Manual light override while OS is dark */
+[data-theme="light"]{
+  color-scheme:light;
+}
+
+/* Dark component polish — shared for system + manual dark */
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]) body{
+    background:
+      linear-gradient(180deg, rgba(120,105,255,.22) 0%, rgba(120,105,255,.08) 14%, var(--bg) 36%),
+      var(--bg);
+    background-color:var(--bg);
+  }
+  :root:not([data-theme="light"]) .aurora{
+    background:
+      linear-gradient(180deg, rgba(120,105,255,.36) 0%, rgba(120,105,255,.14) 14%, transparent 40%),
+      radial-gradient(ellipse 120% 90% at 50% -28%, rgba(120,105,255,.58), transparent 72%),
+      radial-gradient(ellipse 85% 75% at 6% -14%, rgba(210,100,165,.34), transparent 70%),
+      radial-gradient(ellipse 80% 70% at 94% -12%, rgba(255,160,110,.22), transparent 68%),
+      radial-gradient(ellipse 65% 58% at 72% -4%, rgba(255,200,130,.14), transparent 64%),
+      radial-gradient(ellipse 60% 54% at 28% -6%, rgba(110,160,255,.24), transparent 68%);
+    filter:blur(52px) saturate(120%);
+    opacity:.92;
+  }
+  :root:not([data-theme="light"]) .shell::after{opacity:.05;mix-blend-mode:screen}
+  :root:not([data-theme="light"]) .fresh span{background:var(--control-bg);border-color:var(--line);color:var(--muted)}
+  :root:not([data-theme="light"]) .fresh i{
+    background:var(--ok);
+    box-shadow:0 0 0 3px var(--ok-soft), 0 0 12px rgba(61,184,122,.32);
+  }
+  :root:not([data-theme="light"]) .theme-toggle{background:var(--control-bg);color:var(--muted)}
+  :root:not([data-theme="light"]) .theme-toggle:hover{background:var(--surface);color:var(--ink);border-color:var(--line2)}
+  :root:not([data-theme="light"]) .chip{background:var(--control-bg);color:var(--ink-soft)}
+  :root:not([data-theme="light"]) .chip:hover{background:var(--surface)}
+  :root:not([data-theme="light"]) .chip[aria-selected="true"]{
+    background:color-mix(in srgb, var(--accent) 18%, var(--surface));
+    border-color:color-mix(in srgb, var(--accent) 36%, transparent);
+    color:var(--accent-deep);
+    box-shadow:0 4px 16px rgba(99,91,255,.14);
+  }
+  :root:not([data-theme="light"]) .search,
+  :root:not([data-theme="light"]) .sort{background:var(--control-bg)}
+  :root:not([data-theme="light"]) .sort button[aria-pressed="true"]{
+    background:color-mix(in srgb, var(--accent) 18%, var(--surface));
+    color:var(--accent-deep);
+  }
+  :root:not([data-theme="light"]) .ask-cta{
+    background:var(--cta);color:var(--cta-ink);border-color:var(--cta-border);
+    box-shadow:0 1px 2px rgba(0,0,0,.2);
+  }
+  :root:not([data-theme="light"]) .item{background:var(--surface);border-color:var(--line)}
+  :root:not([data-theme="light"]) .item summary::after{border-color:var(--faint)}
+  :root:not([data-theme="light"]) .item[open] summary::after{border-color:var(--muted)}
+  :root:not([data-theme="light"]) .pill{
+    background:rgba(46,160,67,.16);
+    color:#3FB950;
+  }
+  :root:not([data-theme="light"]) .pill::before{background:#3FB950;box-shadow:none}
+  :root:not([data-theme="light"]) .pill:hover{background:rgba(46,160,67,.24);color:#56D364}
+  :root:not([data-theme="light"]) .item .body code{
+    background:rgba(139,132,255,.12);
+    border-color:rgba(139,132,255,.2);
+    color:var(--accent-deep);
+  }
+  :root:not([data-theme="light"]) .empty{background:rgba(23,24,34,.55)}
+  :root:not([data-theme="light"]) .modal{background:var(--surface)}
+  :root:not([data-theme="light"]) .modal select,
+  :root:not([data-theme="light"]) .modal textarea{background:var(--bg-deep);color:var(--ink-soft)}
+  :root:not([data-theme="light"]) .btn.primary{
+    background:var(--cta);color:var(--cta-ink);border-color:var(--cta-border);
+    box-shadow:0 1px 2px rgba(0,0,0,.2);
+  }
+  :root:not([data-theme="light"]) ::selection{background:var(--accent-soft);color:var(--ink)}
+}
+[data-theme="dark"] body{
+  background:
+    linear-gradient(180deg, rgba(120,105,255,.22) 0%, rgba(120,105,255,.08) 14%, var(--bg) 36%),
+    var(--bg);
+  background-color:var(--bg);
+}
 [data-theme="dark"] .aurora{
   background:
-    linear-gradient(180deg, rgba(120,105,255,.28) 0%, rgba(120,105,255,.12) 18%, transparent 42%),
-    radial-gradient(ellipse 110% 85% at 50% -22%, rgba(120,105,255,.56), transparent 70%),
-    radial-gradient(ellipse 80% 70% at 8% -10%, rgba(210,100,165,.32), transparent 68%),
-    radial-gradient(ellipse 75% 65% at 92% -8%, rgba(255,160,110,.20), transparent 66%),
-    radial-gradient(ellipse 60% 55% at 72% -2%, rgba(255,200,130,.14), transparent 62%),
-    radial-gradient(ellipse 55% 50% at 28% -4%, rgba(110,160,255,.22), transparent 66%);
-  filter:blur(56px) saturate(120%);
-  opacity:.88;
+    linear-gradient(180deg, rgba(120,105,255,.36) 0%, rgba(120,105,255,.14) 14%, transparent 40%),
+    radial-gradient(ellipse 120% 90% at 50% -28%, rgba(120,105,255,.58), transparent 72%),
+    radial-gradient(ellipse 85% 75% at 6% -14%, rgba(210,100,165,.34), transparent 70%),
+    radial-gradient(ellipse 80% 70% at 94% -12%, rgba(255,160,110,.22), transparent 68%),
+    radial-gradient(ellipse 65% 58% at 72% -4%, rgba(255,200,130,.14), transparent 64%),
+    radial-gradient(ellipse 60% 54% at 28% -6%, rgba(110,160,255,.24), transparent 68%);
+  filter:blur(52px) saturate(120%);
+  opacity:.92;
 }
-[data-theme="dark"] .shell::after{
-  opacity:.05;mix-blend-mode:screen;
-}
-[data-theme="dark"] .fresh span{
-  background:var(--control-bg);border-color:var(--line);color:var(--muted);
-}
+[data-theme="dark"] .shell::after{opacity:.05;mix-blend-mode:screen}
+[data-theme="dark"] .fresh span{background:var(--control-bg);border-color:var(--line);color:var(--muted)}
 [data-theme="dark"] .fresh i{
   background:var(--ok);
-  box-shadow:
-    0 0 0 3px var(--ok-soft),
-    0 0 12px rgba(61,184,122,.32);
+  box-shadow:0 0 0 3px var(--ok-soft), 0 0 12px rgba(61,184,122,.32);
 }
-[data-theme="dark"] .theme-toggle{
-  background:var(--control-bg);color:var(--muted);
-}
-[data-theme="dark"] .theme-toggle:hover{
-  background:var(--surface);color:var(--ink);border-color:var(--line2);
-}
+[data-theme="dark"] .theme-toggle{background:var(--control-bg);color:var(--muted)}
+[data-theme="dark"] .theme-toggle:hover{background:var(--surface);color:var(--ink);border-color:var(--line2)}
 [data-theme="dark"] .chip{background:var(--control-bg);color:var(--ink-soft)}
 [data-theme="dark"] .chip:hover{background:var(--surface)}
 [data-theme="dark"] .chip[aria-selected="true"]{
@@ -646,37 +768,15 @@ footer{
   background:var(--cta);color:var(--cta-ink);border-color:var(--cta-border);
   box-shadow:0 1px 2px rgba(0,0,0,.2);
 }
-[data-theme="dark"] .item{
-  background:var(--surface);border-color:var(--line);
-}
+[data-theme="dark"] .item{background:var(--surface);border-color:var(--line)}
 [data-theme="dark"] .item summary::after{border-color:var(--faint)}
 [data-theme="dark"] .item[open] summary::after{border-color:var(--muted)}
 [data-theme="dark"] .pill{
-  border-color:rgba(61,184,122,.45);
-  background:
-    linear-gradient(180deg, rgba(61,184,122,.28) 0%, rgba(61,184,122,.12) 100%),
-    rgba(14,20,18,.55);
-  box-shadow:
-    0 0 0 1px rgba(61,184,122,.14),
-    0 0 16px rgba(61,184,122,.42),
-    0 0 32px rgba(61,184,122,.18),
-    inset 0 1px 0 rgba(180,255,210,.18);
-  /* bright mint on dark green glow — high contrast */
-  color:#C9F8DC;
-  text-shadow:0 0 14px rgba(61,184,122,.55);
+  background:rgba(46,160,67,.16);
+  color:#3FB950;
 }
-[data-theme="dark"] .pill:hover{
-  border-color:rgba(61,184,122,.62);
-  background:
-    linear-gradient(180deg, rgba(61,184,122,.36) 0%, rgba(61,184,122,.16) 100%),
-    rgba(14,20,18,.65);
-  color:#E6FFEF;
-  box-shadow:
-    0 0 0 1px rgba(61,184,122,.2),
-    0 0 22px rgba(61,184,122,.55),
-    0 0 40px rgba(61,184,122,.24),
-    inset 0 1px 0 rgba(200,255,220,.22);
-}
+[data-theme="dark"] .pill::before{background:#3FB950;box-shadow:none}
+[data-theme="dark"] .pill:hover{background:rgba(46,160,67,.24);color:#56D364}
 [data-theme="dark"] .item .body code{
   background:rgba(139,132,255,.12);
   border-color:rgba(139,132,255,.2);
@@ -819,14 +919,16 @@ document.getElementById("askSubmit").addEventListener("click",()=>{
 });
 /* fresh bar is non-sticky silk — no scroll hide */
 
-/* Theme toggle v3 — follow OS prefers-color-scheme until an explicit click.
-   Manual key is written ONLY on toggle click. All stale keys are wiped. */
+/* Theme toggle v4 — CSS @media is the default (no data-theme).
+   data-theme + manual-v4 key ONLY after an explicit click. Stale keys wiped. */
 (function(){
-  const MANUAL='flip-beta-qa-theme-manual';
-  const STALE=['flip-beta-qa-theme','flip-beta-qa-theme-v2','flip-beta-qa-theme-v1'];
+  const MANUAL='flip-beta-qa-theme-manual-v4';
+  const STALE=['flip-beta-qa-theme','flip-beta-qa-theme-v1','flip-beta-qa-theme-v2','flip-beta-qa-theme-manual','flip-beta-qa-theme-v3'];
   const root=document.documentElement;
   const btn=document.getElementById('themeToggle');
   const meta=document.getElementById('themeColorMeta');
+  const LIGHT_TC='#E8E0F5'; /* aurora crown — blends with iOS status bar */
+  const DARK_TC='#1A1428';
   for(const k of STALE){try{localStorage.removeItem(k)}catch(e){}}
   function systemTheme(){
     try{return window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'}
@@ -838,23 +940,38 @@ document.getElementById("askSubmit").addEventListener("click",()=>{
       return (s==='light'||s==='dark')?s:null;
     }catch(e){return null}
   }
-  function current(){return root.getAttribute('data-theme')==='dark'?'dark':'light'}
-  function apply(theme, persist){
-    root.setAttribute('data-theme', theme);
-    root.style.colorScheme=theme;
-    if(meta) meta.setAttribute('content', theme==='dark'?'#0E0F14':'#F7F5F1');
+  function current(){
+    const a=root.getAttribute('data-theme');
+    if(a==='dark'||a==='light') return a;
+    return systemTheme();
+  }
+  function paintChrome(theme){
+    if(meta) meta.setAttribute('content', theme==='dark'?DARK_TC:LIGHT_TC);
     if(btn){
       btn.setAttribute('aria-label', theme==='dark'?'Switch to light theme':'Switch to dark theme');
       btn.title=theme==='dark'?'Light':'Dark';
     }
-    if(persist){try{localStorage.setItem(MANUAL, theme)}catch(e){}}
   }
-  // First paint / reconcile: system wins unless user has clicked toggle this deploy era
-  apply(manualPref() || systemTheme(), false);
-  if(btn) btn.addEventListener('click',()=>apply(current()==='dark'?'light':'dark', true));
+  function followSystem(){
+    root.removeAttribute('data-theme');
+    root.style.colorScheme='light dark';
+    paintChrome(systemTheme());
+  }
+  function applyManual(theme){
+    root.setAttribute('data-theme', theme);
+    root.style.colorScheme=theme;
+    try{localStorage.setItem(MANUAL, theme)}catch(e){}
+    paintChrome(theme);
+  }
+  const saved=manualPref();
+  if(saved) applyManual(saved);
+  else followSystem();
+  if(btn) btn.addEventListener('click',()=>{
+    applyManual(current()==='dark'?'light':'dark');
+  });
   try{
     const mq=window.matchMedia('(prefers-color-scheme: dark)');
-    const onChange=e=>{ if(!manualPref()) apply(e.matches?'dark':'light', false); };
+    const onChange=()=>{ if(!manualPref()) followSystem(); };
     if(mq.addEventListener) mq.addEventListener('change', onChange);
     else if(mq.addListener) mq.addListener(onChange);
   }catch(e){}
