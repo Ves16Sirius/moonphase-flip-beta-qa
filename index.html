@@ -88,23 +88,28 @@ a:hover{text-decoration:underline;text-underline-offset:3px}
   padding:max(8px, env(safe-area-inset-top, 0px)) 12px 0;background:transparent;border:0;
 }
 .fresh span{
-  display:inline-flex;align-items:center;gap:8px;
+  display:inline-flex;align-items:center;gap:7px;
   padding:5px 11px;border-radius:999px;
   background:var(--control-bg);
   border:1px solid var(--line);
   backdrop-filter:blur(16px) saturate(140%);
   -webkit-backdrop-filter:blur(16px) saturate(140%);
   box-shadow:var(--shadow-sm);
-  font-family:var(--mono);font-size:10px;font-weight:500;
-  letter-spacing:.09em;text-transform:uppercase;color:var(--muted);
+  font-family:var(--mono);font-size:11px;font-weight:500;
+  letter-spacing:.02em;text-transform:none;color:var(--muted);
 }
 .fresh i{
-  width:5px;height:5px;border-radius:50%;background:var(--ok);
-  box-shadow:0 0 0 3px var(--ok-soft);
-  display:inline-block;
-  animation:pulse 2.8s var(--ease) infinite;
+  width:6px;height:6px;border-radius:50%;background:var(--ok);
+  display:inline-block;flex:0 0 auto;
+  /* soft static halo — healthy Updated ≠ live stream; no opacity pulse */
+  box-shadow:
+    0 0 0 3px var(--ok-soft),
+    0 0 10px rgba(47,158,107,.22);
+  animation:none;
 }
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:.45}}
+@media (prefers-reduced-motion:reduce){
+  .fresh i{animation:none!important}
+}
 
 .shell{
   width:min(880px,100%);margin:0 auto;
@@ -509,6 +514,12 @@ footer{
 [data-theme="dark"] .fresh span{
   background:var(--control-bg);border-color:var(--line);color:var(--muted);
 }
+[data-theme="dark"] .fresh i{
+  background:var(--ok);
+  box-shadow:
+    0 0 0 3px var(--ok-soft),
+    0 0 12px rgba(61,184,122,.32);
+}
 [data-theme="dark"] .theme-toggle{
   background:var(--control-bg);color:var(--muted);
 }
@@ -557,7 +568,7 @@ footer{
 </style>
 </head>
 <body>
-<div class="fresh" role="status"><span><i></i> Updated Oct 24, 2026</span></div>
+<div class="fresh" role="status"><span><i aria-hidden="true"></i> Updated Oct 24, 2026</span></div>
 <div class="shell">
   <div class="brand">
     <img class="wm wm-light" src="wordmark-flip.svg" width="236" height="32" alt="Moonphase Flip" decoding="async" />
