@@ -78,7 +78,7 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/geist-mono@5.2.5/index.min.css" />
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" />
 <style>
-/* Overhaul 2026-10-25 v10.38 — Ask modal: auto-grow textarea, content-fit sheet (max 85dvh), Organise/Undo removed, live Q&A matching ("Might already be answered"), optional iOS | Android choice, copy = "[Topic] · OS" + raw text. v10.37 single WhatsApp CTA; island/sort/theme untouched */
+/* Overhaul 2026-10-25 v10.39 — Ask modal: smarter live matching (hidden per-entry kw EN+CJK, query synonyms, stemming, CJK bigrams; kw > title > body; topics = mild boost), multi-select topic chips, copy = "[Topic A, Topic B] · OS" + raw text, placeholder nudges page/screen + what you saw. v10.38 — Ask modal: auto-grow textarea, content-fit sheet (max 85dvh), Organise/Undo removed, live Q&A matching ("Might already be answered"), optional iOS | Android choice, copy = "[Topic] · OS" + raw text. v10.37 single WhatsApp CTA; island/sort/theme untouched */
 :root{
   /* Surfaces */
   --bg:#F6F5FB;
@@ -1574,9 +1574,9 @@ footer{
       <p class="hint">Write your question below. We'll show matching answers first. If none help, copy it into WhatsApp.</p>
     </div>
     <div class="modal-body">
-      <label id="askCatLabel">Topic</label>
+      <label id="askCatLabel">Topics</label>
       <div class="ask-topics" role="group" aria-labelledby="askCatLabel" id="askTopics">
-        <button type="button" class="ask-topic" data-topic="Getting started" aria-pressed="true">Getting started</button>
+        <button type="button" class="ask-topic" data-topic="Getting started" aria-pressed="false">Getting started</button>
         <button type="button" class="ask-topic" data-topic="Device" aria-pressed="false">Device</button>
         <button type="button" class="ask-topic" data-topic="App &amp; firmware" aria-pressed="false">App &amp; firmware</button>
         <button type="button" class="ask-topic" data-topic="Recording &amp; AI" aria-pressed="false">Recording &amp; AI</button>
@@ -1584,9 +1584,8 @@ footer{
         <button type="button" class="ask-topic" data-topic="How to report" aria-pressed="false">How to report</button>
         <button type="button" class="ask-topic" data-topic="Other" aria-pressed="false">Other</button>
       </div>
-      <input type="hidden" id="askCat" value="Getting started" />
       <label for="askQ">Your question</label>
-      <textarea id="askQ" rows="3" placeholder="What's happening? What did you try? Add SN / app build / firmware only if it's relevant." maxlength="4000"></textarea>
+      <textarea id="askQ" rows="3" placeholder="Which page or screen, and what did you see? (e.g. Memory page shows text in another language) Add SN / app build / firmware if relevant." maxlength="4000"></textarea>
       <div class="ask-matches" id="askMatches" aria-live="polite" hidden>
         <label class="ask-matches-label">Might already be answered</label>
         <div id="askMatchList"></div>
@@ -1613,7 +1612,7 @@ footer{
 
 const PAGE_UPDATED="2026-10-25";
 const LABELS={"all":"All answers","getting-started":"Getting started","device":"Device","app-firmware":"App & firmware","recording-ai":"Recording & AI","privacy":"Privacy","feedback":"Reporting"};
-const DATA=[{"id":"FB-004","cat":"getting-started","tag":"Getting started","sortKey":"2026-10-22","q":"How do I track shipping, and where do I report bugs?","teaser":"UPS delivery; tracking arrives by email. Report bugs in General or Beta Support.","teaserHtml":"<mark>UPS</mark> delivery; tracking arrives by email. Report bugs in <mark>General</mark> or <mark>Beta Support</mark>.","a":"<p>Devices ship with <code>UPS</code>. You’ll get an email from the team; tracking can take a little while to appear.</p><p>For bugs, post in <strong>General</strong> or your personal <strong>Beta Support</strong> group.</p>","alwaysOpen":false,"tags":["Getting started","Shipping"]},{"id":"FB-035","cat":"getting-started","tag":"Getting started","sortKey":"2026-10-24","q":"My device just arrived — what should I do first?","teaser":"Follow Checklist_revised.pdf steps 1–7 (share SN), wait for us to remind you, then continue from step 8.","teaserHtml":"Follow <mark>Checklist_revised.pdf</mark> steps 1–7 (share SN), wait for us to remind you, then continue from step 8.","a":"<p>In the WhatsApp beta community, open <strong>Announcements</strong> and use <code>Checklist_revised.pdf</code> and <code>QuickStartGuide.pdf</code> as your guides.</p><p>Follow <code>Checklist_revised.pdf</code> step by step through <strong>steps 1–7</strong> (including sharing your <strong>serial number (<code>SN</code>)</strong>). Then <strong>stop</strong> and wait for us to remind you.</p><p>After our reminder, continue from <strong>step 8</strong> and set up the device.</p>","alwaysOpen":false,"tags":["Getting started","Setup"]},{"id":"FB-014","cat":"device","tag":"Device","sortKey":"2026-10-24","q":"Recording shows activity, but nothing returns — or I’m stuck on firmware 1.0.68?","teaser":"Share your SN, wait for our firmware-push notice, then follow Checklist_revised.pdf.","teaserHtml":"Share your <mark>SN</mark>, wait for our firmware-push notice, then follow <mark>Checklist_revised.pdf</mark>.","a":"<p>Devices often ship on older firmware (including <code>1.0.68</code>). Send your <strong>serial number (<code>SN</code>)</strong> in <strong>General</strong> or your private <strong>Beta Support</strong> group.</p><p><strong>Wait</strong> for our notice that new firmware was pushed to your device. The app’s Firmware Update screen may not show it right away.</p><p>After that notice, open <strong>Announcements</strong> and follow <code>Checklist_revised.pdf</code> (use the <code>TestFlight</code> build the checklist names). Then keep app and firmware current, and <strong>unbind and re-pair</strong> if data still needs to sync to the Flip screen.</p>","alwaysOpen":false,"tags":["Device","Firmware"]},{"id":"FB-034","cat":"app-firmware","tag":"App & firmware","sortKey":"2026-10-24","q":"Which iOS app build should I install?","teaser":"Use the listed TestFlight build for iOS beta.","teaserHtml":"Use the listed <mark>TestFlight</mark> build for iOS beta.","a":"<p>Install via <code>TestFlight</code>.</p><p>Current build: <strong>1.0.1 (1217)</strong>.</p>","alwaysOpen":false,"tags":["App & firmware","iOS"]},{"id":"FB-009","cat":"app-firmware","tag":"App & firmware","sortKey":"2026-10-24","q":"Calendar shows in the app but not on the device — or Bluetooth is connected with no voice actions?","teaser":"Usually an app + firmware mismatch — share SN if asked, then wait for our push.","teaserHtml":"Usually an <mark>app + firmware</mark> mismatch — share SN if asked, then wait for our push.","a":"<p>This is usually an <strong>app and firmware version</strong> mismatch.</p><p>Send your <strong>serial number (<code>SN</code>)</strong> if asked, then <strong>wait for our notification</strong> that a firmware update has been pushed. After the push, calendars listed in the app should be able to sync to the device.</p><p>Android / Fold calendar feedback is noted; <strong>no commitment yet</strong>.</p>","alwaysOpen":false,"tags":["App & firmware","Sync"]},{"id":"FB-028","cat":"app-firmware","tag":"App & firmware","sortKey":"2026-10-24","q":"Why do I see characters in other languages in the UI or AI output?","teaser":"AI language/prompt issue under fix — send a screenshot if it returns.","teaserHtml":"AI language/prompt issue under fix — send a screenshot if it returns.","a":"<p>Characters in other languages in the UI or AI output are treated as an <strong>AI language / prompt</strong> issue. The team is refining prompts.</p><p>If it continues, send a screenshot in <strong>General</strong> or your personal <strong>Beta Support</strong> group.</p>","alwaysOpen":false,"tags":["App & firmware","AI"]},{"id":"FB-015","cat":"recording-ai","tag":"Recording & AI","sortKey":"2026-10-23","q":"Can I leave recording on all day?","teaser":"Yes — leave it on all day. It only saves when someone speaks; auto-clears after phone sync.","teaserHtml":"Yes — leave it on all day. It only saves when someone speaks; auto-clears after phone sync.","a":"<p>Yes — you can leave recording on all day.</p><p>It <strong>only saves when someone is speaking</strong>. After sync to the phone, the device <strong>auto-clears</strong> (no manual purge).</p>","alwaysOpen":false,"tags":["Recording & AI","Battery"]},{"id":"FB-024","cat":"privacy","tag":"Privacy","sortKey":"2026-10-24","q":"Can I use Flip with other AIs via MCP under the NDA?","teaser":"Yes — MCP with other AIs is allowed in this beta.","teaserHtml":"Yes — <mark>MCP</mark> with other AIs is allowed in this beta.","a":"<p><code>MCP</code> is part of the beta. You’re free to try it with other AIs.</p>","alwaysOpen":false,"tags":["Privacy","MCP"]},{"id":"R1","cat":"feedback","tag":"Reporting","sortKey":"2026-10-22","q":"General channel","teaser":"Shared questions, announcements, and group bug reports.","teaserHtml":"Shared questions, announcements, and group bug reports.","a":"<p>Use <strong>General</strong> for shared questions, announcements, and bug reports the whole beta group can see.</p>","alwaysOpen":false,"tags":["Reporting","General"]},{"id":"R2","cat":"feedback","tag":"Reporting","sortKey":"2026-10-22","q":"Personal Beta Support group","teaser":"Private thread for shipment, SN, and one-to-one issues.","teaserHtml":"Private thread for shipment, <mark>SN</mark>, and one-to-one issues.","a":"<p>Your private thread for shipment details, <strong>serial number (<code>SN</code>)</strong>, and one-to-one issues.</p>","alwaysOpen":false,"tags":["Reporting","Support"]},{"id":"R3","cat":"feedback","tag":"Reporting","sortKey":"2026-10-24","q":"Which docs matter, and what should I include when reporting?","teaser":"Include SN, versions, and a screenshot; QuickStartGuide.pdf and Checklist_revised.pdf live in Announcements.","teaserHtml":"Include SN, versions, and a screenshot; <mark>QuickStartGuide.pdf</mark> and <mark>Checklist_revised.pdf</mark> live in Announcements.","a":"<p><strong>Announcements</strong> includes <code>QuickStartGuide.pdf</code> and <code>Checklist_revised.pdf</code>.</p><p>Helpful reports include repro steps, your <strong>serial number (<code>SN</code>)</strong>, app and firmware versions, and a screenshot or short video.</p>","alwaysOpen":false,"tags":["Reporting","Docs"]}];
+const DATA=[{"id":"FB-004","cat":"getting-started","tag":"Getting started","sortKey":"2026-10-22","q":"How do I track shipping, and where do I report bugs?","teaser":"UPS delivery; tracking arrives by email. Report bugs in General or Beta Support.","teaserHtml":"<mark>UPS</mark> delivery; tracking arrives by email. Report bugs in <mark>General</mark> or <mark>Beta Support</mark>.","a":"<p>Devices ship with <code>UPS</code>. You’ll get an email from the team; tracking can take a little while to appear.</p><p>For bugs, post in <strong>General</strong> or your personal <strong>Beta Support</strong> group.</p>","alwaysOpen":false,"tags":["Getting started","Shipping"],"kw":["shipping","ship","shipped","shipment","delivery","deliver","delivered","tracking","track","tracking number","ups","package","parcel","order","where is my device","not arrived","arrive","when will it arrive","email","bug","report bug","report a bug","where to report","快递","物流","发货","运单","单号","追踪","跟踪","到货","没收到","包裹","邮件","报bug","报告问题"]},{"id":"FB-035","cat":"getting-started","tag":"Getting started","sortKey":"2026-10-24","q":"My device just arrived — what should I do first?","teaser":"Follow Checklist_revised.pdf steps 1–7 (share SN), wait for us to remind you, then continue from step 8.","teaserHtml":"Follow <mark>Checklist_revised.pdf</mark> steps 1–7 (share SN), wait for us to remind you, then continue from step 8.","a":"<p>In the WhatsApp beta community, open <strong>Announcements</strong> and use <code>Checklist_revised.pdf</code> and <code>QuickStartGuide.pdf</code> as your guides.</p><p>Follow <code>Checklist_revised.pdf</code> step by step through <strong>steps 1–7</strong> (including sharing your <strong>serial number (<code>SN</code>)</strong>). Then <strong>stop</strong> and wait for us to remind you.</p><p>After our reminder, continue from <strong>step 8</strong> and set up the device.</p>","alwaysOpen":false,"tags":["Getting started","Setup"],"kw":["setup","set up","first","first steps","start","getting started","new","just arrived","arrived","unbox","unboxing","received","checklist","quick start","quick start guide","quickstart","instructions","steps","step 8","onboarding","what next","what now","serial number","sn","charge","charging","battery","battery dead","dead","power on","turn on","won't turn on","pair","pairing","bind","开箱","设置","初始化","第一步","刚到","收到了","新手","入门","说明书","指南","步骤","开机","充电","序列号","绑定","配对"]},{"id":"FB-014","cat":"device","tag":"Device","sortKey":"2026-10-24","q":"Recording shows activity, but nothing returns — or I’m stuck on firmware 1.0.68?","teaser":"Share your SN, wait for our firmware-push notice, then follow Checklist_revised.pdf.","teaserHtml":"Share your <mark>SN</mark>, wait for our firmware-push notice, then follow <mark>Checklist_revised.pdf</mark>.","a":"<p>Devices often ship on older firmware (including <code>1.0.68</code>). Send your <strong>serial number (<code>SN</code>)</strong> in <strong>General</strong> or your private <strong>Beta Support</strong> group.</p><p><strong>Wait</strong> for our notice that new firmware was pushed to your device. The app’s Firmware Update screen may not show it right away.</p><p>After that notice, open <strong>Announcements</strong> and follow <code>Checklist_revised.pdf</code> (use the <code>TestFlight</code> build the checklist names). Then keep app and firmware current, and <strong>unbind and re-pair</strong> if data still needs to sync to the Flip screen.</p>","alwaysOpen":false,"tags":["Device","Firmware"],"kw":["recording not returning","nothing returns","no results","no response","nothing happens","stuck","old firmware","1.0.68","firmware","firmware update","update","upgrade","ota","outdated","version","serial number","sn","unbind","re-pair","repair","re-bind","rebind","pair","pairing","bind","reconnect","sync","not syncing","flip screen","data not showing","固件","升级","更新","版本","旧版本","卡住","没反应","没有结果","解绑","重新绑定","绑定","配对","同步","序列号"]},{"id":"FB-034","cat":"app-firmware","tag":"App & firmware","sortKey":"2026-10-24","q":"Which iOS app build should I install?","teaser":"Use the listed TestFlight build for iOS beta.","teaserHtml":"Use the listed <mark>TestFlight</mark> build for iOS beta.","a":"<p>Install via <code>TestFlight</code>.</p><p>Current build: <strong>1.0.1 (1217)</strong>.</p>","alwaysOpen":false,"tags":["App & firmware","iOS"],"kw":["ios app","which build","build","app build","version","app version","testflight","test flight","install","download","latest app","latest build","iphone","ipa","app store","1.0.1","1217","安装","下载","最新版","苹果","测试版","版本"]},{"id":"FB-009","cat":"app-firmware","tag":"App & firmware","sortKey":"2026-10-24","q":"Calendar shows in the app but not on the device — or Bluetooth is connected with no voice actions?","teaser":"Usually an app + firmware mismatch — share SN if asked, then wait for our push.","teaserHtml":"Usually an <mark>app + firmware</mark> mismatch — share SN if asked, then wait for our push.","a":"<p>This is usually an <strong>app and firmware version</strong> mismatch.</p><p>Send your <strong>serial number (<code>SN</code>)</strong> if asked, then <strong>wait for our notification</strong> that a firmware update has been pushed. After the push, calendars listed in the app should be able to sync to the device.</p><p>Android / Fold calendar feedback is noted; <strong>no commitment yet</strong>.</p>","alwaysOpen":false,"tags":["App & firmware","Sync"],"kw":["calendar","calendar sync","events","event","schedule","meetings","meeting","not on device","not showing","bluetooth","connected","voice actions","voice action","voice command","voice","android","fold","google calendar","outlook","mismatch","firmware update","sync","日历","日程","同步","蓝牙","语音","语音指令","安卓","折叠屏","不显示"]},{"id":"FB-028","cat":"app-firmware","tag":"App & firmware","sortKey":"2026-10-24","q":"Why do I see characters in other languages in the UI or AI output?","teaser":"AI language/prompt issue under fix — send a screenshot if it returns.","teaserHtml":"AI language/prompt issue under fix — send a screenshot if it returns.","a":"<p>Characters in other languages in the UI or AI output are treated as an <strong>AI language / prompt</strong> issue. The team is refining prompts.</p><p>If it continues, send a screenshot in <strong>General</strong> or your personal <strong>Beta Support</strong> group.</p>","alwaysOpen":false,"tags":["App & firmware","AI"],"kw":["chinese","mandarin","wrong language","foreign characters","chinese characters","characters","what is this","language bug","not english","english","memory","memory page","lifelog","summary","transcript","language","user.md","profile","garbled","weird text","gibberish","japanese","korean","symbols","prompt","translation","translate","ai output","中文","语言","英文","乱码","汉字","外语","显示中文","语言错误","总结","摘要","转录","记忆","翻译","字符"]},{"id":"FB-015","cat":"recording-ai","tag":"Recording & AI","sortKey":"2026-10-23","q":"Can I leave recording on all day?","teaser":"Yes — leave it on all day. It only saves when someone speaks; auto-clears after phone sync.","teaserHtml":"Yes — leave it on all day. It only saves when someone speaks; auto-clears after phone sync.","a":"<p>Yes — you can leave recording on all day.</p><p>It <strong>only saves when someone is speaking</strong>. After sync to the phone, the device <strong>auto-clears</strong> (no manual purge).</p>","alwaysOpen":false,"tags":["Recording & AI","Battery"],"kw":["record all day","all day","recording","record","always on","continuous","24/7","storage","storage full","space","delete","purge","clear","auto clear","battery","battery life","charge","charging","battery drain","battery dead","power","silence","speaking","录音","全天","一整天","一直录","存储","空间","删除","清除","电池","电量","续航","充电","没电"]},{"id":"FB-024","cat":"privacy","tag":"Privacy","sortKey":"2026-10-24","q":"Can I use Flip with other AIs via MCP under the NDA?","teaser":"Yes — MCP with other AIs is allowed in this beta.","teaserHtml":"Yes — <mark>MCP</mark> with other AIs is allowed in this beta.","a":"<p><code>MCP</code> is part of the beta. You’re free to try it with other AIs.</p>","alwaysOpen":false,"tags":["Privacy","MCP"],"kw":["mcp","claude","chatgpt","openai","other ai","other ais","integration","integrate","api","nda","privacy","private data","data","confidential","share","隐私","数据","保密","协议","接入","集成"]},{"id":"R1","cat":"feedback","tag":"Reporting","sortKey":"2026-10-22","q":"General channel","teaser":"Shared questions, announcements, and group bug reports.","teaserHtml":"Shared questions, announcements, and group bug reports.","a":"<p>Use <strong>General</strong> for shared questions, announcements, and bug reports the whole beta group can see.</p>","alwaysOpen":false,"tags":["Reporting","General"],"kw":["general channel","general","group chat","community","whatsapp","announcements","where to ask","post","bug report","群","群聊","公告","提问","社区"]},{"id":"R2","cat":"feedback","tag":"Reporting","sortKey":"2026-10-22","q":"Personal Beta Support group","teaser":"Private thread for shipment, SN, and one-to-one issues.","teaserHtml":"Private thread for shipment, <mark>SN</mark>, and one-to-one issues.","a":"<p>Your private thread for shipment details, <strong>serial number (<code>SN</code>)</strong>, and one-to-one issues.</p>","alwaysOpen":false,"tags":["Reporting","Support"],"kw":["beta support","support","private","personal","one to one","dm","direct message","contact team","contact","shipment","address","serial number","sn","客服","支持","私信","私聊","联系","售后","地址","序列号"]},{"id":"R3","cat":"feedback","tag":"Reporting","sortKey":"2026-10-24","q":"Which docs matter, and what should I include when reporting?","teaser":"Include SN, versions, and a screenshot; QuickStartGuide.pdf and Checklist_revised.pdf live in Announcements.","teaserHtml":"Include SN, versions, and a screenshot; <mark>QuickStartGuide.pdf</mark> and <mark>Checklist_revised.pdf</mark> live in Announcements.","a":"<p><strong>Announcements</strong> includes <code>QuickStartGuide.pdf</code> and <code>Checklist_revised.pdf</code>.</p><p>Helpful reports include repro steps, your <strong>serial number (<code>SN</code>)</strong>, app and firmware versions, and a screenshot or short video.</p>","alwaysOpen":false,"tags":["Reporting","Docs"],"kw":["docs","documents","pdf","checklist","quick start guide","report","bug report","how to report","what to include","repro","reproduce","steps","logs","screenshot","video","version","文档","说明书","截图","录屏","视频","反馈","报告","复现"]}];
 let tab="all", sortDir="newest";
 const list=document.getElementById("list"), qEl=document.getElementById("q"), sec=document.getElementById("sec");
 /* Size search input to placeholder — snug, last letter fully visible (mobile + desktop) */
@@ -1710,19 +1709,25 @@ if(document.fonts&&document.fonts.ready) document.fonts.ready.then(syncSortThumb
 requestAnimationFrame(syncSortThumb);
 qEl.addEventListener("input",()=>render());render();
 
-/* —— Ask modal v10.38: auto-grow textarea, live Q&A matching, optional OS, WhatsApp copy/jump —— */
+/* —— Ask modal v10.39 (multi-topic, smarter matching); v10.38: auto-grow textarea, live Q&A matching, optional OS, WhatsApp copy/jump —— */
 const modal=document.getElementById("askModal");
 const askQ=document.getElementById("askQ");
 const askSend=document.getElementById("askSend");
 const askNote=document.getElementById("askNote");
-const askCat=document.getElementById("askCat");
 const askMatches=document.getElementById("askMatches");
 const askMatchList=document.getElementById("askMatchList");
 let askOs="";
+/* Topics v10.39: multi-select — tap toggles; none or several. Selected topics mildly boost matches. */
+let askTopicOrder=[];/* tap order, so the copy reads the way the user picked */
+function askSelectedTopics(){
+  const on=Array.from(document.querySelectorAll("#askTopics .ask-topic[aria-pressed=\"true\"]")).map(b=>b.dataset.topic||"").filter(Boolean);
+  return askTopicOrder.filter(t=>on.includes(t)).concat(on.filter(t=>!askTopicOrder.includes(t)));
+}
 document.querySelectorAll("#askTopics .ask-topic").forEach(btn=>btn.addEventListener("click",()=>{
-  const t=btn.dataset.topic||"Other";
-  if(askCat) askCat.value=t;
-  document.querySelectorAll("#askTopics .ask-topic").forEach(b=>b.setAttribute("aria-pressed",b===btn?"true":"false"));
+  const t=btn.dataset.topic||"", on=btn.getAttribute("aria-pressed")!=="true";
+  btn.setAttribute("aria-pressed",on?"true":"false");
+  askTopicOrder=askTopicOrder.filter(x=>x!==t); if(on) askTopicOrder.push(t);
+  if(typeof updateAskMatches==="function") updateAskMatches();
 }));
 /* iOS | Android — optional; tap again to deselect */
 document.querySelectorAll("#askOs .ask-topic").forEach(btn=>btn.addEventListener("click",()=>{
@@ -1759,26 +1764,59 @@ document.getElementById("askCancel").addEventListener("click",closeAsk);
 modal.addEventListener("click",e=>{if(e.target===modal)closeAsk()});
 document.addEventListener("keydown",e=>{if(e.key==="Escape"&&modal.classList.contains("open"))closeAsk()});
 
-/* —— Live Q&A matching (keyword overlap; CJK bigrams; question-title boost) —— */
-const ASK_STOP=new Set(("a an the and or but if then so to of in on at by for from with without about into over under is are was were be been being am do does did done have has had having i me my mine we our you your he she it its they them their this that these those there here what which who whom when where why how can could would should will shall may might must not no yes just also too very really still only any some all more most much many such than as up out off again please thanks thank hi hello hey team anyone someone something get got getting im ive dont doesnt didnt cant cannot one like know want need way thing").split(" "));
-const ASK_CJK_STOP=/[的了吗呢吧啊呀嘛么是在我你他她它们这那个和与及就也都还很请问一下]/g;
-const CJK_CHAR=/[\u3400-\u9fff\uf900-\ufaff]/;
+/* —— Live Q&A matching v10.39 (pure frontend): hidden per-entry kw (EN + CJK) + query synonym map,
+   light stemming, stopwords, CJK whole-kw substring hits + bigrams. Weight: kw > title > body.
+   Selected topics = mild boost, never a filter. Generic words alone never produce a match. —— */
+const ASK_STOP=new Set(("a an the and or but if then so to of in on at by for from with without about into over under is are was were be been being am do does did done have has had having i me my mine we our you your he she it its they them their this that these those there here what which who whom when where why how can could would should will shall may might must not no yes just also too very really still only any some all more most much many such than as up out off again please thanks thank hi hello hey team anyone someone something get got getting im ive dont doesnt didnt cant cannot wont isnt one like know want need way thing").split(" "));
+/* Too generic to justify a match on their own (tiny weight, never qualify a hit) */
+const ASK_GENERIC_RAW="guide app apps device devices flip beta phone page pages screen see saw seen show showing shown use using used work working works issue issues problem problems help question questions thing stuff new try tried go going make made time day".split(" ");
+/* Query-side synonyms → canonical term (added alongside the original word) */
+const ASK_SYN_RAW={chinese:"language",mandarin:"language",cantonese:"language",japanese:"language",korean:"language",foreign:"language",english:"language",garbled:"language",gibberish:"language",
+  pair:"bind",pairing:"bind",repair:"bind",rebind:"bind",unbind:"bind",unpair:"bind",connect:"bind",link:"bind",
+  battery:"charge",charger:"charge",power:"charge",dead:"charge",
+  update:"firmware",upgrade:"firmware",ota:"firmware",fw:"firmware",
+  serial:"sn",
+  ship:"shipping",shipment:"shipping",delivery:"shipping",deliver:"shipping",tracking:"shipping",track:"shipping",package:"shipping",parcel:"shipping",ups:"shipping",
+  record:"recording",recorder:"recording",
+  calendar:"calendar",schedule:"calendar",event:"calendar",meeting:"calendar",
+  testflight:"build",install:"build",download:"build",
+  confidential:"privacy",private:"privacy",nda:"privacy",
+  lifelog:"memory",summary:"memory",transcript:"memory"};
+const CJK_RUN=/[\u3400-\u9fff\uf900-\ufaff]+/g;
+const ASK_CJK_STOP=/[的了吗呢吧啊呀嘛是在我你他她它们这那个和与及就也都还很请问一下]/g;
 function askStem(w){
-  if(w.length>4&&/ies$/.test(w)) return w.slice(0,-3)+"y";
-  if(w.length>3&&/[^s]s$/.test(w)) return w.slice(0,-1);
-  return w;
+  if(/\d/.test(w)) return w;
+  let s=w;
+  if(s.length>5&&/ing$/.test(s)) s=s.slice(0,-3);
+  else if(s.length>4&&/ied$/.test(s)) s=s.slice(0,-3)+"y";
+  else if(s.length>4&&/ies$/.test(s)) s=s.slice(0,-3)+"y";
+  else if(s.length>4&&/ed$/.test(s)) s=s.slice(0,-2);
+  else if(s.length>4&&/(ss|x|ch|sh)es$/.test(s)) s=s.slice(0,-2);
+  else if(s.length>3&&/[^s]s$/.test(s)) s=s.slice(0,-1);
+  if(s.length>3&&/e$/.test(s)) s=s.slice(0,-1);
+  if(s.length>3&&/([b-df-hj-np-tv-z])\1$/.test(s)&&!/(ll|ss)$/.test(s)) s=s.slice(0,-1);
+  return s;
 }
-function askTokens(text){
+const ASK_GENERIC=new Set(ASK_GENERIC_RAW.map(askStem));
+const ASK_SYN=new Map(Object.keys(ASK_SYN_RAW).map(k=>[askStem(k),askStem(ASK_SYN_RAW[k])]));
+/* English word stems (stopwords removed). expand=true adds canonical synonyms. */
+function askWords(text, expand){
   const out=[];
-  const t=String(text||"").toLowerCase().replace(/[’']/g,"");
+  const t=String(text||"").toLowerCase().replace(/[’']/g,"").replace(/user\.md/g,"usermd");
   (t.match(/[a-z0-9]+(?:\.[0-9]+)*/g)||[]).forEach(w=>{
     if(w.length<2&&!/\d/.test(w)) return;
     if(ASK_STOP.has(w)) return;
-    out.push(askStem(w));
+    const st=askStem(w);
+    out.push(st);
+    if(expand&&ASK_SYN.has(st)&&ASK_SYN.get(st)!==st) out.push(ASK_SYN.get(st));
   });
-  (t.match(/[\u3400-\u9fff\uf900-\ufaff]+/g)||[]).forEach(run=>{
+  return out;
+}
+function askCjkRuns(text){return String(text||"").match(CJK_RUN)||[]}
+function askBigrams(text){
+  const out=[];
+  askCjkRuns(text).forEach(run=>{
     run=run.replace(ASK_CJK_STOP,"");
-    if(run.length===1){out.push(run);return}
     for(let k=0;k<run.length-1;k++) out.push(run.slice(k,k+2));
   });
   return out;
@@ -1789,30 +1827,62 @@ function stripHtml(h){
   return d.textContent||"";
 }
 const ASK_INDEX=DATA.map(i=>{
-  const qT=new Set(askTokens(i.q));
-  const bT=new Set(askTokens(stripHtml(i.a)+" "+(i.teaser||"")+" "+(i.tags||[]).join(" ")+" "+(i.tag||"")));
-  return {item:i, qT, bT};
+  const kw=(i.kw||[]);
+  const kwT=new Set(), kwPhrases=[], kwCjk=[], kwBi=new Set();
+  kw.forEach(k=>{
+    if(CJK_RUN.test(k)){CJK_RUN.lastIndex=0;kwCjk.push(k);askBigrams(k).forEach(b=>kwBi.add(b));return}
+    CJK_RUN.lastIndex=0;
+    const ws=askWords(k,true);
+    ws.forEach(w=>kwT.add(w));
+    const core=askWords(k,false);
+    if(core.length>1) kwPhrases.push(core);
+  });
+  const qT=new Set(askWords(i.q,true));
+  const bT=new Set(askWords(stripHtml(i.a)+" "+(i.teaser||"")+" "+(i.tags||[]).join(" "),true));
+  return {item:i, kwT, kwPhrases, kwCjk, kwBi, qT, bT};
 });
 const ASK_DF=new Map();
-ASK_INDEX.forEach(e=>{new Set([...e.qT,...e.bT]).forEach(t=>ASK_DF.set(t,(ASK_DF.get(t)||0)+1))});
-function askIdf(t){return Math.log(1+ASK_INDEX.length/(ASK_DF.get(t)||1))}
-function findAskMatches(text, limit){
-  const toks=Array.from(new Set(askTokens(text)));
-  if(!toks.length) return [];
+ASK_INDEX.forEach(e=>{new Set([...e.kwT,...e.qT,...e.bT,...e.kwBi,...e.kwCjk]).forEach(t=>ASK_DF.set(t,(ASK_DF.get(t)||0)+1))});
+const ASK_N=ASK_INDEX.length;
+function askIdf(t){return Math.log(1+ASK_N/(ASK_DF.get(t)||1))/Math.log(1+ASK_N)}
+/* Topic chip label → DATA cat */
+const ASK_TOPIC_CAT={"Getting started":"getting-started","Device":"device","App & firmware":"app-firmware","Recording & AI":"recording-ai","Privacy & MCP":"privacy","How to report":"feedback"};
+function findAskMatches(text, limit, topics){
+  const words=askWords(text,true);
+  const wset=new Set(words);
+  const core=askWords(text,false);
+  const cset=new Set(core);
+  const qCjk=askCjkRuns(text).join(" ");
+  const qBi=Array.from(new Set(askBigrams(text)));
+  if(!wset.size&&!qBi.length) return [];
+  const boostCats=new Set((topics||[]).map(t=>ASK_TOPIC_CAT[t]).filter(Boolean));
   const scored=[];
   ASK_INDEX.forEach(e=>{
-    let score=0, hits=0;
-    toks.forEach(t=>{
-      if(e.qT.has(t)){score+=3*askIdf(t);hits++}
-      else if(e.bT.has(t)){score+=askIdf(t);hits++}
+    let score=0, strong=0;
+    wset.forEach(t=>{
+      const gen=ASK_GENERIC.has(t), idf=askIdf(t), g=gen?0.15:1;
+      if(e.kwT.has(t)){score+=3*idf*g; if(!gen&&idf>=0.45) strong++}
+      else if(e.qT.has(t)){score+=2*idf*g; if(!gen&&idf>=0.6) strong+=0.5}
+      else if(e.bT.has(t)){score+=1*idf*g}
     });
-    if(hits) scored.push({item:e.item, score, hits});
+    /* Multi-word kw phrase fully present in query (e.g. "memory page") */
+    e.kwPhrases.forEach(ph=>{if(ph.every(w=>cset.has(w))){score+=1.5*ph.length;strong++}});
+    /* Chinese: whole kw substring hit, then leftover bigrams */
+    const covered=new Set();
+    e.kwCjk.forEach(k=>{
+      if(k.length>=2&&qCjk.indexOf(k)>=0){
+        score+=3*askIdf(k)*(1+0.25*(k.length-2)); strong++;
+        for(let x=0;x<k.length-1;x++) covered.add(k.slice(x,x+2));
+      }
+    });
+    qBi.forEach(b=>{if(!covered.has(b)&&e.kwBi.has(b)){score+=1.2*askIdf(b);strong+=0.5}});
+    if(score>0&&boostCats.has(e.item.cat)) score*=1.2;
+    if(strong>=1&&score>=1.5) scored.push({item:e.item, score});
   });
   if(!scored.length) return [];
   scored.sort((x,y)=>y.score-x.score);
   const top=scored[0].score;
-  /* keep strong-enough hits only: absolute floor + relative to best */
-  return scored.filter(x=>x.score>=1.2 && x.score>=top*0.35).slice(0,limit||3).map(x=>x.item);
+  return scored.filter(x=>x.score>=top*0.35).slice(0,limit||3).map(x=>x.item);
 }
 function askSnippet(i){
   const t=(i.teaser||stripHtml(i.a)).replace(/\s+/g," ").trim();
@@ -1821,7 +1891,7 @@ function askSnippet(i){
 function updateAskMatches(){
   const v=(askQ.value||"").trim();
   const enough=v.replace(/\s+/g,"").length>=3;
-  const hits=enough?findAskMatches(v,3):[];
+  const hits=enough?findAskMatches(v,3,askSelectedTopics()):[];
   if(!hits.length){askMatches.hidden=true;askMatchList.innerHTML="";return}
   askMatchList.innerHTML=hits.map(i=>`<button type="button" class="ask-match" data-id="${esc(i.id)}"><span class="ask-match-q">${esc(i.q)}</span><span class="ask-match-a">${esc(askSnippet(i))}</span></button>`).join("");
   askMatches.hidden=false;
@@ -1856,10 +1926,12 @@ askQ.addEventListener("input",()=>{
 });
 window.addEventListener("resize",()=>{if(!modal.hidden) growAsk()},{passive:true});
 
-/* Copy format: "[Topic] · iOS" newline, then the user's text exactly as typed */
+/* Copy format v10.39: "[Topic A, Topic B] · iOS" newline, then the user's text exactly as typed.
+   Bracket omitted when no topic is selected; " · OS" only if chosen. */
 function buildAskMessage(){
-  const cat=(askCat&&askCat.value||"Other").trim();
-  return "["+cat+"]"+(askOs?" · "+askOs:"")+"\n"+(askQ.value||"");
+  const topics=askSelectedTopics();
+  const head=(topics.length?"["+topics.join(", ")+"]":"")+(askOs?(topics.length?" · ":"")+askOs:"");
+  return (head?head+"\n":"")+(askQ.value||"");
 }
 async function copyAskMessage(){
   if(!(askQ.value||"").trim()){askQ.focus();return false}
