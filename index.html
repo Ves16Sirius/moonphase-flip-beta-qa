@@ -76,7 +76,7 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/geist-mono@5.2.5/index.min.css" />
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600&display=swap" />
 <style>
-/* Overhaul 2026-10-25 v10.16 — small top-left Moonphase wordmark · Updated under island · aurora/toggle/title from v10.15 kept */
+/* Overhaul 2026-10-25 v10.17 — brand+toggle under island · Updated below · aurora theme-sync · quiet glass toggle · sharper card titles */
 :root{
   /* Surfaces */
   --bg:#F6F5FB;
@@ -124,7 +124,7 @@
   --mono:"Geist Mono",ui-monospace,"SF Mono",Menlo,Consolas,monospace;
   /* Type scale */
   --fs-hero:clamp(2.5rem,5.4vw,3.5rem);
-  --fs-title:15.5px;
+  --fs-title:16.5px; /* card Q — Linear/Cursor-like list title */
   --fs-body:14.5px;
   --fs-ui:13.5px;
   --fs-meta:12.5px;
@@ -134,7 +134,7 @@
   --fw-medium:500;
   --fw-semibold:600;
   --lh-tight:1.2;
-  --lh-title:1.32;
+  --lh-title:1.28;
   --lh-body:1.62;
   --lh-ui:1.45;
   /* Controls / cards */
@@ -216,6 +216,8 @@ body{
   display:none!important; /* gradient itself starts at y=0 — no solid slab crown */
 }
 .aurora-blobs{display:none!important}
+/* Toggle class kicks Safari to recompute fixed-layer gradients after theme change */
+.aurora.aurora-repaint,#aurora-sticky.aurora-repaint{opacity:.999;will-change:transform,opacity}
 .fresh,.shell,.modal-backdrop{position:relative;z-index:1}
 .modal-backdrop{z-index:100}
 button,input,select,textarea{font:inherit;color:inherit}
@@ -224,10 +226,11 @@ a{color:var(--accent-deep);text-decoration:none}
 a:hover{text-decoration:underline;text-underline-offset:3px}
 ::selection{background:var(--accent-soft);color:var(--ink)}
 
-/* —— Updated chip —— */
+/* —— Updated chip —— sits BELOW brand row (centered), no island inset —— */
 .fresh{
   display:flex;justify-content:center;align-items:center;
-  padding:calc(env(safe-area-inset-top, 0px) + 14px) 18px 0;
+  padding:0 18px;
+  margin:0 0 22px;
   background:transparent;border:0;box-shadow:none;
 }
 .fresh span{
@@ -268,12 +271,13 @@ a:hover{text-decoration:underline;text-underline-offset:3px}
 }
 .shell > *{position:relative;z-index:1}
 
-/* —— Brand row —— v10.16: small Moonphase wordmark TOP-LEFT + theme toggle TOP-RIGHT
-   Updated chip stays above (centered under island). Hero title remains the headline. */
+/* —— Brand row —— v10.17: TOP under island = Moonphase left + theme toggle right.
+   Updated badge is BELOW this row (centered). Hero stays the headline. */
 .brand{
-  /* Toggle TOP == MOONPHASE wordmark TOP */
   display:flex;align-items:flex-start;justify-content:space-between;gap:8px;
-  margin:18px 0 28px;position:relative;min-height:22px;
+  /* Island / notch clearance lives here now (was on .fresh) */
+  margin:0 0 12px;padding:calc(env(safe-area-inset-top, 0px) + 14px) 0 0;
+  position:relative;min-height:22px;
 }
 .brand-slot{
   flex:1 1 0;display:flex;align-items:flex-start;min-width:0;min-height:22px;
@@ -284,7 +288,7 @@ a:hover{text-decoration:underline;text-underline-offset:3px}
   flex:0 0 auto;display:flex;align-items:flex-start;justify-content:flex-start;
 }
 .brand .wm{height:21px;width:auto;display:block}
-/* Glass moon|sun switch — clear glass track · thumb CONTAINS active icon · spring slide
+/* Quiet premium glass moon|sun switch — Linear/Vercel/Apple: soft rim, readable icons, no neon chrome
    Dims: --tt-w/--tt-h track, --tt-pad inset, --tt-thumb size, --tt-travel = w - 2*pad - thumb */
 .theme-toggle{
   --tt-w:60px;
@@ -299,19 +303,17 @@ a:hover{text-decoration:underline;text-underline-offset:3px}
   width:var(--tt-w);min-width:var(--tt-w);
   padding:0;border-radius:999px;gap:0;
   display:inline-flex;align-items:center;justify-content:center;
-  /* Clear glass pill track — readable on dark */
-  border:1px solid rgba(255,255,255,.55);
+  /* Dark default: hush rim — whisper border, soft glass, no bright neon frame */
+  border:1px solid rgba(255,255,255,.14);
   background:
-    linear-gradient(180deg, rgba(255,255,255,.34) 0%, rgba(255,255,255,.14) 50%, rgba(255,255,255,.08) 100%);
-  backdrop-filter:blur(28px) saturate(220%) brightness(1.16);
-  -webkit-backdrop-filter:blur(28px) saturate(220%) brightness(1.16);
+    linear-gradient(180deg, rgba(255,255,255,.12) 0%, rgba(255,255,255,.05) 55%, rgba(255,255,255,.03) 100%);
+  backdrop-filter:blur(20px) saturate(160%);
+  -webkit-backdrop-filter:blur(20px) saturate(160%);
   box-shadow:
-    0 1px 2px rgba(0,0,0,.28),
-    0 6px 18px rgba(0,0,0,.18),
-    inset 0 1px 0 rgba(255,255,255,.78),
-    inset 0 -1px 0 rgba(255,255,255,.12),
-    inset 1px 0 0 rgba(255,255,255,.32),
-    inset -1px 0 0 rgba(255,255,255,.24);
+    0 1px 2px rgba(0,0,0,.22),
+    0 4px 12px rgba(0,0,0,.12),
+    inset 0 1px 0 rgba(255,255,255,.22),
+    inset 0 -0.5px 0 rgba(0,0,0,.25);
   color:var(--muted);
   overflow:hidden; /* thumb never clips outside track */
   transition:background .28s var(--ease), border-color .28s var(--ease), box-shadow .28s var(--ease);
@@ -319,30 +321,27 @@ a:hover{text-decoration:underline;text-underline-offset:3px}
 }
 .theme-toggle::before{
   content:"";
-  position:absolute;left:8%;right:8%;top:0;height:1px;border-radius:999px;
-  background:linear-gradient(90deg, transparent, rgba(255,255,255,.9), transparent);
-  pointer-events:none;z-index:4;opacity:.95;
+  position:absolute;left:12%;right:12%;top:0;height:1px;border-radius:999px;
+  background:linear-gradient(90deg, transparent, rgba(255,255,255,.28), transparent);
+  pointer-events:none;z-index:4;opacity:.7;
 }
 .theme-toggle::after{
   content:"";
   position:absolute;inset:0;border-radius:inherit;pointer-events:none;z-index:0;
   background:
-    linear-gradient(135deg, rgba(255,255,255,.55) 0%, rgba(255,255,255,.16) 26%, transparent 52%),
-    linear-gradient(210deg, transparent 40%, rgba(255,255,255,.10) 70%, transparent 100%);
-  mix-blend-mode:screen;
-  opacity:.9;
+    linear-gradient(135deg, rgba(255,255,255,.16) 0%, rgba(255,255,255,.04) 30%, transparent 55%);
+  mix-blend-mode:normal;
+  opacity:.85;
 }
 .theme-toggle:hover{
-  border-color:rgba(255,255,255,.68);
+  border-color:rgba(255,255,255,.22);
   background:
-    linear-gradient(180deg, rgba(255,255,255,.40) 0%, rgba(255,255,255,.18) 50%, rgba(255,255,255,.10) 100%);
+    linear-gradient(180deg, rgba(255,255,255,.16) 0%, rgba(255,255,255,.07) 55%, rgba(255,255,255,.04) 100%);
   box-shadow:
-    0 2px 6px rgba(0,0,0,.28),
-    0 8px 22px rgba(0,0,0,.20),
-    inset 0 1px 0 rgba(255,255,255,.88),
-    inset 0 -1px 0 rgba(255,255,255,.14),
-    inset 1px 0 0 rgba(255,255,255,.36),
-    inset -1px 0 0 rgba(255,255,255,.28);
+    0 1px 3px rgba(0,0,0,.24),
+    0 6px 16px rgba(0,0,0,.14),
+    inset 0 1px 0 rgba(255,255,255,.28),
+    inset 0 -0.5px 0 rgba(0,0,0,.22);
 }
 .theme-toggle:active{transform:none}
 .theme-toggle .tlabel{display:none!important}
@@ -436,36 +435,34 @@ a:hover{text-decoration:underline;text-underline-offset:3px}
 [data-theme="light"] .theme-toggle .tt-face-sun{opacity:1;color:#8A6410}
 [data-theme="light"] .theme-toggle .tt-face-moon{opacity:0}
 [data-theme="light"] .theme-toggle .icon-sun{opacity:0}
-[data-theme="light"] .theme-toggle .icon-moon{opacity:.82;color:#3A3648}
+[data-theme="light"] .theme-toggle .icon-moon{opacity:.92;color:#2A2640}
 [data-theme="light"] .theme-toggle{
-  border-color:rgba(255,255,255,.90);
+  /* Soft clear glass — icons readable, not washed out / muddy */
+  border-color:rgba(40,30,80,.14);
   background:
-    linear-gradient(180deg, rgba(255,255,255,.78) 0%, rgba(255,255,255,.48) 55%, rgba(246,245,251,.40) 100%);
-  backdrop-filter:blur(28px) saturate(200%) brightness(1.06);
-  -webkit-backdrop-filter:blur(28px) saturate(200%) brightness(1.06);
+    linear-gradient(180deg, rgba(255,255,255,.72) 0%, rgba(255,255,255,.48) 55%, rgba(246,245,251,.42) 100%);
+  backdrop-filter:blur(18px) saturate(150%);
+  -webkit-backdrop-filter:blur(18px) saturate(150%);
   box-shadow:
-    0 1px 3px rgba(40,30,80,.10),
-    0 6px 16px rgba(60,50,120,.08),
-    inset 0 1px 0 rgba(255,255,255,1),
-    inset 0 -1px 0 rgba(40,30,80,.06),
-    inset 1px 0 0 rgba(255,255,255,.70),
-    inset -1px 0 0 rgba(255,255,255,.50);
+    0 1px 2px rgba(40,30,80,.06),
+    0 4px 12px rgba(60,50,120,.05),
+    inset 0 1px 0 rgba(255,255,255,.92),
+    inset 0 -0.5px 0 rgba(40,30,80,.06);
 }
 [data-theme="light"] .theme-toggle::before{
-  background:linear-gradient(90deg, transparent, rgba(255,255,255,1), transparent);
-  opacity:1;
+  background:linear-gradient(90deg, transparent, rgba(255,255,255,.75), transparent);
+  opacity:.85;
 }
 [data-theme="light"] .theme-toggle::after{
   background:
-    linear-gradient(135deg, rgba(255,255,255,.92) 0%, rgba(255,255,255,.28) 28%, transparent 56%),
-    linear-gradient(210deg, transparent 45%, rgba(255,255,255,.18) 75%, transparent 100%);
+    linear-gradient(135deg, rgba(255,255,255,.55) 0%, rgba(255,255,255,.12) 32%, transparent 58%);
   mix-blend-mode:normal;
-  opacity:1;
+  opacity:.9;
 }
 [data-theme="dark"] .theme-toggle{
-  border-color:rgba(255,255,255,.55);
+  border-color:rgba(255,255,255,.14);
   background:
-    linear-gradient(180deg, rgba(255,255,255,.34) 0%, rgba(255,255,255,.14) 50%, rgba(255,255,255,.08) 100%);
+    linear-gradient(180deg, rgba(255,255,255,.12) 0%, rgba(255,255,255,.05) 55%, rgba(255,255,255,.03) 100%);
 }
 @media (prefers-reduced-motion: reduce){
   .theme-toggle .tt-thumb{transition:none}
@@ -687,8 +684,10 @@ a:hover{text-decoration:underline;text-underline-offset:3px}
 }
 .item:hover summary::after{border-color:var(--muted)}
 .item .q{
-  font-size:var(--fs-title);font-weight:var(--fw-semibold);letter-spacing:-.024em;line-height:var(--lh-title);
+  font-family:var(--font); /* Geist Sans / ui-sans — Cursor/Linear card lists */
+  font-size:var(--fs-title);font-weight:var(--fw-semibold);letter-spacing:-.028em;line-height:var(--lh-title);
   color:var(--ink);margin:0 0 10px;
+  -webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;
 }
 .item .teaser{
   margin:0 0 14px;font-size:var(--fs-ui);font-weight:var(--fw-regular);letter-spacing:-.01em;
@@ -924,8 +923,14 @@ footer{
 }
 /* Light toggle hover — brighter glass */
 [data-theme="light"] .theme-toggle:hover{
-  background:linear-gradient(180deg, rgba(255,255,255,.82) 0%, rgba(255,255,255,.52) 55%, rgba(246,245,251,.42) 100%);
-  border-color:rgba(255,255,255,.96);
+  border-color:rgba(40,30,80,.20);
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.82) 0%, rgba(255,255,255,.55) 55%, rgba(246,245,251,.48) 100%);
+  box-shadow:
+    0 1px 3px rgba(40,30,80,.08),
+    0 6px 14px rgba(60,50,120,.06),
+    inset 0 1px 0 rgba(255,255,255,.95),
+    inset 0 -0.5px 0 rgba(40,30,80,.07);
 }
 [data-theme="light"] .chip[aria-selected="true"],
 [data-theme="light"] .sort button[aria-pressed="true"]{
@@ -1022,13 +1027,13 @@ footer{
 [data-theme="dark"] .fresh i{background:var(--ok);box-shadow:0 0 0 3px var(--ok-soft)}
 [data-theme="dark"] .theme-toggle{
   color:var(--muted);
-  border-color:rgba(255,255,255,.55);
-  background:linear-gradient(180deg, rgba(255,255,255,.34) 0%, rgba(255,255,255,.14) 50%, rgba(255,255,255,.08) 100%);
+  border-color:rgba(255,255,255,.14);
+  background:linear-gradient(180deg, rgba(255,255,255,.12) 0%, rgba(255,255,255,.05) 55%, rgba(255,255,255,.03) 100%);
 }
 [data-theme="dark"] .theme-toggle:hover{
   color:var(--ink);
-  border-color:rgba(255,255,255,.68);
-  background:linear-gradient(180deg, rgba(255,255,255,.40) 0%, rgba(255,255,255,.18) 50%, rgba(255,255,255,.10) 100%);
+  border-color:rgba(255,255,255,.22);
+  background:linear-gradient(180deg, rgba(255,255,255,.16) 0%, rgba(255,255,255,.07) 55%, rgba(255,255,255,.04) 100%);
 }
 [data-theme="dark"] .chip{background:var(--control-bg);color:var(--ink-soft)}
 [data-theme="dark"] .chip:hover{background:var(--surface)}
@@ -1079,13 +1084,13 @@ footer{
   :root:not([data-theme="light"]) .fresh i{background:var(--ok);box-shadow:0 0 0 3px var(--ok-soft)}
   :root:not([data-theme="light"]) .theme-toggle{
     color:var(--muted);
-    border-color:rgba(255,255,255,.55);
-    background:linear-gradient(180deg, rgba(255,255,255,.34) 0%, rgba(255,255,255,.14) 50%, rgba(255,255,255,.08) 100%);
+    border-color:rgba(255,255,255,.14);
+    background:linear-gradient(180deg, rgba(255,255,255,.12) 0%, rgba(255,255,255,.05) 55%, rgba(255,255,255,.03) 100%);
   }
   :root:not([data-theme="light"]) .theme-toggle:hover{
     color:var(--ink);
-    border-color:rgba(255,255,255,.68);
-    background:linear-gradient(180deg, rgba(255,255,255,.40) 0%, rgba(255,255,255,.18) 50%, rgba(255,255,255,.10) 100%);
+    border-color:rgba(255,255,255,.22);
+    background:linear-gradient(180deg, rgba(255,255,255,.16) 0%, rgba(255,255,255,.07) 55%, rgba(255,255,255,.04) 100%);
   }
   :root:not([data-theme="light"]) .chip{background:var(--control-bg);color:var(--ink-soft)}
   :root:not([data-theme="light"]) .chip:hover{background:var(--surface)}
@@ -1136,7 +1141,8 @@ footer{
 /* —— Mobile rhythm —— */
 @media (max-width:719px){
   .fresh{
-    padding:calc(env(safe-area-inset-top, 0px) + 12px) max(18px, env(safe-area-inset-right, 0px)) 0 max(18px, env(safe-area-inset-left, 0px));
+    padding:0 max(18px, env(safe-area-inset-right, 0px)) 0 max(18px, env(safe-area-inset-left, 0px));
+    margin:0 0 18px;
   }
   .shell{
     width:100%;max-width:100%;margin:0;
@@ -1153,7 +1159,10 @@ footer{
   #aurora-sticky{
     height:calc(env(safe-area-inset-top, 0px) + 88px);
   }
-  .brand{margin:16px 0 22px;min-height:20px;padding:0;align-items:flex-start}
+  .brand{
+    margin:0 0 10px;min-height:20px;align-items:flex-start;
+    padding:calc(env(safe-area-inset-top, 0px) + 12px) 0 0;
+  }
   .brand-slot{min-height:20px;align-items:flex-start}
   .brand .wm{height:20px}
   .theme-toggle{
@@ -1223,7 +1232,6 @@ footer{
   <div class="aurora-crown"></div>
   <div class="aurora-blobs"></div>
 </div>
-<div class="fresh" role="status"><span><i aria-hidden="true"></i> Updated Oct 25, 2026</span></div>
 <div class="shell">
   <div class="brand">
     <div class="brand-slot brand-slot-start">
@@ -1245,6 +1253,7 @@ footer{
       </button>
     </div>
   </div>
+  <div class="fresh" role="status"><span><i aria-hidden="true"></i> Updated Oct 25, 2026</span></div>
   <div class="hero">
     <h1>Beta Q&amp;A <em>Center</em></h1>
     <p class="sub">Answers for Flip beta testers — search a topic, or open a card.</p>
@@ -1428,37 +1437,59 @@ document.getElementById("askSubmit").addEventListener("click",()=>{
   function setThemeColor(theme){
     const tc=theme==='dark'?DARK_TC:LIGHT_TC;
     const bg=theme==='dark'?DARK_BG:LIGHT_BG;
+    /* Sync ALL theme-color metas so iOS Safari chrome matches --bg immediately */
     if(meta) meta.setAttribute('content', tc);
     if(metaL) metaL.setAttribute('content', tc);
     if(metaD) metaD.setAttribute('content', tc);
     try{
-      root.style.backgroundColor=bg;
-      if(document.body) document.body.style.backgroundColor=bg;
+      /* Force html/body paint to --bg; clear any stale cascade locks */
+      root.style.setProperty('background-color', bg);
+      root.style.setProperty('background', bg);
+      if(document.body){
+        document.body.style.setProperty('background-color', bg);
+        document.body.style.setProperty('background', bg);
+      }
     }catch(e){}
     if(btn){
       btn.setAttribute('aria-label', theme==='dark'?'Switch to light theme':'Switch to dark theme');
       btn.title=theme==='dark'?'Light':'Dark';
     }
   }
-  /* Force fixed aurora + sticky wash to repaint with new --bg (Safari compositor lag). */
+  /* Strip inline styles that can freeze aurora/sticky on the previous theme (iOS Safari). */
+  function clearAuroraInline(el){
+    if(!el||!el.style) return;
+    try{
+      el.style.removeProperty('opacity');
+      el.style.removeProperty('transform');
+      el.style.removeProperty('background');
+      el.style.removeProperty('background-image');
+      el.style.removeProperty('filter');
+      el.style.removeProperty('will-change');
+      el.classList.remove('aurora-repaint');
+    }catch(e){}
+  }
+  /* Force fixed aurora + sticky wash to repaint with new --bg (Safari compositor lag).
+     Strengthened: clear stale inlines → cloneNode replace → class toggle + double rAF. */
   function repaintAurora(){
-    const nodes=[document.getElementById('aurora'), document.getElementById('aurora-sticky')];
-    for(const el of nodes){
-      if(!el) continue;
+    const ids=['aurora','aurora-sticky'];
+    for(const id of ids){
+      let el=document.getElementById(id);
+      if(!el||!el.parentNode) continue;
       try{
-        el.classList.remove('aurora-repaint');
+        clearAuroraInline(el);
+        /* Clone replace rebuilds the compositor layer with current CSS (data-theme / --bg) */
+        const clone=el.cloneNode(true);
+        clearAuroraInline(clone);
+        el.parentNode.replaceChild(clone, el);
+        el=clone;
         void el.offsetHeight;
-        el.style.opacity='0.999';
-        void el.offsetHeight;
-        el.style.opacity='';
         el.classList.add('aurora-repaint');
         void el.offsetHeight;
         el.classList.remove('aurora-repaint');
-        /* bounce transform to kick will-change layer */
-        const prev=el.style.transform;
+        /* Tiny transform bounce to re-promote will-change layer */
         el.style.transform='translateZ(0.1px)';
         void el.offsetHeight;
-        el.style.transform=prev||'';
+        el.style.removeProperty('transform');
       }catch(e){}
     }
   }
@@ -1474,10 +1505,14 @@ document.getElementById("askSubmit").addEventListener("click",()=>{
     root.style.colorScheme=theme;
     try{localStorage.setItem(MANUAL, theme)}catch(e){}
     setThemeColor(theme);
-    /* double rAF: wait for CSS var/--bg cascade, then force layer redraw */
+    /* double rAF: wait for CSS var/--bg cascade, then force full aurora rebuild */
     requestAnimationFrame(()=>{
       repaintAurora();
-      requestAnimationFrame(repaintAurora);
+      requestAnimationFrame(()=>{
+        repaintAurora();
+        /* third tick: re-sync theme-color after Safari settles chrome */
+        setThemeColor(theme);
+      });
     });
   }
   const saved=manualPref();
