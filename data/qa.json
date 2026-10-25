@@ -94,11 +94,12 @@
     {
       "id": "FB-015",
       "question": "Can I leave recording on all day?",
-      "teaser": "Yes — it only keeps speech and clears after phone sync.",
-      "answerHtml": "Yes — leave it on. It <strong>only keeps audio when someone is speaking</strong>. After sync to your phone, device storage <strong>clears automatically</strong>.",
+      "teaser": "Yes — leave it on all day. It only saves when someone speaks; auto-clears after phone sync.",
+      "answerHtml": "<p>Yes — you can leave recording on all day.</p><p>It <strong>only saves when someone is speaking</strong>. After sync to the phone, the device <strong>auto-clears</strong> (no manual purge).</p>",
       "category": "recording-ai",
       "updatedAt": "2026-10-23",
-      "status": "answered"
+      "status": "answered",
+      "teaserHtml": "Yes — leave it on all day. It only saves when someone speaks; auto-clears after phone sync."
     },
     {
       "id": "FB-024",

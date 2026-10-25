@@ -4,22 +4,23 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 <meta name="color-scheme" content="light dark" />
-<!-- theme-color === --crown (aurora solid). JS keeps html/body bgColor in sync. -->
-<meta name="theme-color" content="#E8E0F5" media="(prefers-color-scheme: light)" id="themeColorMetaLight" />
-<meta name="theme-color" content="#1A1428" media="(prefers-color-scheme: dark)" id="themeColorMetaDark" />
-<meta name="theme-color" content="#E8E0F5" id="themeColorMeta" />
+<!-- theme-color = soft page wash (matches --bg). No purple/black slab. -->
+<meta name="theme-color" content="#F7F5F1" media="(prefers-color-scheme: light)" id="themeColorMetaLight" />
+<meta name="theme-color" content="#0E0F14" media="(prefers-color-scheme: dark)" id="themeColorMetaDark" />
+<meta name="theme-color" content="#F7F5F1" id="themeColorMeta" />
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 <title>Moonphase Flip — Beta Q&amp;A Center</title>
 <script>
-/* Theme bootstrap v5 — CSS @media (prefers-color-scheme) is the DEFAULT.
+/* Theme bootstrap v6 — CSS @media (prefers-color-scheme) is the DEFAULT.
    data-theme ONLY after explicit toggle (manual-v5). Wipe ALL prior keys
-   including manual-v4 so a stuck "light" cannot block OS follow on phones. */
+   including manual-v5 so a stuck override cannot block OS follow on phones. */
 (function(){
-  var MANUAL='flip-beta-qa-theme-manual-v5';
+  var MANUAL='flip-beta-qa-theme-manual-v6';
   var STALE=[
     'flip-beta-qa-theme','flip-beta-qa-theme-v1','flip-beta-qa-theme-v2',
-    'flip-beta-qa-theme-manual','flip-beta-qa-theme-v3','flip-beta-qa-theme-manual-v4'
+    'flip-beta-qa-theme-manual','flip-beta-qa-theme-v3','flip-beta-qa-theme-manual-v4',
+    'flip-beta-qa-theme-manual-v5'
   ];
   try{
     for(var i=0;i<STALE.length;i++){
@@ -36,6 +37,7 @@
     }else{
       document.documentElement.removeAttribute('data-theme');
       document.documentElement.style.colorScheme='light dark';
+      document.documentElement.style.backgroundColor='';
     }
   }catch(e){
     try{document.documentElement.removeAttribute('data-theme')}catch(_){}
@@ -50,18 +52,19 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/geist-mono@5.2.5/index.min.css" />
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600&display=swap" />
 <style>
-/* Layout rebuild 2026-10-25 — luminous chromatic v4 + Linear/Stripe rhythm
-   8px spacing scale · solid aurora crown (no blur at status bar) · 34px chips */
+/* Overhaul 2026-10-25 — type tokens · soft top aurora (8a41356 lineage) · system dark v6 */
 :root{
-  --crown:#E8E0F5; /* EXACT theme-color — iOS status bar / html top */
+  /* Surfaces */
   --bg:#F7F5F1;
   --bg-deep:#EFEBE4;
   --surface:#FFFFFF;
+  /* Ink hierarchy */
   --ink:#1A1917;
   --ink-soft:#2A2825;
   --title:#141210;
   --muted:#7C766E;
   --faint:#A8A29A;
+  /* Lines & accents */
   --line:rgba(12,10,8,.065);
   --line2:rgba(12,10,8,.11);
   --accent:#635BFF;
@@ -73,6 +76,7 @@
   --cta-hover:rgba(99,91,255,.14);
   --ok:#2F9E6B;
   --ok-soft:rgba(47,158,107,.14);
+  /* Elevation */
   --shadow-sm:0 1px 2px rgba(24,18,12,.03), 0 2px 8px rgba(24,18,12,.035);
   --shadow-md:
     0 1px 2px rgba(24,18,12,.028),
@@ -86,75 +90,74 @@
   --ease:cubic-bezier(.22,1,.36,1);
   --dur:180ms;
   --r:20px;
+  /* Families */
   --font:"Geist Sans",Geist,Inter,ui-sans-serif,system-ui,-apple-system,sans-serif;
   --display:"Instrument Serif",ui-serif,Georgia,"Times New Roman",serif;
   --mono:"Geist Mono",ui-monospace,"SF Mono",Menlo,Consolas,monospace;
-  /* One control band height — chips + Submit + search/sort */
+  /* Type scale */
+  --fs-hero:clamp(2.5rem,5.4vw,3.5rem);
+  --fs-title:15.5px;
+  --fs-body:14.5px;
+  --fs-ui:13.5px;
+  --fs-meta:12.5px;
+  --fs-tag:11.5px;
+  --fs-mono:11px;
+  --fw-regular:400;
+  --fw-medium:500;
+  --fw-semibold:600;
+  --lh-tight:1.2;
+  --lh-title:1.32;
+  --lh-body:1.62;
+  --lh-ui:1.45;
+  /* Controls / cards */
   --control-h:34px;
   --space:8px;
+  --card-pad-x:24px;
+  --card-pad-y:22px;
   color-scheme:light dark;
 }
 *,*::before,*::after{box-sizing:border-box}
 html{
   scroll-behavior:smooth;overflow-x:hidden;width:100%;max-width:100%;
   color-scheme:light dark;
-  /* Solid crown = theme-color — paints behind iOS status bar */
-  background-color:var(--crown);
-  background:var(--crown);
+  background-color:var(--bg);
+  background:var(--bg);
 }
 body{
   margin:0;min-height:100vh;min-height:100dvh;color:var(--ink-soft);
-  background-color:var(--crown);
-  /* Crown solid at top → soft handoff into page bg. No black/cream band. */
-  background:
-    linear-gradient(180deg,
-      var(--crown) 0%,
-      var(--crown) 18%,
-      color-mix(in srgb, var(--crown) 55%, var(--bg)) 32%,
-      var(--bg) 48%),
-    var(--crown);
-  font-family:var(--font);font-size:15px;line-height:1.55;font-weight:400;
+  background-color:var(--bg);
+  background:var(--bg);
+  font-family:var(--font);font-size:15px;line-height:1.55;font-weight:var(--fw-regular);
   letter-spacing:-.011em;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;
   width:100%;max-width:100%;
   position:relative;
 }
-/* Aurora: TWO layers. Crown = opaque solid (NO blur). Blobs = decorative blur. */
+/* Restrained TOP aurora only (Linear/Vercel). Extends UP behind status bar.
+   Soft radial wash — NEVER an opaque purple/black crown slab. */
 .aurora{
   position:fixed;
   top:calc(-1 * env(safe-area-inset-top, 0px));
   left:0;right:0;
   width:100%;
-  height:calc(env(safe-area-inset-top, 0px) + min(480px, 68dvh));
+  height:calc(env(safe-area-inset-top, 0px) + min(280px, 38dvh));
   margin:0;padding:0;
   pointer-events:none;
   z-index:0;
   overflow:visible;
-}
-/* Opaque underlay — must cover status bar. Never filter/blur this layer. */
-.aurora-crown{
-  position:absolute;
-  top:0;left:0;right:0;
-  height:100%;
-  background:var(--crown);
-  /* Fade ONLY at bottom into page — top stays fully opaque */
-  -webkit-mask-image:linear-gradient(180deg,#000 0%,#000 42%,transparent 100%);
-  mask-image:linear-gradient(180deg,#000 0%,#000 42%,transparent 100%);
-}
-.aurora-blobs{
-  position:absolute;
-  top:-60px;left:-8%;right:-8%;
-  height:calc(100% + 80px);
   background:
-    radial-gradient(ellipse 120% 90% at 50% -20%, rgba(168,145,255,.55), transparent 70%),
-    radial-gradient(ellipse 85% 75% at 8% -10%, rgba(255,160,195,.36), transparent 68%),
-    radial-gradient(ellipse 80% 70% at 92% -8%, rgba(255,200,160,.30), transparent 66%),
-    radial-gradient(ellipse 65% 58% at 70% 0%, rgba(255,230,190,.22), transparent 62%),
-    radial-gradient(ellipse 60% 54% at 30% -2%, rgba(170,205,255,.24), transparent 66%);
-  filter:blur(48px) saturate(112%);
+    radial-gradient(ellipse 100% 80% at 50% -20%, rgba(168,145,255,.38), transparent 70%),
+    radial-gradient(ellipse 75% 65% at 10% -15%, rgba(255,160,195,.26), transparent 68%),
+    radial-gradient(ellipse 70% 60% at 90% -12%, rgba(255,200,160,.22), transparent 66%),
+    radial-gradient(ellipse 55% 50% at 70% -5%, rgba(255,230,190,.14), transparent 62%),
+    radial-gradient(ellipse 50% 45% at 30% -8%, rgba(170,205,255,.16), transparent 66%);
+  filter:blur(52px) saturate(110%);
   opacity:.88;
-  -webkit-mask-image:linear-gradient(180deg,#000 0%,#000 48%,transparent 100%);
-  mask-image:linear-gradient(180deg,#000 0%,#000 48%,transparent 100%);
+  -webkit-mask-image:linear-gradient(180deg,#000 0%,#000 50%,transparent 100%);
+  mask-image:linear-gradient(180deg,#000 0%,#000 50%,transparent 100%);
 }
+/* Keep crown node inert — no solid bar paint */
+.aurora-crown{display:none!important}
+.aurora-blobs{display:none!important}
 .fresh,.shell,.modal-backdrop{position:relative;z-index:1}
 .modal-backdrop{z-index:100}
 button,input,select,textarea{font:inherit;color:inherit}
@@ -166,7 +169,7 @@ a:hover{text-decoration:underline;text-underline-offset:3px}
 /* —— Updated chip —— */
 .fresh{
   display:flex;justify-content:center;align-items:center;
-  padding:calc(env(safe-area-inset-top, 0px) + 12px) 18px 0;
+  padding:calc(env(safe-area-inset-top, 0px) + 14px) 18px 0;
   background:transparent;border:0;box-shadow:none;
 }
 .fresh span{
@@ -177,7 +180,7 @@ a:hover{text-decoration:underline;text-underline-offset:3px}
   backdrop-filter:blur(16px) saturate(140%);
   -webkit-backdrop-filter:blur(16px) saturate(140%);
   box-shadow:var(--shadow-sm);
-  font-family:var(--mono);font-size:11px;font-weight:500;
+  font-family:var(--mono);font-size:var(--fs-mono);font-weight:var(--fw-medium);
   letter-spacing:.02em;color:var(--muted);
 }
 .fresh i{
@@ -210,7 +213,7 @@ a:hover{text-decoration:underline;text-underline-offset:3px}
 /* —— Brand row —— */
 .brand{
   display:flex;align-items:flex-start;justify-content:space-between;gap:8px;
-  margin:16px 0 32px;position:relative;min-height:32px;
+  margin:24px 0 32px;position:relative;min-height:32px;
 }
 .brand-slot{
   flex:1 1 0;display:flex;align-items:flex-start;min-width:0;min-height:32px;
@@ -263,14 +266,14 @@ a:hover{text-decoration:underline;text-underline-offset:3px}
 .hero h1{
   margin:0 0 12px;
   font-family:var(--display);
-  font-size:clamp(2.5rem,5.4vw,3.5rem);
-  font-weight:400;font-style:normal;
+  font-size:var(--fs-hero);
+  font-weight:var(--fw-regular);font-style:normal;
   letter-spacing:-.02em;line-height:1.06;
   color:var(--title);
   text-wrap:balance;
 }
 .hero .sub{
-  margin:0 0 28px;font-size:16px;font-weight:400;letter-spacing:-.012em;
+  margin:0 0 28px;font-size:16px;font-weight:var(--fw-regular);letter-spacing:-.012em;
   line-height:1.5;color:var(--muted);max-width:400px;
 }
 .ask-cta{
@@ -278,7 +281,7 @@ a:hover{text-decoration:underline;text-underline-offset:3px}
   height:var(--control-h);padding:0 18px;
   border-radius:999px;
   background:var(--cta);color:var(--cta-ink);
-  font-size:13.5px;font-weight:500;letter-spacing:-.014em;
+  font-size:var(--fs-ui);font-weight:var(--fw-medium);letter-spacing:-.014em;
   border:1px solid var(--cta-border);
   box-shadow:0 1px 2px rgba(24,18,12,.03);
   backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
@@ -307,7 +310,7 @@ a:hover{text-decoration:underline;text-underline-offset:3px}
   flex:0 0 auto;height:var(--control-h);padding:0 16px;border-radius:999px;
   border:1px solid var(--line);background:var(--control-bg);
   backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
-  font-size:13.5px;font-weight:500;letter-spacing:-.011em;color:var(--ink-soft);
+  font-size:var(--fs-ui);font-weight:var(--fw-medium);letter-spacing:-.011em;color:var(--ink-soft);
   white-space:nowrap;box-shadow:var(--shadow-sm);
   transition:background var(--dur) var(--ease), border-color var(--dur) var(--ease), color var(--dur) var(--ease), box-shadow var(--dur) var(--ease), transform var(--dur) var(--ease);
 }
@@ -401,12 +404,12 @@ a:hover{text-decoration:underline;text-underline-offset:3px}
 .item:nth-child(n+7){animation-delay:144ms}
 
 .item summary{
-  list-style:none;cursor:pointer;padding:20px 20px 18px;position:relative;
-  padding-right:48px;
+  list-style:none;cursor:pointer;position:relative;
+  padding:var(--card-pad-y) 44px var(--card-pad-y) var(--card-pad-x);
 }
 .item summary::-webkit-details-marker{display:none}
 .item summary::after{
-  content:"";position:absolute;right:20px;top:24px;
+  content:"";position:absolute;right:18px;top:26px;
   width:8px;height:8px;
   border-right:1.5px solid var(--faint);
   border-bottom:1.5px solid var(--faint);
@@ -416,24 +419,24 @@ a:hover{text-decoration:underline;text-underline-offset:3px}
 .item[open] summary::after{
   transform:rotate(225deg);
   border-color:var(--muted);
-  top:28px;
+  top:30px;
 }
 .item:hover summary::after{border-color:var(--muted)}
 .item .q{
-  font-size:15.5px;font-weight:600;letter-spacing:-.024em;line-height:1.32;
-  color:var(--ink);margin:0 0 8px;
+  font-size:var(--fs-title);font-weight:var(--fw-semibold);letter-spacing:-.024em;line-height:var(--lh-title);
+  color:var(--ink);margin:0 0 10px;
 }
 .item .teaser{
-  margin:0 0 14px;font-size:13.5px;font-weight:400;letter-spacing:-.01em;
-  line-height:1.5;color:var(--muted);
+  margin:0 0 14px;font-size:var(--fs-ui);font-weight:var(--fw-regular);letter-spacing:-.01em;
+  line-height:var(--lh-ui);color:var(--muted);
   display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;line-clamp:2;
   overflow:hidden;
 }
 .item[open] .teaser{display:none}
 .item .teaser mark{
-  background:transparent;color:var(--ink-soft);font-weight:500;
+  background:transparent;color:var(--ink-soft);font-weight:var(--fw-medium);
 }
-.meta{display:flex;flex-wrap:wrap;gap:6px}
+.meta{display:flex;flex-wrap:wrap;gap:6px;margin-top:2px}
 
 /* Primer soft tags — solid green dot, ZERO outward glow */
 .pill{
@@ -445,7 +448,7 @@ a:hover{text-decoration:underline;text-underline-offset:3px}
   box-shadow:none!important;
   filter:none!important;
   backdrop-filter:none!important;-webkit-backdrop-filter:none!important;
-  font-family:var(--font);font-size:11.5px;font-weight:500;
+  font-family:var(--font);font-size:var(--fs-tag);font-weight:var(--fw-medium);
   letter-spacing:-.01em;text-transform:none;
   color:#116329;
   line-height:1;
@@ -463,17 +466,17 @@ a:hover{text-decoration:underline;text-underline-offset:3px}
 .pill:hover{background:#c8efd4;color:#0a5328}
 
 .item .body{
-  padding:0 20px 20px;border-top:1px solid var(--line);
+  padding:4px var(--card-pad-x) var(--card-pad-y);border-top:1px solid var(--line);
   animation:bodyIn 180ms var(--ease) both;
 }
 @keyframes bodyIn{from{opacity:0;transform:translateY(2px)}to{opacity:1;transform:none}}
-.item .body p{margin:14px 0 0;font-size:14.5px;letter-spacing:-.01em;line-height:1.62;color:var(--ink-soft)}
+.item .body p{margin:14px 0 0;font-size:var(--fs-body);letter-spacing:-.01em;line-height:var(--lh-body);color:var(--ink-soft)}
 .item .body p:first-child{margin-top:14px}
 .item .body code{
-  font-family:var(--mono);font-size:12.5px;padding:1px 5px;border-radius:5px;
+  font-family:var(--mono);font-size:var(--fs-meta);padding:1px 5px;border-radius:5px;
   background:rgba(99,91,255,.07);border:1px solid rgba(99,91,255,.11);color:var(--accent-deep);
 }
-.item .body strong{font-weight:600;color:var(--ink)}
+.item .body strong{font-weight:var(--fw-semibold);color:var(--ink)}
 
 .empty{
   flex:1 1 100%;text-align:center;padding:56px 16px;
@@ -544,7 +547,6 @@ footer{
 /* ---- Dark tokens ---- */
 @media (prefers-color-scheme: dark){
   :root:not([data-theme="light"]){
-    --crown:#1A1428;
     --bg:#0E0F14;
     --bg-deep:#090A0E;
     --surface:#171822;
@@ -578,7 +580,6 @@ footer{
   }
 }
 [data-theme="dark"]{
-  --crown:#1A1428;
   --bg:#0E0F14;
   --bg-deep:#090A0E;
   --surface:#171822;
@@ -612,78 +613,30 @@ footer{
 }
 [data-theme="light"]{
   color-scheme:light;
-  --crown:#E8E0F5;
 }
 
-/* Dark aurora blobs */
+/* Dark soft top aurora — restrained, never opaque black/purple bar */
 @media (prefers-color-scheme: dark){
-  :root:not([data-theme="light"]) .aurora-blobs{
+  :root:not([data-theme="light"]) .aurora{
     background:
-      radial-gradient(ellipse 120% 90% at 50% -18%, rgba(120,105,255,.60), transparent 70%),
-      radial-gradient(ellipse 85% 75% at 8% -8%, rgba(210,100,165,.36), transparent 68%),
-      radial-gradient(ellipse 80% 70% at 92% -6%, rgba(255,160,110,.24), transparent 66%),
-      radial-gradient(ellipse 65% 58% at 70% 2%, rgba(255,200,130,.16), transparent 62%),
-      radial-gradient(ellipse 60% 54% at 30% 0%, rgba(110,160,255,.26), transparent 66%);
-    filter:blur(52px) saturate(120%);
-    opacity:.92;
+      radial-gradient(ellipse 100% 80% at 50% -20%, rgba(120,105,255,.42), transparent 70%),
+      radial-gradient(ellipse 75% 65% at 10% -15%, rgba(210,100,165,.24), transparent 68%),
+      radial-gradient(ellipse 70% 60% at 90% -12%, rgba(255,160,110,.14), transparent 66%),
+      radial-gradient(ellipse 55% 50% at 70% -5%, rgba(255,200,130,.10), transparent 62%),
+      radial-gradient(ellipse 50% 45% at 30% -8%, rgba(110,160,255,.16), transparent 66%);
+    filter:blur(56px) saturate(115%);
+    opacity:.82;
   }
-  :root:not([data-theme="light"]) .shell::after{opacity:.05;mix-blend-mode:screen}
-  :root:not([data-theme="light"]) .fresh span{background:var(--control-bg);border-color:var(--line);color:var(--muted)}
-  :root:not([data-theme="light"]) .fresh i{
-    background:var(--ok);box-shadow:0 0 0 3px var(--ok-soft);
-  }
-  :root:not([data-theme="light"]) .theme-toggle{background:var(--control-bg);color:var(--muted)}
-  :root:not([data-theme="light"]) .theme-toggle:hover{background:var(--surface);color:var(--ink);border-color:var(--line2)}
-  :root:not([data-theme="light"]) .chip{background:var(--control-bg);color:var(--ink-soft)}
-  :root:not([data-theme="light"]) .chip:hover{background:var(--surface)}
-  :root:not([data-theme="light"]) .chip[aria-selected="true"]{
-    background:color-mix(in srgb, var(--accent) 18%, var(--surface));
-    border-color:color-mix(in srgb, var(--accent) 36%, transparent);
-    color:var(--accent-deep);
-    box-shadow:0 4px 16px rgba(99,91,255,.14);
-  }
-  :root:not([data-theme="light"]) .search,
-  :root:not([data-theme="light"]) .sort{background:var(--control-bg)}
-  :root:not([data-theme="light"]) .sort button[aria-pressed="true"]{
-    background:color-mix(in srgb, var(--accent) 18%, var(--surface));
-    color:var(--accent-deep);
-  }
-  :root:not([data-theme="light"]) .ask-cta{
-    background:var(--cta);color:var(--cta-ink);border-color:var(--cta-border);
-    box-shadow:0 1px 2px rgba(0,0,0,.2);
-  }
-  :root:not([data-theme="light"]) .item{background:var(--surface);border-color:var(--line)}
-  :root:not([data-theme="light"]) .item summary::after{border-color:var(--faint)}
-  :root:not([data-theme="light"]) .item[open] summary::after{border-color:var(--muted)}
-  :root:not([data-theme="light"]) .pill{
-    background:rgba(46,160,67,.14);color:#3FB950;
-    box-shadow:none!important;filter:none!important;
-  }
-  :root:not([data-theme="light"]) .pill::before{background:#3FB950;box-shadow:none!important;filter:none!important}
-  :root:not([data-theme="light"]) .pill:hover{background:rgba(46,160,67,.22);color:#56D364}
-  :root:not([data-theme="light"]) .item .body code{
-    background:rgba(139,132,255,.12);border-color:rgba(139,132,255,.2);color:var(--accent-deep);
-  }
-  :root:not([data-theme="light"]) .empty{background:rgba(23,24,34,.55)}
-  :root:not([data-theme="light"]) .modal{background:var(--surface)}
-  :root:not([data-theme="light"]) .modal select,
-  :root:not([data-theme="light"]) .modal textarea{background:var(--bg-deep);color:var(--ink-soft)}
-  :root:not([data-theme="light"]) .btn.primary{
-    background:var(--cta);color:var(--cta-ink);border-color:var(--cta-border);
-    box-shadow:0 1px 2px rgba(0,0,0,.2);
-  }
-  :root:not([data-theme="light"]) ::selection{background:var(--accent-soft);color:var(--ink)}
-  :root:not([data-theme="light"]) .hero h1{color:#FFFFFF}
 }
-[data-theme="dark"] .aurora-blobs{
+[data-theme="dark"] .aurora{
   background:
-    radial-gradient(ellipse 120% 90% at 50% -18%, rgba(120,105,255,.60), transparent 70%),
-    radial-gradient(ellipse 85% 75% at 8% -8%, rgba(210,100,165,.36), transparent 68%),
-    radial-gradient(ellipse 80% 70% at 92% -6%, rgba(255,160,110,.24), transparent 66%),
-    radial-gradient(ellipse 65% 58% at 70% 2%, rgba(255,200,130,.16), transparent 62%),
-    radial-gradient(ellipse 60% 54% at 30% 0%, rgba(110,160,255,.26), transparent 66%);
-  filter:blur(52px) saturate(120%);
-  opacity:.92;
+    radial-gradient(ellipse 100% 80% at 50% -20%, rgba(120,105,255,.42), transparent 70%),
+    radial-gradient(ellipse 75% 65% at 10% -15%, rgba(210,100,165,.24), transparent 68%),
+    radial-gradient(ellipse 70% 60% at 90% -12%, rgba(255,160,110,.14), transparent 66%),
+    radial-gradient(ellipse 55% 50% at 70% -5%, rgba(255,200,130,.10), transparent 62%),
+    radial-gradient(ellipse 50% 45% at 30% -8%, rgba(110,160,255,.16), transparent 66%);
+  filter:blur(56px) saturate(115%);
+  opacity:.82;
 }
 [data-theme="dark"] .shell::after{opacity:.05;mix-blend-mode:screen}
 [data-theme="dark"] .fresh span{background:var(--control-bg);border-color:var(--line);color:var(--muted)}
@@ -734,7 +687,7 @@ footer{
 /* —— Mobile rhythm —— */
 @media (max-width:719px){
   .fresh{
-    padding:calc(env(safe-area-inset-top, 0px) + 10px) max(18px, env(safe-area-inset-right, 0px)) 0 max(18px, env(safe-area-inset-left, 0px));
+    padding:calc(env(safe-area-inset-top, 0px) + 12px) max(18px, env(safe-area-inset-right, 0px)) 0 max(18px, env(safe-area-inset-left, 0px));
   }
   .shell{
     width:100%;max-width:100%;margin:0;
@@ -744,9 +697,9 @@ footer{
     padding-right:max(18px, env(safe-area-inset-right, 0px));
   }
   .aurora{
-    height:calc(env(safe-area-inset-top, 0px) + min(420px, 62dvh));
+    height:calc(env(safe-area-inset-top, 0px) + min(240px, 34dvh));
   }
-  .brand{margin:12px 0 24px;min-height:28px;padding:0}
+  .brand{margin:22px 0 24px;min-height:28px;padding:0}
   .brand-slot{min-height:28px}
   .brand .wm{height:28px}
   .theme-toggle{
@@ -763,11 +716,12 @@ footer{
   .search{width:min(100%,320px)}
   .sec{margin:0 0 12px}
   #list{gap:12px}
-  .item{border-radius:16px}
-  .item summary{padding:16px 16px 14px;padding-right:40px}
-  .item summary::after{right:14px;top:18px}
-  .item[open] summary::after{top:22px}
-  .item .body{padding:0 16px 16px}
+  .item{border-radius:18px}
+  .item summary{padding:20px 40px 18px 20px}
+  .item summary::after{right:16px;top:24px}
+  .item[open] summary::after{top:28px}
+  .item .body{padding:4px 20px 20px}
+  .item .q{margin:0 0 10px}
   footer{margin:40px 0 0;padding:20px 0 0}
 }
 </style>
@@ -859,7 +813,7 @@ footer{
 
 const PAGE_UPDATED="2026-10-24";
 const LABELS={"all":"All answers","getting-started":"Getting started","device":"Device","app-firmware":"App & firmware","recording-ai":"Recording & AI","privacy":"Privacy","feedback":"Reporting"};
-const DATA=[{"id":"FB-004","cat":"getting-started","tag":"Getting started","sortKey":"2026-10-22","q":"How do I track shipping, and where do I report bugs?","teaser":"UPS delivery; tracking arrives by email. Report bugs in General or Beta Support.","teaserHtml":"<mark>UPS</mark> delivery; tracking arrives by email. Report bugs in <mark>General</mark> or <mark>Beta Support</mark>.","a":"<p>Devices ship with <code>UPS</code>. You’ll get an email from the team; tracking can take a little while to appear.</p><p>For bugs, post in <strong>General</strong> or your personal <strong>Beta Support</strong> group.</p>","alwaysOpen":false,"tags":["Getting started","Shipping"]},{"id":"FB-035","cat":"getting-started","tag":"Getting started","sortKey":"2026-10-24","q":"My device just arrived — what should I do first?","teaser":"Follow Checklist_revised.pdf steps 1–7 (share SN), wait for us to remind you, then continue from step 8.","teaserHtml":"Follow <mark>Checklist_revised.pdf</mark> steps 1–7 (share SN), wait for us to remind you, then continue from step 8.","a":"<p>In the WhatsApp beta community, open <strong>Announcements</strong> and use <code>Checklist_revised.pdf</code> and <code>QuickStartGuide.pdf</code> as your guides.</p><p>Follow <code>Checklist_revised.pdf</code> step by step through <strong>steps 1–7</strong> (including sharing your <strong>serial number (<code>SN</code>)</strong>). Then <strong>stop</strong> and wait for us to remind you.</p><p>After our reminder, continue from <strong>step 8</strong> and set up the device.</p>","alwaysOpen":false,"tags":["Getting started","Setup"]},{"id":"FB-014","cat":"device","tag":"Device","sortKey":"2026-10-24","q":"Recording shows activity, but nothing returns — or I’m stuck on firmware 1.0.68?","teaser":"Share your SN, wait for our firmware-push notice, then follow Checklist_revised.pdf.","teaserHtml":"Share your <mark>SN</mark>, wait for our firmware-push notice, then follow <mark>Checklist_revised.pdf</mark>.","a":"<p>Devices often ship on older firmware (including <code>1.0.68</code>). Send your <strong>serial number (<code>SN</code>)</strong> in <strong>General</strong> or your private <strong>Beta Support</strong> group.</p><p><strong>Wait</strong> for our notice that new firmware was pushed to your device. The app’s Firmware Update screen may not show it right away.</p><p>After that notice, open <strong>Announcements</strong> and follow <code>Checklist_revised.pdf</code> (use the <code>TestFlight</code> build the checklist names). Then keep app and firmware current, and <strong>unbind and re-pair</strong> if data still needs to sync to the Flip screen.</p>","alwaysOpen":false,"tags":["Device","Firmware"]},{"id":"FB-034","cat":"app-firmware","tag":"App & firmware","sortKey":"2026-10-24","q":"Which iOS app build should I install?","teaser":"Use the listed TestFlight build for iOS beta.","teaserHtml":"Use the listed <mark>TestFlight</mark> build for iOS beta.","a":"<p>Install via <code>TestFlight</code>.</p><p>Current build: <strong>1.0.1 (1217)</strong>.</p>","alwaysOpen":false,"tags":["App & firmware","iOS"]},{"id":"FB-009","cat":"app-firmware","tag":"App & firmware","sortKey":"2026-10-24","q":"Calendar shows in the app but not on the device — or Bluetooth is connected with no voice actions?","teaser":"Usually an app + firmware mismatch — share SN if asked, then wait for our push.","teaserHtml":"Usually an <mark>app + firmware</mark> mismatch — share SN if asked, then wait for our push.","a":"<p>This is usually an <strong>app and firmware version</strong> mismatch.</p><p>Send your <strong>serial number (<code>SN</code>)</strong> if asked, then <strong>wait for our notification</strong> that a firmware update has been pushed. After the push, calendars listed in the app should be able to sync to the device.</p><p>Android / Fold calendar feedback is noted; <strong>no commitment yet</strong>.</p>","alwaysOpen":false,"tags":["App & firmware","Sync"]},{"id":"FB-028","cat":"app-firmware","tag":"App & firmware","sortKey":"2026-10-24","q":"Why do I see characters in other languages in the UI or AI output?","teaser":"AI language/prompt issue under fix — send a screenshot if it returns.","teaserHtml":"AI language/prompt issue under fix — send a screenshot if it returns.","a":"<p>Characters in other languages in the UI or AI output are treated as an <strong>AI language / prompt</strong> issue. The team is refining prompts.</p><p>If it continues, send a screenshot in <strong>General</strong> or your personal <strong>Beta Support</strong> group.</p>","alwaysOpen":false,"tags":["App & firmware","AI"]},{"id":"FB-015","cat":"recording-ai","tag":"Recording & AI","sortKey":"2026-10-23","q":"Can I leave recording on all day?","teaser":"Yes — it keeps speech only and clears after phone sync.","teaserHtml":"Yes — it keeps speech only and clears after phone sync.","a":"<p>Yes. Leave recording on.</p><p>It <strong>only keeps audio when someone is speaking</strong>. After sync to your phone, device storage <strong>clears automatically</strong>.</p>","alwaysOpen":false,"tags":["Recording & AI","Battery"]},{"id":"FB-024","cat":"privacy","tag":"Privacy","sortKey":"2026-10-24","q":"Can I use Flip with other AIs via MCP under the NDA?","teaser":"Yes — MCP with other AIs is allowed in this beta.","teaserHtml":"Yes — <mark>MCP</mark> with other AIs is allowed in this beta.","a":"<p><code>MCP</code> is part of the beta. You’re free to try it with other AIs.</p>","alwaysOpen":false,"tags":["Privacy","MCP"]},{"id":"R1","cat":"feedback","tag":"Reporting","sortKey":"2026-10-22","q":"General channel","teaser":"Shared questions, announcements, and group bug reports.","teaserHtml":"Shared questions, announcements, and group bug reports.","a":"<p>Use <strong>General</strong> for shared questions, announcements, and bug reports the whole beta group can see.</p>","alwaysOpen":false,"tags":["Reporting","General"]},{"id":"R2","cat":"feedback","tag":"Reporting","sortKey":"2026-10-22","q":"Personal Beta Support group","teaser":"Private thread for shipment, SN, and one-to-one issues.","teaserHtml":"Private thread for shipment, <mark>SN</mark>, and one-to-one issues.","a":"<p>Your private thread for shipment details, <strong>serial number (<code>SN</code>)</strong>, and one-to-one issues.</p>","alwaysOpen":false,"tags":["Reporting","Support"]},{"id":"R3","cat":"feedback","tag":"Reporting","sortKey":"2026-10-24","q":"Which docs matter, and what should I include when reporting?","teaser":"Include SN, versions, and a screenshot; QuickStartGuide.pdf and Checklist_revised.pdf live in Announcements.","teaserHtml":"Include SN, versions, and a screenshot; <mark>QuickStartGuide.pdf</mark> and <mark>Checklist_revised.pdf</mark> live in Announcements.","a":"<p><strong>Announcements</strong> includes <code>QuickStartGuide.pdf</code> and <code>Checklist_revised.pdf</code>.</p><p>Helpful reports include repro steps, your <strong>serial number (<code>SN</code>)</strong>, app and firmware versions, and a screenshot or short video.</p>","alwaysOpen":false,"tags":["Reporting","Docs"]}];
+const DATA=[{"id":"FB-004","cat":"getting-started","tag":"Getting started","sortKey":"2026-10-22","q":"How do I track shipping, and where do I report bugs?","teaser":"UPS delivery; tracking arrives by email. Report bugs in General or Beta Support.","teaserHtml":"<mark>UPS</mark> delivery; tracking arrives by email. Report bugs in <mark>General</mark> or <mark>Beta Support</mark>.","a":"<p>Devices ship with <code>UPS</code>. You’ll get an email from the team; tracking can take a little while to appear.</p><p>For bugs, post in <strong>General</strong> or your personal <strong>Beta Support</strong> group.</p>","alwaysOpen":false,"tags":["Getting started","Shipping"]},{"id":"FB-035","cat":"getting-started","tag":"Getting started","sortKey":"2026-10-24","q":"My device just arrived — what should I do first?","teaser":"Follow Checklist_revised.pdf steps 1–7 (share SN), wait for us to remind you, then continue from step 8.","teaserHtml":"Follow <mark>Checklist_revised.pdf</mark> steps 1–7 (share SN), wait for us to remind you, then continue from step 8.","a":"<p>In the WhatsApp beta community, open <strong>Announcements</strong> and use <code>Checklist_revised.pdf</code> and <code>QuickStartGuide.pdf</code> as your guides.</p><p>Follow <code>Checklist_revised.pdf</code> step by step through <strong>steps 1–7</strong> (including sharing your <strong>serial number (<code>SN</code>)</strong>). Then <strong>stop</strong> and wait for us to remind you.</p><p>After our reminder, continue from <strong>step 8</strong> and set up the device.</p>","alwaysOpen":false,"tags":["Getting started","Setup"]},{"id":"FB-014","cat":"device","tag":"Device","sortKey":"2026-10-24","q":"Recording shows activity, but nothing returns — or I’m stuck on firmware 1.0.68?","teaser":"Share your SN, wait for our firmware-push notice, then follow Checklist_revised.pdf.","teaserHtml":"Share your <mark>SN</mark>, wait for our firmware-push notice, then follow <mark>Checklist_revised.pdf</mark>.","a":"<p>Devices often ship on older firmware (including <code>1.0.68</code>). Send your <strong>serial number (<code>SN</code>)</strong> in <strong>General</strong> or your private <strong>Beta Support</strong> group.</p><p><strong>Wait</strong> for our notice that new firmware was pushed to your device. The app’s Firmware Update screen may not show it right away.</p><p>After that notice, open <strong>Announcements</strong> and follow <code>Checklist_revised.pdf</code> (use the <code>TestFlight</code> build the checklist names). Then keep app and firmware current, and <strong>unbind and re-pair</strong> if data still needs to sync to the Flip screen.</p>","alwaysOpen":false,"tags":["Device","Firmware"]},{"id":"FB-034","cat":"app-firmware","tag":"App & firmware","sortKey":"2026-10-24","q":"Which iOS app build should I install?","teaser":"Use the listed TestFlight build for iOS beta.","teaserHtml":"Use the listed <mark>TestFlight</mark> build for iOS beta.","a":"<p>Install via <code>TestFlight</code>.</p><p>Current build: <strong>1.0.1 (1217)</strong>.</p>","alwaysOpen":false,"tags":["App & firmware","iOS"]},{"id":"FB-009","cat":"app-firmware","tag":"App & firmware","sortKey":"2026-10-24","q":"Calendar shows in the app but not on the device — or Bluetooth is connected with no voice actions?","teaser":"Usually an app + firmware mismatch — share SN if asked, then wait for our push.","teaserHtml":"Usually an <mark>app + firmware</mark> mismatch — share SN if asked, then wait for our push.","a":"<p>This is usually an <strong>app and firmware version</strong> mismatch.</p><p>Send your <strong>serial number (<code>SN</code>)</strong> if asked, then <strong>wait for our notification</strong> that a firmware update has been pushed. After the push, calendars listed in the app should be able to sync to the device.</p><p>Android / Fold calendar feedback is noted; <strong>no commitment yet</strong>.</p>","alwaysOpen":false,"tags":["App & firmware","Sync"]},{"id":"FB-028","cat":"app-firmware","tag":"App & firmware","sortKey":"2026-10-24","q":"Why do I see characters in other languages in the UI or AI output?","teaser":"AI language/prompt issue under fix — send a screenshot if it returns.","teaserHtml":"AI language/prompt issue under fix — send a screenshot if it returns.","a":"<p>Characters in other languages in the UI or AI output are treated as an <strong>AI language / prompt</strong> issue. The team is refining prompts.</p><p>If it continues, send a screenshot in <strong>General</strong> or your personal <strong>Beta Support</strong> group.</p>","alwaysOpen":false,"tags":["App & firmware","AI"]},{"id":"FB-015","cat":"recording-ai","tag":"Recording & AI","sortKey":"2026-10-23","q":"Can I leave recording on all day?","teaser":"Yes — leave it on all day. It only saves when someone speaks; auto-clears after phone sync.","teaserHtml":"Yes — leave it on all day. It only saves when someone speaks; auto-clears after phone sync.","a":"<p>Yes — you can leave recording on all day.</p><p>It <strong>only saves when someone is speaking</strong>. After sync to the phone, the device <strong>auto-clears</strong> (no manual purge).</p>","alwaysOpen":false,"tags":["Recording & AI","Battery"]},{"id":"FB-024","cat":"privacy","tag":"Privacy","sortKey":"2026-10-24","q":"Can I use Flip with other AIs via MCP under the NDA?","teaser":"Yes — MCP with other AIs is allowed in this beta.","teaserHtml":"Yes — <mark>MCP</mark> with other AIs is allowed in this beta.","a":"<p><code>MCP</code> is part of the beta. You’re free to try it with other AIs.</p>","alwaysOpen":false,"tags":["Privacy","MCP"]},{"id":"R1","cat":"feedback","tag":"Reporting","sortKey":"2026-10-22","q":"General channel","teaser":"Shared questions, announcements, and group bug reports.","teaserHtml":"Shared questions, announcements, and group bug reports.","a":"<p>Use <strong>General</strong> for shared questions, announcements, and bug reports the whole beta group can see.</p>","alwaysOpen":false,"tags":["Reporting","General"]},{"id":"R2","cat":"feedback","tag":"Reporting","sortKey":"2026-10-22","q":"Personal Beta Support group","teaser":"Private thread for shipment, SN, and one-to-one issues.","teaserHtml":"Private thread for shipment, <mark>SN</mark>, and one-to-one issues.","a":"<p>Your private thread for shipment details, <strong>serial number (<code>SN</code>)</strong>, and one-to-one issues.</p>","alwaysOpen":false,"tags":["Reporting","Support"]},{"id":"R3","cat":"feedback","tag":"Reporting","sortKey":"2026-10-24","q":"Which docs matter, and what should I include when reporting?","teaser":"Include SN, versions, and a screenshot; QuickStartGuide.pdf and Checklist_revised.pdf live in Announcements.","teaserHtml":"Include SN, versions, and a screenshot; <mark>QuickStartGuide.pdf</mark> and <mark>Checklist_revised.pdf</mark> live in Announcements.","a":"<p><strong>Announcements</strong> includes <code>QuickStartGuide.pdf</code> and <code>Checklist_revised.pdf</code>.</p><p>Helpful reports include repro steps, your <strong>serial number (<code>SN</code>)</strong>, app and firmware versions, and a screenshot or short video.</p>","alwaysOpen":false,"tags":["Reporting","Docs"]}];
 let tab="all", sortDir="newest";
 const list=document.getElementById("list"), qEl=document.getElementById("q"), sec=document.getElementById("sec");
 function esc(s){return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")}
@@ -901,18 +855,18 @@ document.getElementById("askSubmit").addEventListener("click",()=>{
 });
 /* fresh bar is non-sticky silk — no scroll hide */
 
-/* Theme toggle v5 — CSS @media is the default (no data-theme).
-   data-theme + manual-v5 ONLY after an explicit click. All stale keys wiped (incl v4). */
+/* Theme toggle v6 — CSS @media is the default (no data-theme).
+   data-theme + manual-v6 ONLY after an explicit click. All stale keys wiped (incl v5). */
 (function(){
-  const MANUAL='flip-beta-qa-theme-manual-v5';
-  const STALE=['flip-beta-qa-theme','flip-beta-qa-theme-v1','flip-beta-qa-theme-v2','flip-beta-qa-theme-manual','flip-beta-qa-theme-v3','flip-beta-qa-theme-manual-v4'];
+  const MANUAL='flip-beta-qa-theme-manual-v6';
+  const STALE=['flip-beta-qa-theme','flip-beta-qa-theme-v1','flip-beta-qa-theme-v2','flip-beta-qa-theme-manual','flip-beta-qa-theme-v3','flip-beta-qa-theme-manual-v4','flip-beta-qa-theme-manual-v5'];
   const root=document.documentElement;
   const btn=document.getElementById('themeToggle');
   const meta=document.getElementById('themeColorMeta');
   const metaL=document.getElementById('themeColorMetaLight');
   const metaD=document.getElementById('themeColorMetaDark');
-  const LIGHT_TC='#E8E0F5'; /* exact aurora crown — iOS Safari status bar */
-  const DARK_TC='#1A1428';
+  const LIGHT_TC='#F7F5F1'; /* soft page wash — matches --bg */
+  const DARK_TC='#0E0F14';
   for(const k of STALE){try{localStorage.removeItem(k)}catch(e){}}
   function systemTheme(){
     try{return window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'}
@@ -933,18 +887,21 @@ document.getElementById("askSubmit").addEventListener("click",()=>{
     const tc=theme==='dark'?DARK_TC:LIGHT_TC;
     if(meta) meta.setAttribute('content', tc);
     if(manual){
-      /* Manual override: force every theme-color meta to the active crown (iOS Safari) */
       if(metaL) metaL.setAttribute('content', tc);
       if(metaD) metaD.setAttribute('content', tc);
+      try{
+        root.style.backgroundColor=tc;
+        if(document.body) document.body.style.backgroundColor=tc;
+      }catch(e){}
     }else{
       if(metaL) metaL.setAttribute('content', LIGHT_TC);
       if(metaD) metaD.setAttribute('content', DARK_TC);
+      /* Clear inline bg so CSS @media + var(--bg) drive the page */
+      try{
+        root.style.backgroundColor='';
+        if(document.body) document.body.style.backgroundColor='';
+      }catch(e){}
     }
-    /* Always paint html/body crown so status-bar region never falls back to black */
-    try{
-      root.style.backgroundColor=tc;
-      if(document.body) document.body.style.backgroundColor=tc;
-    }catch(e){}
     if(btn){
       btn.setAttribute('aria-label', theme==='dark'?'Switch to light theme':'Switch to dark theme');
       btn.title=theme==='dark'?'Light':'Dark';
