@@ -72,7 +72,7 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/geist-mono@5.2.5/index.min.css" />
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600&display=swap" />
 <style>
-/* Overhaul 2026-10-25 v8 — premium cream aurora · cool night wash · safe-area blend */
+/* Overhaul 2026-10-25 v9 — top-curtain aurora · brand title tones · light card polish · compact search */
 :root{
   /* Surfaces */
   --bg:#F7F5F1;
@@ -85,8 +85,8 @@
   --muted:#7C766E;
   --faint:#A8A29A;
   /* Lines & accents */
-  --line:rgba(12,10,8,.065);
-  --line2:rgba(12,10,8,.11);
+  --line:rgba(40,28,12,.08);
+  --line2:rgba(40,28,12,.14);
   --accent:#635BFF;
   --accent-deep:#4F46E5;
   --accent-soft:rgba(99,91,255,.11);
@@ -96,17 +96,17 @@
   --cta-hover:rgba(99,91,255,.14);
   --ok:#2F9E6B;
   --ok-soft:rgba(47,158,107,.14);
-  /* Elevation */
-  --shadow-sm:0 1px 2px rgba(24,18,12,.03), 0 2px 8px rgba(24,18,12,.035);
+  /* Elevation — warm soft lift (premium light cards) */
+  --shadow-sm:0 1px 2px rgba(40,28,12,.04), 0 2px 6px rgba(40,28,12,.03);
   --shadow-md:
-    0 1px 2px rgba(24,18,12,.028),
-    0 6px 18px rgba(24,18,12,.045),
-    0 18px 40px rgba(24,18,12,.04);
+    0 1px 2px rgba(40,28,12,.035),
+    0 4px 10px rgba(40,28,12,.04),
+    0 12px 28px rgba(40,28,12,.05);
   --shadow-lg:
-    0 2px 4px rgba(24,18,12,.03),
-    0 14px 36px rgba(24,18,12,.06),
-    0 32px 64px rgba(24,18,12,.05);
-  --control-bg:rgba(255,255,255,.78);
+    0 2px 4px rgba(40,28,12,.04),
+    0 10px 24px rgba(40,28,12,.06),
+    0 24px 48px rgba(40,28,12,.055);
+  --control-bg:rgba(255,255,255,.88);
   --ease:cubic-bezier(.22,1,.36,1);
   --dur:180ms;
   --r:20px;
@@ -155,46 +155,44 @@ body{
   width:100%;max-width:100%;
   position:relative;
 }
-/* Premium TOP aurora (Linear-like). Extends UP behind status / Dynamic Island.
-   Light: cream · champagne · warm peach only — no cool blue (avoids muddy purple under blur).
-   Dark: cool night violet/indigo — elegant, low noise. Never an opaque black/purple slab. */
+/* TOP-curtain aurora (Linear / Cursor pattern).
+   Anchored at top-center only; fades downward. NO side/edge frame wash.
+   Soft gradient stops — no container blur (blur bleeds to all 4 edges). */
 .aurora{
   position:fixed;
-  top:calc(-1 * env(safe-area-inset-top, 0px));
-  left:0;right:0;
+  top:0;left:0;right:0;
   width:100%;
-  height:calc(env(safe-area-inset-top, 0px) + min(280px, 40dvh));
+  height:calc(env(safe-area-inset-top, 0px) + min(360px, 46vh));
   margin:0;padding:0;
   pointer-events:none;
   z-index:0;
   overflow:hidden;
-  /* Soft cream / champagne / peach wash — intentional, airy */
+  isolation:isolate;
+  /* Light: brand cream / champagne / #FFFBC1 wash — from TOP only */
   background:
-    radial-gradient(ellipse 130% 95% at 50% -35%, rgba(255,248,236,.90) 0%, transparent 68%),
-    radial-gradient(ellipse 85% 75% at 12% -18%, rgba(255,232,214,.42) 0%, transparent 62%),
-    radial-gradient(ellipse 80% 70% at 90% -14%, rgba(246,238,222,.48) 0%, transparent 60%),
-    radial-gradient(ellipse 55% 50% at 50% 8%, rgba(255,252,247,.35) 0%, transparent 70%);
-  filter:blur(32px) saturate(104%);
+    radial-gradient(ellipse 100% 80% at 50% -8%, rgba(255,251,193,.55) 0%, transparent 62%),
+    radial-gradient(ellipse 70% 55% at 50% 0%, rgba(255,236,214,.38) 0%, transparent 58%),
+    radial-gradient(ellipse 50% 40% at 50% 4%, rgba(255,252,247,.42) 0%, transparent 55%);
+  filter:none;
   opacity:1;
-  -webkit-mask-image:linear-gradient(180deg,#000 0%,#000 38%,transparent 100%);
-  mask-image:linear-gradient(180deg,#000 0%,#000 38%,transparent 100%);
+  -webkit-mask-image:linear-gradient(180deg,#000 0%,#000 22%,rgba(0,0,0,.55) 55%,transparent 100%);
+  mask-image:linear-gradient(180deg,#000 0%,#000 22%,rgba(0,0,0,.55) 55%,transparent 100%);
 }
-/* Soft top veil = page wash into safe-area (not a slab) */
+/* Thin safe-area crown — top veil only, never a side frame */
 .aurora-crown{
   display:block!important;
   position:absolute;
   left:0;right:0;top:0;
-  height:calc(env(safe-area-inset-top, 0px) + 72px);
+  height:calc(env(safe-area-inset-top, 0px) + 56px);
   margin:0;padding:0;
   pointer-events:none;
   background:linear-gradient(
     180deg,
-    color-mix(in srgb, var(--bg) 88%, #FFE9D4) 0%,
-    color-mix(in srgb, var(--bg) 55%, transparent) 55%,
+    color-mix(in srgb, var(--bg) 70%, #FFFBC1) 0%,
     transparent 100%
   );
   filter:none;
-  opacity:1;
+  opacity:.85;
 }
 .aurora-blobs{display:none!important}
 .fresh,.shell,.modal-backdrop{position:relative;z-index:1}
@@ -298,22 +296,21 @@ a:hover{text-decoration:underline;text-underline-offset:3px}
   text-align:center;display:flex;flex-direction:column;align-items:center;
 }
 .hero h1{
-  /* hellomoonphase.com cues: Instrument Serif 400, LH~1.1, brand brown on cream */
+  /* Light default: warm brand gold (#A67A4E from hellomoonphase). Dark override → white. */
   margin:0 0 12px;
   font-family:var(--display);
   font-size:var(--fs-hero);
   font-weight:400;font-style:normal;
   letter-spacing:-.01em;line-height:1.1;
-  color:#402F1E; /* --lp-brown */
+  color:#A67A4E;
   text-wrap:balance;
 }
 .hero h1 em{
-  /* italic accent like logo/name + FAQ italic on marketing site */
   font-family:var(--display);
   font-style:italic;
   font-weight:400;
   letter-spacing:0;
-  color:#7F715C; /* --lp-answer */
+  color:#C4A574; /* softer warm cream-gold */
 }
 .hero .sub{
   margin:0 0 28px;font-size:16px;font-weight:var(--fw-regular);letter-spacing:-.012em;
@@ -343,7 +340,7 @@ a:hover{text-decoration:underline;text-underline-offset:3px}
 /* —— Control band: one clear block —— */
 .controls{
   display:flex;flex-direction:column;align-items:center;gap:14px;
-  margin:0 auto 32px;max-width:720px;
+  margin:0 auto 32px;max-width:680px;
 }
 .chips{
   display:flex;flex-wrap:wrap;gap:8px;justify-content:center;
@@ -367,17 +364,17 @@ a:hover{text-decoration:underline;text-underline-offset:3px}
 
 .toolbar{
   display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap;
-  margin:0;width:100%;max-width:720px;
+  margin:0;width:auto;max-width:100%;
 }
 .search{
   position:relative;display:flex;align-items:center;
-  width:min(420px,100%);height:var(--control-h);padding:0 14px 0 36px;
+  width:min(292px,100%);height:var(--control-h);padding:0 14px 0 36px;
   border-radius:999px;border:1px solid var(--line);
   background:var(--control-bg);
   backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
   box-shadow:var(--shadow-sm);
   transition:border-color var(--dur) var(--ease), box-shadow var(--dur) var(--ease);
-  flex:1 1 280px;max-width:440px;
+  flex:0 1 292px;max-width:292px;
 }
 .search:focus-within{
   border-color:color-mix(in srgb, var(--accent) 36%, var(--line));
@@ -681,68 +678,95 @@ footer{
 [data-theme="light"]{
   color-scheme:light;
 }
-[data-theme="light"] .hero h1{color:#402F1E}
-[data-theme="light"] .hero h1 em{color:#7F715C}
+[data-theme="light"] .hero h1{color:#A67A4E}
+[data-theme="light"] .hero h1 em{color:#C4A574}
+/* Light mode card / control polish — lift to dark-mode quality bar */
+[data-theme="light"] .item{
+  background:#FFFFFF;
+  border-color:rgba(40,28,12,.09);
+  box-shadow:
+    0 1px 2px rgba(40,28,12,.04),
+    0 4px 12px rgba(40,28,12,.045),
+    0 14px 32px rgba(40,28,12,.04);
+}
+[data-theme="light"] .item:hover{
+  border-color:rgba(40,28,12,.14);
+  box-shadow:
+    0 2px 4px rgba(40,28,12,.045),
+    0 10px 28px rgba(40,28,12,.07),
+    0 28px 56px rgba(40,28,12,.05);
+}
+[data-theme="light"] .item .body{border-top-color:rgba(40,28,12,.07)}
+[data-theme="light"] .chip,
+[data-theme="light"] .search,
+[data-theme="light"] .sort,
+[data-theme="light"] .theme-toggle,
+[data-theme="light"] .fresh span{
+  background:rgba(255,255,255,.92);
+  border-color:rgba(40,28,12,.09);
+  box-shadow:0 1px 2px rgba(40,28,12,.04), 0 2px 8px rgba(40,28,12,.03);
+}
+[data-theme="light"] .chip:hover,
+[data-theme="light"] .theme-toggle:hover{
+  background:#fff;
+  border-color:rgba(40,28,12,.14);
+}
 
-/* Dark soft top aurora — cool night violet / indigo / blue, never opaque bar */
+/* Dark top-curtain aurora — cool violet from TOP center only (Linear-style) */
 @media (prefers-color-scheme: dark){
   :root:not([data-theme="light"]) .aurora{
     background:
-      radial-gradient(ellipse 120% 90% at 50% -32%, rgba(92,98,190,.30) 0%, transparent 70%),
-      radial-gradient(ellipse 75% 65% at 18% -16%, rgba(70,90,170,.16) 0%, transparent 64%),
-      radial-gradient(ellipse 70% 60% at 88% -12%, rgba(110,85,190,.14) 0%, transparent 62%),
-      radial-gradient(ellipse 50% 42% at 50% 6%, rgba(36,42,88,.18) 0%, transparent 68%);
-    filter:blur(40px) saturate(112%);
-    opacity:.88;
+      radial-gradient(ellipse 95% 75% at 50% -6%, rgba(110,118,220,.34) 0%, transparent 64%),
+      radial-gradient(ellipse 60% 50% at 50% 0%, rgba(72,80,170,.20) 0%, transparent 58%);
+    filter:none;
+    opacity:.92;
   }
   :root:not([data-theme="light"]) .aurora-crown{
     background:linear-gradient(
       180deg,
-      color-mix(in srgb, var(--bg) 90%, #2A2E55) 0%,
-      color-mix(in srgb, var(--bg) 50%, transparent) 55%,
+      color-mix(in srgb, var(--bg) 75%, #3A3F78) 0%,
       transparent 100%
     );
+    opacity:.7;
   }
-  :root:not([data-theme="light"]) .hero h1{color:#FFFBC1}
-  :root:not([data-theme="light"]) .hero h1 em{color:#D9D4A0}
+  /* Dark title: white + muted cream italic — NOT yellow */
+  :root:not([data-theme="light"]) .hero h1{color:#FFFFFF}
+  :root:not([data-theme="light"]) .hero h1 em{color:#E8E4D8}
 }
 [data-theme="dark"] .aurora{
   background:
-    radial-gradient(ellipse 120% 90% at 50% -32%, rgba(92,98,190,.30) 0%, transparent 70%),
-    radial-gradient(ellipse 75% 65% at 18% -16%, rgba(70,90,170,.16) 0%, transparent 64%),
-    radial-gradient(ellipse 70% 60% at 88% -12%, rgba(110,85,190,.14) 0%, transparent 62%),
-    radial-gradient(ellipse 50% 42% at 50% 6%, rgba(36,42,88,.18) 0%, transparent 68%);
-  filter:blur(40px) saturate(112%);
-  opacity:.88;
+    radial-gradient(ellipse 95% 75% at 50% -6%, rgba(110,118,220,.34) 0%, transparent 64%),
+    radial-gradient(ellipse 60% 50% at 50% 0%, rgba(72,80,170,.20) 0%, transparent 58%);
+  filter:none;
+  opacity:.92;
 }
 [data-theme="dark"] .aurora-crown{
   background:linear-gradient(
     180deg,
-    color-mix(in srgb, var(--bg) 90%, #2A2E55) 0%,
-    color-mix(in srgb, var(--bg) 50%, transparent) 55%,
+    color-mix(in srgb, var(--bg) 75%, #3A3F78) 0%,
     transparent 100%
   );
+  opacity:.7;
 }
 /* Explicit light reset when user forces light over system dark */
 [data-theme="light"] .aurora{
   background:
-    radial-gradient(ellipse 130% 95% at 50% -35%, rgba(255,248,236,.90) 0%, transparent 68%),
-    radial-gradient(ellipse 85% 75% at 12% -18%, rgba(255,232,214,.42) 0%, transparent 62%),
-    radial-gradient(ellipse 80% 70% at 90% -14%, rgba(246,238,222,.48) 0%, transparent 60%),
-    radial-gradient(ellipse 55% 50% at 50% 8%, rgba(255,252,247,.35) 0%, transparent 70%);
-  filter:blur(32px) saturate(104%);
+    radial-gradient(ellipse 100% 80% at 50% -8%, rgba(255,251,193,.55) 0%, transparent 62%),
+    radial-gradient(ellipse 70% 55% at 50% 0%, rgba(255,236,214,.38) 0%, transparent 58%),
+    radial-gradient(ellipse 50% 40% at 50% 4%, rgba(255,252,247,.42) 0%, transparent 55%);
+  filter:none;
   opacity:1;
 }
 [data-theme="light"] .aurora-crown{
   background:linear-gradient(
     180deg,
-    color-mix(in srgb, var(--bg) 88%, #FFE9D4) 0%,
-    color-mix(in srgb, var(--bg) 55%, transparent) 55%,
+    color-mix(in srgb, var(--bg) 70%, #FFFBC1) 0%,
     transparent 100%
   );
+  opacity:.85;
 }
-[data-theme="dark"] .hero h1{color:#FFFBC1}
-[data-theme="dark"] .hero h1 em{color:#D9D4A0}
+[data-theme="dark"] .hero h1{color:#FFFFFF}
+[data-theme="dark"] .hero h1 em{color:#E8E4D8}
 [data-theme="dark"] .shell::after{opacity:.05;mix-blend-mode:screen}
 [data-theme="dark"] .fresh span{background:var(--control-bg);border-color:var(--line);color:var(--muted)}
 [data-theme="dark"] .fresh i{background:var(--ok);box-shadow:0 0 0 3px var(--ok-soft)}
@@ -833,7 +857,8 @@ footer{
     box-shadow:0 1px 2px rgba(0,0,0,.2);
   }
   :root:not([data-theme="light"]) ::selection{background:var(--accent-soft);color:var(--ink)}
-  :root:not([data-theme="light"]) .hero h1{color:#FFFBC1}
+  :root:not([data-theme="light"]) .hero h1{color:#FFFFFF}
+  :root:not([data-theme="light"]) .hero h1 em{color:#E8E4D8}
 }
 
 /* —— Mobile rhythm —— */
@@ -849,42 +874,37 @@ footer{
     padding-right:max(18px, env(safe-area-inset-right, 0px));
   }
   .aurora{
-    height:calc(env(safe-area-inset-top, 0px) + min(220px, 32dvh));
-    /* Mobile light: quieter, intentional cream wash — less blur mud */
+    height:calc(env(safe-area-inset-top, 0px) + min(280px, 38vh));
     background:
-      radial-gradient(ellipse 140% 100% at 50% -40%, rgba(255,248,238,.95) 0%, transparent 66%),
-      radial-gradient(ellipse 90% 80% at 18% -20%, rgba(255,234,216,.36) 0%, transparent 60%),
-      radial-gradient(ellipse 85% 70% at 86% -16%, rgba(244,236,222,.40) 0%, transparent 58%);
-    filter:blur(28px) saturate(102%);
+      radial-gradient(ellipse 110% 85% at 50% -6%, rgba(255,251,193,.50) 0%, transparent 62%),
+      radial-gradient(ellipse 65% 50% at 50% 0%, rgba(255,236,214,.32) 0%, transparent 56%);
+    filter:none;
     opacity:1;
   }
   .aurora-crown{
-    height:calc(env(safe-area-inset-top, 0px) + 64px);
+    height:calc(env(safe-area-inset-top, 0px) + 48px);
   }
   @media (prefers-color-scheme: dark){
     :root:not([data-theme="light"]) .aurora{
       background:
-        radial-gradient(ellipse 130% 95% at 50% -36%, rgba(88,94,178,.28) 0%, transparent 68%),
-        radial-gradient(ellipse 80% 70% at 20% -18%, rgba(64,82,160,.14) 0%, transparent 62%),
-        radial-gradient(ellipse 75% 65% at 86% -14%, rgba(100,80,175,.12) 0%, transparent 60%);
-      filter:blur(34px) saturate(110%);
-      opacity:.90;
+        radial-gradient(ellipse 100% 80% at 50% -4%, rgba(110,118,220,.30) 0%, transparent 64%),
+        radial-gradient(ellipse 55% 45% at 50% 0%, rgba(72,80,170,.16) 0%, transparent 56%);
+      filter:none;
+      opacity:.92;
     }
   }
   [data-theme="dark"] .aurora{
     background:
-      radial-gradient(ellipse 130% 95% at 50% -36%, rgba(88,94,178,.28) 0%, transparent 68%),
-      radial-gradient(ellipse 80% 70% at 20% -18%, rgba(64,82,160,.14) 0%, transparent 62%),
-      radial-gradient(ellipse 75% 65% at 86% -14%, rgba(100,80,175,.12) 0%, transparent 60%);
-    filter:blur(34px) saturate(110%);
-    opacity:.90;
+      radial-gradient(ellipse 100% 80% at 50% -4%, rgba(110,118,220,.30) 0%, transparent 64%),
+      radial-gradient(ellipse 55% 45% at 50% 0%, rgba(72,80,170,.16) 0%, transparent 56%);
+    filter:none;
+    opacity:.92;
   }
   [data-theme="light"] .aurora{
     background:
-      radial-gradient(ellipse 140% 100% at 50% -40%, rgba(255,248,238,.95) 0%, transparent 66%),
-      radial-gradient(ellipse 90% 80% at 18% -20%, rgba(255,234,216,.36) 0%, transparent 60%),
-      radial-gradient(ellipse 85% 70% at 86% -16%, rgba(244,236,222,.40) 0%, transparent 58%);
-    filter:blur(28px) saturate(102%);
+      radial-gradient(ellipse 110% 85% at 50% -6%, rgba(255,251,193,.50) 0%, transparent 62%),
+      radial-gradient(ellipse 65% 50% at 50% 0%, rgba(255,236,214,.32) 0%, transparent 56%);
+    filter:none;
     opacity:1;
   }
   .brand{margin:22px 0 24px;min-height:28px;padding:0}
@@ -957,7 +977,7 @@ footer{
       <div class="toolbar">
         <div class="search">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
-          <input id="q" type="search" placeholder="Search shipping, firmware, calendar, MCP" autocomplete="off" />
+          <input id="q" type="search" placeholder="Search shipping, firmware, MCP" autocomplete="off" />
         </div>
         <div class="sort" role="group" aria-label="Sort order">
           <button type="button" data-sort="newest" aria-pressed="true">Newest</button>
