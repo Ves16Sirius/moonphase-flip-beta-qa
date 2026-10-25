@@ -78,7 +78,7 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/geist-mono@5.2.5/index.min.css" />
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" />
 <style>
-/* Overhaul 2026-10-25 v10.31 — iOS-centered sort thumb (equal inset, elevated white glass); keep Ask WhatsApp + island */
+/* Overhaul 2026-10-25 v10.32 — restore sort accent fills + optical lift; Ask chips/dest glass + organise polish; island untouched */
 :root{
   /* Surfaces */
   --bg:#F6F5FB;
@@ -598,11 +598,14 @@ a:hover{text-decoration:underline;text-underline-offset:3px}
 .search input::-webkit-search-cancel-button{-webkit-appearance:none}
 
 .sort{
-  /* iOS segmented control: equal inset track; elevated glass thumb (not accent wash) */
-  --sort-inset:2px;
+  /* Glass track + accent thumb — equal inset structure, optically lifted (top 1 / bottom 3) */
+  --sort-inset-x:2px;
+  --sort-inset-y-top:1px;
+  --sort-inset-y-bottom:3px;
   position:relative;
   box-sizing:border-box;
-  display:inline-flex;align-items:center;height:var(--control-h);padding:var(--sort-inset);
+  display:inline-flex;align-items:center;height:var(--control-h);
+  padding:var(--sort-inset-y-top) var(--sort-inset-x) var(--sort-inset-y-bottom);
   border-radius:999px;border:1px solid var(--glass-rim);
   background:var(--glass-fill);
   backdrop-filter:blur(var(--glass-blur)) saturate(var(--glass-sat));
@@ -614,15 +617,15 @@ a:hover{text-decoration:underline;text-underline-offset:3px}
 }
 .sort-thumb{
   position:absolute;
-  top:var(--sort-inset);bottom:var(--sort-inset);left:var(--sort-inset);
-  height:auto; /* top+bottom = perfect vertical center (fixes border-box low bias) */
+  top:var(--sort-inset-y-top);bottom:var(--sort-inset-y-bottom);left:var(--sort-inset-x);
+  height:auto;
   width:50%;
   border-radius:999px;
   pointer-events:none;
   z-index:0;
-  /* Apple: elevated white glass pill, soft drop — not tinted fill */
-  background:rgba(255,255,255,.92);
-  box-shadow:0 1px 2px rgba(40,28,12,.08), 0 1px 1px rgba(40,28,12,.04), inset 0 1px 0 rgba(255,255,255,.95);
+  /* v10.30 accent wash restored — soft inset highlight only (no heavy drop) */
+  background:color-mix(in srgb, var(--accent) 12%, #fff);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.55);
   transform:translateX(0);
   transition:transform .32s var(--ease-spring), width .22s var(--ease), background .22s var(--ease), box-shadow .22s var(--ease);
   will-change:transform;
@@ -639,7 +642,7 @@ a:hover{text-decoration:underline;text-underline-offset:3px}
 }
 .sort button[aria-pressed="true"]{
   background:transparent;
-  color:var(--ink);
+  color:var(--accent-deep);
   box-shadow:none;
 }
 @media (prefers-reduced-motion: reduce){
@@ -835,20 +838,105 @@ footer{
 .modal label{display:block;font-family:var(--mono);font-size:10px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:var(--faint);margin:0 0 6px}
 .modal select,.modal textarea{
   width:100%;margin:0 0 14px;padding:10px 12px;border-radius:11px;
-  border:1px solid var(--line);background:var(--bg);outline:0;
+  border:1px solid var(--glass-rim);background:var(--glass-fill);outline:0;
+  backdrop-filter:blur(14px) saturate(150%);
+  -webkit-backdrop-filter:blur(14px) saturate(150%);
+  box-shadow:var(--glass-shadow), var(--glass-highlight);
   font-size:13.5px;letter-spacing:-.01em;color:var(--ink-soft);
   transition:border-color 150ms var(--ease), box-shadow 150ms var(--ease);
 }
 .modal select:focus,.modal textarea:focus{
   border-color:color-mix(in srgb, var(--accent) 40%, var(--line));
-  box-shadow:0 0 0 3px var(--accent-soft);
+  box-shadow:0 0 0 3px var(--accent-soft), var(--glass-highlight);
 }
 .modal textarea{min-height:100px;resize:vertical}
 .modal textarea.ask-preview{min-height:140px;font-family:var(--mono);font-size:12px;line-height:1.5;letter-spacing:0}
 .modal .ask-actions{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 14px}
 .modal .ask-note{margin:-6px 0 12px;font-size:12.5px;color:var(--muted);line-height:1.4}
 .modal .ask-note[hidden]{display:none}
-.modal .row{display:flex;justify-content:flex-end;flex-wrap:wrap;gap:8px;margin-top:4px}
+.modal .row{display:flex;justify-content:flex-end;flex-wrap:wrap;gap:8px;margin-top:4px;align-items:center}
+/* Ask topic chips — same glass language as page .chip */
+.ask-topics{
+  display:flex;flex-wrap:wrap;gap:8px;margin:0 0 14px;
+}
+.ask-topic{
+  flex:0 0 auto;height:32px;padding:0 12px;border-radius:999px;
+  border:1px solid var(--glass-rim);background:var(--glass-fill);
+  backdrop-filter:blur(var(--glass-blur)) saturate(var(--glass-sat));
+  -webkit-backdrop-filter:blur(var(--glass-blur)) saturate(var(--glass-sat));
+  font-size:12.5px;font-weight:var(--fw-medium);letter-spacing:-.011em;color:var(--ink-soft);
+  white-space:nowrap;box-shadow:var(--glass-shadow), var(--glass-highlight);
+  line-height:1;
+  transition:background var(--dur) var(--ease), border-color var(--dur) var(--ease), color var(--dur) var(--ease), box-shadow var(--dur) var(--ease);
+}
+.ask-topic:hover{border-color:var(--line2);background:var(--glass-fill-strong)}
+.ask-topic[aria-pressed="true"]{
+  background:color-mix(in srgb, var(--accent) 12%, #fff);
+  border-color:color-mix(in srgb, var(--accent) 28%, transparent);
+  color:var(--accent-deep);
+  box-shadow:none;
+}
+/* Ask destination — segmented glass thumb like .sort */
+.ask-dest{
+  --ask-dest-inset-x:2px;
+  --ask-dest-inset-y-top:1px;
+  --ask-dest-inset-y-bottom:3px;
+  position:relative;
+  box-sizing:border-box;
+  display:inline-flex;align-items:center;width:100%;
+  height:var(--control-h);
+  padding:var(--ask-dest-inset-y-top) var(--ask-dest-inset-x) var(--ask-dest-inset-y-bottom);
+  margin:0 0 14px;
+  border-radius:999px;border:1px solid var(--glass-rim);
+  background:var(--glass-fill);
+  backdrop-filter:blur(var(--glass-blur)) saturate(var(--glass-sat));
+  -webkit-backdrop-filter:blur(var(--glass-blur)) saturate(var(--glass-sat));
+  box-shadow:var(--glass-shadow), var(--glass-highlight);
+  isolation:isolate;overflow:hidden;
+}
+.ask-dest-thumb{
+  position:absolute;
+  top:var(--ask-dest-inset-y-top);bottom:var(--ask-dest-inset-y-bottom);left:var(--ask-dest-inset-x);
+  height:auto;width:50%;border-radius:999px;pointer-events:none;z-index:0;
+  background:color-mix(in srgb, var(--accent) 12%, #fff);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.55);
+  transform:translateX(0);
+  transition:transform .32s var(--ease-spring), width .22s var(--ease), background .22s var(--ease);
+  will-change:transform;
+}
+.ask-dest button{
+  position:relative;z-index:1;flex:1 1 0;
+  box-sizing:border-box;
+  display:inline-flex;align-items:center;justify-content:center;
+  height:100%;padding:0 10px;border-radius:999px;
+  font-size:var(--fs-ui);font-weight:var(--fw-medium);letter-spacing:-.011em;color:var(--muted);
+  line-height:1;background:transparent;border:0;box-shadow:none;
+  transition:color var(--dur) var(--ease);
+  -webkit-tap-highlight-color:transparent;
+}
+.ask-dest button[aria-pressed="true"]{color:var(--accent-deep);background:transparent;box-shadow:none}
+[data-theme="light"] .ask-topic[aria-pressed="true"]{
+  background:color-mix(in srgb, var(--accent) 14%, #fff);
+  border-color:color-mix(in srgb, var(--accent) 28%, transparent);
+  color:var(--accent-deep);
+}
+[data-theme="light"] .ask-dest-thumb{
+  background:color-mix(in srgb, var(--accent) 14%, #fff);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.78);
+}
+[data-theme="dark"] .ask-topic[aria-pressed="true"]{
+  background:color-mix(in srgb, var(--accent) 18%, var(--surface));
+  border-color:color-mix(in srgb, var(--accent) 36%, transparent);
+  color:var(--accent-deep);
+  box-shadow:none;
+}
+[data-theme="dark"] .ask-dest-thumb{
+  background:color-mix(in srgb, var(--accent) 18%, var(--surface));
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.12);
+}
+@media (prefers-reduced-motion: reduce){
+  .ask-dest-thumb{transition:none}
+}
 .btn{
   height:36px;padding:0 15px;border-radius:999px;border:1px solid var(--line);
   font-size:12.5px;font-weight:500;color:var(--ink-soft);background:transparent;
@@ -1071,13 +1159,13 @@ footer{
   overflow:hidden;
 }
 [data-theme="light"] .sort-thumb{
-  background:rgba(255,255,255,.96);
-  box-shadow:0 1px 3px rgba(40,28,12,.10), 0 1px 1px rgba(40,28,12,.05), inset 0 1px 0 #fff;
+  background:color-mix(in srgb, var(--accent) 14%, #fff);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.78);
 }
 [data-theme="light"] .sort button[aria-pressed="true"]{
   background:transparent;
   border-color:transparent;
-  color:var(--ink);
+  color:var(--accent-deep);
   box-shadow:none;
 }
 [data-theme="light"] .sort button[aria-pressed="false"]{color:var(--muted)}
@@ -1178,12 +1266,12 @@ footer{
 [data-theme="dark"] .search,
 [data-theme="dark"] .sort{background:var(--glass-fill);border-color:var(--glass-rim);box-shadow:var(--glass-shadow), var(--glass-highlight)}
 [data-theme="dark"] .sort-thumb{
-  background:color-mix(in srgb, var(--surface) 88%, #fff);
-  box-shadow:0 1px 3px rgba(0,0,0,.28), inset 0 1px 0 rgba(255,255,255,.14);
+  background:color-mix(in srgb, var(--accent) 18%, var(--surface));
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.12);
 }
 [data-theme="dark"] .sort button[aria-pressed="true"]{
   background:transparent;
-  color:var(--ink);
+  color:var(--accent-deep);
   box-shadow:none;
 }
 [data-theme="dark"] .sort button[aria-pressed="false"]{color:var(--muted)}
@@ -1210,7 +1298,7 @@ footer{
 [data-theme="dark"] .empty{background:rgba(23,24,34,.55)}
 [data-theme="dark"] .modal{background:color-mix(in srgb, var(--surface) 82%, transparent);border-color:var(--glass-rim);backdrop-filter:blur(24px) saturate(160%);-webkit-backdrop-filter:blur(24px) saturate(160%)}
 [data-theme="dark"] .modal select,
-[data-theme="dark"] .modal textarea{background:var(--bg-deep);color:var(--ink-soft)}
+[data-theme="dark"] .modal textarea{background:var(--glass-fill);color:var(--ink-soft);border-color:var(--glass-rim)}
 [data-theme="dark"] .btn.primary{
   background:var(--cta);color:var(--cta-ink);border-color:var(--cta-border);
   box-shadow:0 1px 2px rgba(0,0,0,.2);
@@ -1242,13 +1330,23 @@ footer{
   :root:not([data-theme="light"]) .search,
   :root:not([data-theme="light"]) .sort{background:var(--control-bg)}
   :root:not([data-theme="light"]) .sort-thumb{
-    background:color-mix(in srgb, var(--surface) 88%, #fff);
-    box-shadow:0 1px 3px rgba(0,0,0,.28), inset 0 1px 0 rgba(255,255,255,.14);
+    background:color-mix(in srgb, var(--accent) 18%, var(--surface));
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.12);
   }
   :root:not([data-theme="light"]) .sort button[aria-pressed="true"]{
     background:transparent;
-    color:var(--ink);
+    color:var(--accent-deep);
     box-shadow:none;
+  }
+  :root:not([data-theme="light"]) .ask-topic[aria-pressed="true"]{
+    background:color-mix(in srgb, var(--accent) 18%, var(--surface));
+    border-color:color-mix(in srgb, var(--accent) 36%, transparent);
+    color:var(--accent-deep);
+    box-shadow:none;
+  }
+  :root:not([data-theme="light"]) .ask-dest-thumb{
+    background:color-mix(in srgb, var(--accent) 18%, var(--surface));
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.12);
   }
   :root:not([data-theme="light"]) .ask-cta{
     background:var(--cta);color:var(--cta-ink);border-color:var(--cta-border);
@@ -1271,7 +1369,7 @@ footer{
   :root:not([data-theme="light"]) .empty{background:rgba(23,24,34,.55)}
   :root:not([data-theme="light"]) .modal{background:var(--surface)}
   :root:not([data-theme="light"]) .modal select,
-  :root:not([data-theme="light"]) .modal textarea{background:var(--bg-deep);color:var(--ink-soft)}
+  :root:not([data-theme="light"]) .modal textarea{background:var(--glass-fill);color:var(--ink-soft);border-color:var(--glass-rim)}
   :root:not([data-theme="light"]) .btn.primary{
     background:var(--cta);color:var(--cta-ink);border-color:var(--cta-border);
     box-shadow:0 1px 2px rgba(0,0,0,.2);
@@ -1438,29 +1536,32 @@ footer{
 <div class="modal-backdrop" id="askModal" role="dialog" aria-modal="true" aria-labelledby="askTitle" hidden>
   <div class="modal">
     <h2 id="askTitle">Ask the beta team</h2>
-    <p class="hint">Jot messy notes below. Organise into a clear report, copy, then paste into WhatsApp — Moonphase General or your Beta Support group.</p>
-    <label for="askCat">Topic</label>
-    <select id="askCat">
-      <option value="Getting started">Getting started</option>
-      <option value="Device">Device</option>
-      <option value="App &amp; firmware">App &amp; firmware</option>
-      <option value="Recording &amp; AI">Recording &amp; AI</option>
-      <option value="Privacy &amp; MCP">Privacy &amp; MCP</option>
-      <option value="How to report">How to report</option>
-      <option value="Other">Other</option>
-    </select>
+    <p class="hint">Jot messy notes below. Tap Organise for a clear numbered message, then <strong>Copy message</strong> and paste into WhatsApp — General or your Beta Support chat.</p>
+    <label id="askCatLabel">Topic</label>
+    <div class="ask-topics" role="group" aria-labelledby="askCatLabel" id="askTopics">
+      <button type="button" class="ask-topic" data-topic="Getting started" aria-pressed="true">Getting started</button>
+      <button type="button" class="ask-topic" data-topic="Device" aria-pressed="false">Device</button>
+      <button type="button" class="ask-topic" data-topic="App &amp; firmware" aria-pressed="false">App &amp; firmware</button>
+      <button type="button" class="ask-topic" data-topic="Recording &amp; AI" aria-pressed="false">Recording &amp; AI</button>
+      <button type="button" class="ask-topic" data-topic="Privacy &amp; MCP" aria-pressed="false">Privacy &amp; MCP</button>
+      <button type="button" class="ask-topic" data-topic="How to report" aria-pressed="false">How to report</button>
+      <button type="button" class="ask-topic" data-topic="Other" aria-pressed="false">Other</button>
+    </div>
+    <input type="hidden" id="askCat" value="Getting started" />
     <label for="askQ">Your notes</label>
-    <textarea id="askQ" placeholder="What are you seeing? Steps, SN, app build, firmware — messy notes are fine." maxlength="2000"></textarea>
+    <textarea id="askQ" placeholder="What are you seeing? Steps, SN, app build, firmware — messy notes are fine (中文也行)." maxlength="2000"></textarea>
     <div class="ask-actions">
-      <button type="button" class="btn" id="askOrganise">Organise with AI</button>
+      <button type="button" class="btn" id="askOrganise">Organise</button>
     </div>
     <label for="askPreview">Message preview</label>
-    <textarea id="askPreview" class="ask-preview" placeholder="Organised message appears here — edit freely before copying." maxlength="4000"></textarea>
-    <label for="askDest">Send to</label>
-    <select id="askDest">
-      <option value="general">Moonphase General (WhatsApp)</option>
-      <option value="beta">My Beta Support group (WhatsApp)</option>
-    </select>
+    <textarea id="askPreview" class="ask-preview" placeholder="Organised numbered message appears here — edit freely, then Copy message." maxlength="4000"></textarea>
+    <label id="askDestLabel">Send to</label>
+    <div class="ask-dest" role="group" aria-labelledby="askDestLabel" id="askDestSeg" data-dest="general">
+      <span class="ask-dest-thumb" aria-hidden="true"></span>
+      <button type="button" data-dest="general" aria-pressed="true">General</button>
+      <button type="button" data-dest="beta" aria-pressed="false">Beta Support</button>
+    </div>
+    <input type="hidden" id="askDest" value="general" />
     <p class="ask-note" id="askNote" hidden></p>
     <div class="row">
       <button type="button" class="btn" id="askCancel">Cancel</button>
@@ -1555,7 +1656,7 @@ function syncSortThumb(){
   const active=sortEl.querySelector('button[aria-pressed="true"]')||sortEl.querySelector("button");
   if(!active) return;
   sortEl.dataset.dir=active.dataset.sort||"newest";
-  const pad=parseFloat(getComputedStyle(sortEl).getPropertyValue("--sort-inset"))||2;
+  const pad=parseFloat(getComputedStyle(sortEl).getPropertyValue("--sort-inset-x"))||2;
   const w=active.offsetWidth;
   const x=Math.max(0, active.offsetLeft - pad);
   sortThumb.style.width=w+"px";
@@ -1574,21 +1675,55 @@ qEl.addEventListener("input",()=>render());render();
 
 /* —— Ask modal: local organise + WhatsApp copy/jump (no GitHub Issues) ——
    TODO: drop real WhatsApp group invite / chat deep links here when available.
-   Do NOT invent invite codes. Empty → copy works; Open WhatsApp falls back to wa.me + paste note. */
+   Do NOT invent invite codes. Empty → copy + clear paste note; skip bare wa.me open. */
 const WA_LINKS={
   general:"", /* TODO: Moonphase General WhatsApp invite URL, e.g. https://chat.whatsapp.com/... */
   beta:""     /* TODO: Beta Support — usually per-tester; leave empty unless a shared deep link exists */
 };
-const WA_FALLBACK="https://wa.me/";
 const modal=document.getElementById("askModal");
 const askQ=document.getElementById("askQ");
 const askPreview=document.getElementById("askPreview");
 const askNote=document.getElementById("askNote");
 const askDest=document.getElementById("askDest");
+const askCat=document.getElementById("askCat");
+const askDestSeg=document.getElementById("askDestSeg");
+const askDestThumb=askDestSeg&&askDestSeg.querySelector(".ask-dest-thumb");
+function syncAskDestThumb(){
+  if(!askDestSeg||!askDestThumb) return;
+  const active=askDestSeg.querySelector('button[aria-pressed="true"]')||askDestSeg.querySelector("button");
+  if(!active) return;
+  const pad=parseFloat(getComputedStyle(askDestSeg).getPropertyValue("--ask-dest-inset-x"))||2;
+  const w=active.offsetWidth;
+  const x=Math.max(0, active.offsetLeft - pad);
+  askDestThumb.style.width=w+"px";
+  askDestThumb.style.transform="translateX("+x+"px)";
+}
+function setAskDest(key){
+  const k=key==="beta"?"beta":"general";
+  if(askDest) askDest.value=k;
+  if(askDestSeg){
+    askDestSeg.dataset.dest=k;
+    askDestSeg.querySelectorAll("button").forEach(b=>b.setAttribute("aria-pressed",b.dataset.dest===k?"true":"false"));
+    syncAskDestThumb();
+  }
+}
+if(askDestSeg){
+  askDestSeg.querySelectorAll("button").forEach(btn=>btn.addEventListener("click",()=>setAskDest(btn.dataset.dest)));
+  window.addEventListener("resize", syncAskDestThumb, {passive:true});
+  if(document.fonts&&document.fonts.ready) document.fonts.ready.then(syncAskDestThumb).catch(function(){});
+}
+document.querySelectorAll(".ask-topic").forEach(btn=>btn.addEventListener("click",()=>{
+  const t=btn.dataset.topic||"Other";
+  if(askCat) askCat.value=t;
+  document.querySelectorAll(".ask-topic").forEach(b=>b.setAttribute("aria-pressed",b===btn?"true":"false"));
+}));
 function openAsk(){
   if(askNote){askNote.hidden=true;askNote.textContent=""}
   modal.hidden=false;
-  requestAnimationFrame(()=>modal.classList.add("open"));
+  requestAnimationFrame(()=>{
+    modal.classList.add("open");
+    syncAskDestThumb();
+  });
   askQ.focus();
 }
 function closeAsk(){modal.classList.remove("open");setTimeout(()=>{modal.hidden=true},200)}
@@ -1606,10 +1741,10 @@ function cleanFiller(s){
 }
 function extractMeta(text){
   const t=String(text||"");
-  const sn=(t.match(/\b(?:SN|S\/N|serial(?:\s+number)?)\s*[:#]?\s*([A-Za-z0-9\-]{4,})\b/i)||[])[1]||"";
-  const fw=(t.match(/\b(?:firmware|fw)\s*(?:version|ver\.?)?\s*[:#]?\s*(v?\d+(?:\.\d+){1,3})\b/i)||[])[1]
+  const sn=(t.match(/\b(?:SN|S\/N|serial(?:\s+number)?|序列号)\s*[:：#]?\s*([A-Za-z0-9\-]{4,})\b/i)||[])[1]||"";
+  const fw=(t.match(/\b(?:firmware|fw|固件)\s*(?:version|ver\.?|版本)?\s*[:：#]?\s*(v?\d+(?:\.\d+){1,3})\b/i)||[])[1]
     ||(t.match(/\b(1\.\d+\.\d+)\b/)||[])[1]||"";
-  const app=(t.match(/\b(?:app|build|TestFlight)\s*(?:version|ver\.?|build)?\s*[:#]?\s*([\d.]+(?:\s*\(\d+\))?)/i)||[])[1]||"";
+  const app=(t.match(/\b(?:app|build|TestFlight|应用|版本)\s*(?:version|ver\.?|build|版本)?\s*[:：#]?\s*([\d.]+(?:\s*\(\d+\))?)/i)||[])[1]||"";
   return {sn, fw, app};
 }
 function splitBits(text){
@@ -1617,20 +1752,46 @@ function splitBits(text){
   if(!raw) return [];
   let parts=raw.split(/\n+/).map(s=>s.trim()).filter(Boolean);
   if(parts.length<=1){
-    parts=raw.split(/(?<=[.!?])\s+/).map(s=>s.trim()).filter(Boolean);
+    /* EN needs space after .!? so versions like 1.0.1 stay intact; CJK 。！？； ok without space */
+    parts=raw.split(/(?<=[.!?])\s+|(?<=[。！？；])/).map(s=>s.trim()).filter(Boolean);
+  }
+  if(parts.length<=1 && /[\u4e00-\u9fff]/.test(raw) && raw.length>24){
+    /* soft-split long Chinese-only blobs every ~40 chars at punctuation or space */
+    const soft=[];
+    let buf="";
+    for(const ch of raw){
+      buf+=ch;
+      if(buf.length>=36 && /[，,、\s]/.test(ch)){
+        soft.push(buf.trim());
+        buf="";
+      }
+    }
+    if(buf.trim()) soft.push(buf.trim());
+    if(soft.length>1) parts=soft;
   }
   return parts;
 }
-/** Deterministic local "AI organise" — no backend */
+/** Deterministic local "AI organise" — EN template; keeps Chinese/mixed body text */
 function organiseAsk(cat, draft){
   const bits=splitBits(draft);
   const meta=extractMeta(draft);
   const seeing=bits[0]||"(describe what you're seeing)";
-  const steps=bits.length>1?bits.slice(1).join(" "):"(add steps / context)";
+  let steps="(add steps / context)";
+  let need="(what do you need from the team?)";
+  if(bits.length===2){
+    steps=bits[1];
+    /* short second line stays in steps only — don't also mirror into need */
+  }else if(bits.length>2){
+    const mid=bits.slice(1,-1);
+    const last=bits[bits.length-1];
+    steps=mid.length?mid.join(" "):"(add steps / context)";
+    /* avoid duplicating the same short closing into both steps and need */
+    if(last && last!==seeing && last!==steps) need=last;
+  }
+  /* single sentence → #1 only; #2/#4 stay English placeholders */
   const snLine=meta.sn||"(add SN if you have it)";
   const appLine=meta.app||"(add app build, e.g. 1.0.1 (1217))";
   const fwLine=meta.fw||"(add firmware version)";
-  const need=bits.length>2?bits[bits.length-1]:"(what do you need from the team?)";
   return [
     "[Topic] "+cat,
     "1. What I'm seeing: "+seeing,
@@ -1640,7 +1801,7 @@ function organiseAsk(cat, draft){
   ].join("\n");
 }
 document.getElementById("askOrganise").addEventListener("click",()=>{
-  const cat=document.getElementById("askCat").value.trim();
+  const cat=(askCat&&askCat.value||"Other").trim();
   const draft=askQ.value.trim();
   if(!draft){askQ.focus();return}
   askPreview.value=organiseAsk(cat, draft);
@@ -1649,7 +1810,7 @@ document.getElementById("askOrganise").addEventListener("click",()=>{
 async function copyAskMessage(){
   let msg=(askPreview.value||"").trim();
   if(!msg){
-    const cat=document.getElementById("askCat").value.trim();
+    const cat=(askCat&&askCat.value||"Other").trim();
     const draft=askQ.value.trim();
     if(!draft){askQ.focus();return false}
     msg=organiseAsk(cat, draft);
@@ -1662,23 +1823,29 @@ async function copyAskMessage(){
     askPreview.select();
     try{document.execCommand("copy")}catch(_){}
   }
-  const dest=askDest.value==="beta"?"Beta Support":"General";
-  askNote.hidden=false;
-  askNote.textContent="Copied. Paste into "+dest+" in WhatsApp.";
   return true;
 }
-document.getElementById("askCopy").addEventListener("click",()=>{copyAskMessage()});
+function destLabel(){
+  return (askDest&&askDest.value)==="beta"?"Beta Support":"General";
+}
+document.getElementById("askCopy").addEventListener("click",async()=>{
+  const ok=await copyAskMessage();
+  if(!ok) return;
+  askNote.hidden=false;
+  askNote.textContent="Message copied — paste into "+destLabel()+" in WhatsApp.";
+});
 document.getElementById("askOpenWa").addEventListener("click",async()=>{
-  await copyAskMessage();
-  const key=askDest.value==="beta"?"beta":"general";
+  const ok=await copyAskMessage();
+  if(!ok) return;
+  const key=(askDest&&askDest.value)==="beta"?"beta":"general";
   const link=(WA_LINKS[key]||"").trim();
+  askNote.hidden=false;
   if(link){
+    askNote.textContent="Message copied — opening WhatsApp. Paste into "+destLabel()+" if needed.";
     window.open(link,"_blank","noopener,noreferrer");
   }else{
-    askNote.hidden=false;
-    const dest=key==="beta"?"Beta Support":"General";
-    askNote.textContent="Copied. Paste into "+dest+" in WhatsApp (no group invite URL configured yet).";
-    window.open(WA_FALLBACK,"_blank","noopener,noreferrer");
+    /* No invite configured — skip bare wa.me so it doesn't look like the group */
+    askNote.textContent="Message copied — open WhatsApp and paste into General / your Beta Support chat.";
   }
 });
 /* fresh bar is non-sticky silk — no scroll hide */
