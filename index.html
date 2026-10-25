@@ -72,7 +72,7 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/geist-mono@5.2.5/index.min.css" />
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600&display=swap" />
 <style>
-/* Overhaul 2026-10-25 v10 — brand yellow dark title · desktop toolbar row · soft violet light aurora · status wash · light chips */
+/* Overhaul 2026-10-25 v10.1 — v10 + snug search width · global search across tabs */
 :root{
   /* Surfaces */
   --bg:#F6F5FB;
@@ -381,14 +381,14 @@ a:hover{text-decoration:underline;text-underline-offset:3px}
   margin:0;width:auto;max-width:100%;
 }
 .search{
-  position:relative;display:flex;align-items:center;
-  width:292px;height:var(--control-h);padding:0 14px 0 36px;
+  position:relative;display:inline-flex;align-items:center;
+  width:auto;height:var(--control-h);padding:0 12px 0 36px;
   border-radius:999px;border:1px solid var(--line);
   background:var(--control-bg);
   backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
   box-shadow:var(--shadow-sm);
   transition:border-color var(--dur) var(--ease), box-shadow var(--dur) var(--ease);
-  flex:0 0 292px;max-width:292px;min-width:0;
+  flex:0 0 auto;max-width:100%;min-width:0;
 }
 .search:focus-within{
   border-color:color-mix(in srgb, var(--accent) 36%, var(--line));
@@ -398,9 +398,10 @@ a:hover{text-decoration:underline;text-underline-offset:3px}
   position:absolute;left:13px;width:14px;height:14px;color:var(--faint);pointer-events:none;
 }
 .search input{
-  width:100%;height:100%;border:0;outline:0;background:transparent;
+  width:var(--search-input-w, 31ch);height:100%;border:0;outline:0;background:transparent;
   font-size:13px;letter-spacing:-.01em;color:var(--ink);
-  min-width:0;
+  min-width:0;max-width:100%;
+  field-sizing:fixed;
 }
 .search input::placeholder{color:var(--faint)}
 .search input::-webkit-search-cancel-button{-webkit-appearance:none}
@@ -967,8 +968,8 @@ footer{
   .hero .sub{font-size:14.5px;max-width:320px;margin-bottom:24px}
   .controls{padding:0;margin:0 auto 28px;gap:12px}
   .chips{gap:8px}
-  .search{width:100%;max-width:100%;flex:1 1 auto}
-  .toolbar{flex-direction:column;flex-wrap:wrap;align-items:stretch}
+  .search{width:auto;max-width:100%;flex:0 0 auto;align-self:center}
+  .toolbar{flex-direction:column;flex-wrap:wrap;align-items:center}
   .sort{align-self:center;flex:0 0 auto}
   .sec{margin:0 0 12px}
   #list{gap:12px}
@@ -993,9 +994,9 @@ footer{
     gap:10px;
   }
   .toolbar .search{
-    flex:0 0 292px!important;
-    width:292px!important;
-    max-width:292px!important;
+    flex:0 0 auto!important;
+    width:auto!important;
+    max-width:100%!important;
   }
   .toolbar .sort{flex:0 0 auto!important;align-self:center!important}
 }
@@ -1041,7 +1042,7 @@ footer{
       <div class="toolbar">
         <div class="search">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
-          <input id="q" type="search" placeholder="Search shipping, firmware, MCP" autocomplete="off" />
+          <input id="q" type="search" placeholder="Search shipping, firmware, MCP" size="31" autocomplete="off" />
         </div>
         <div class="sort" role="group" aria-label="Sort order">
           <button type="button" data-sort="newest" aria-pressed="true">Newest</button>
@@ -1089,6 +1090,27 @@ const LABELS={"all":"All answers","getting-started":"Getting started","device":"
 const DATA=[{"id":"FB-004","cat":"getting-started","tag":"Getting started","sortKey":"2026-10-22","q":"How do I track shipping, and where do I report bugs?","teaser":"UPS delivery; tracking arrives by email. Report bugs in General or Beta Support.","teaserHtml":"<mark>UPS</mark> delivery; tracking arrives by email. Report bugs in <mark>General</mark> or <mark>Beta Support</mark>.","a":"<p>Devices ship with <code>UPS</code>. You’ll get an email from the team; tracking can take a little while to appear.</p><p>For bugs, post in <strong>General</strong> or your personal <strong>Beta Support</strong> group.</p>","alwaysOpen":false,"tags":["Getting started","Shipping"]},{"id":"FB-035","cat":"getting-started","tag":"Getting started","sortKey":"2026-10-24","q":"My device just arrived — what should I do first?","teaser":"Follow Checklist_revised.pdf steps 1–7 (share SN), wait for us to remind you, then continue from step 8.","teaserHtml":"Follow <mark>Checklist_revised.pdf</mark> steps 1–7 (share SN), wait for us to remind you, then continue from step 8.","a":"<p>In the WhatsApp beta community, open <strong>Announcements</strong> and use <code>Checklist_revised.pdf</code> and <code>QuickStartGuide.pdf</code> as your guides.</p><p>Follow <code>Checklist_revised.pdf</code> step by step through <strong>steps 1–7</strong> (including sharing your <strong>serial number (<code>SN</code>)</strong>). Then <strong>stop</strong> and wait for us to remind you.</p><p>After our reminder, continue from <strong>step 8</strong> and set up the device.</p>","alwaysOpen":false,"tags":["Getting started","Setup"]},{"id":"FB-014","cat":"device","tag":"Device","sortKey":"2026-10-24","q":"Recording shows activity, but nothing returns — or I’m stuck on firmware 1.0.68?","teaser":"Share your SN, wait for our firmware-push notice, then follow Checklist_revised.pdf.","teaserHtml":"Share your <mark>SN</mark>, wait for our firmware-push notice, then follow <mark>Checklist_revised.pdf</mark>.","a":"<p>Devices often ship on older firmware (including <code>1.0.68</code>). Send your <strong>serial number (<code>SN</code>)</strong> in <strong>General</strong> or your private <strong>Beta Support</strong> group.</p><p><strong>Wait</strong> for our notice that new firmware was pushed to your device. The app’s Firmware Update screen may not show it right away.</p><p>After that notice, open <strong>Announcements</strong> and follow <code>Checklist_revised.pdf</code> (use the <code>TestFlight</code> build the checklist names). Then keep app and firmware current, and <strong>unbind and re-pair</strong> if data still needs to sync to the Flip screen.</p>","alwaysOpen":false,"tags":["Device","Firmware"]},{"id":"FB-034","cat":"app-firmware","tag":"App & firmware","sortKey":"2026-10-24","q":"Which iOS app build should I install?","teaser":"Use the listed TestFlight build for iOS beta.","teaserHtml":"Use the listed <mark>TestFlight</mark> build for iOS beta.","a":"<p>Install via <code>TestFlight</code>.</p><p>Current build: <strong>1.0.1 (1217)</strong>.</p>","alwaysOpen":false,"tags":["App & firmware","iOS"]},{"id":"FB-009","cat":"app-firmware","tag":"App & firmware","sortKey":"2026-10-24","q":"Calendar shows in the app but not on the device — or Bluetooth is connected with no voice actions?","teaser":"Usually an app + firmware mismatch — share SN if asked, then wait for our push.","teaserHtml":"Usually an <mark>app + firmware</mark> mismatch — share SN if asked, then wait for our push.","a":"<p>This is usually an <strong>app and firmware version</strong> mismatch.</p><p>Send your <strong>serial number (<code>SN</code>)</strong> if asked, then <strong>wait for our notification</strong> that a firmware update has been pushed. After the push, calendars listed in the app should be able to sync to the device.</p><p>Android / Fold calendar feedback is noted; <strong>no commitment yet</strong>.</p>","alwaysOpen":false,"tags":["App & firmware","Sync"]},{"id":"FB-028","cat":"app-firmware","tag":"App & firmware","sortKey":"2026-10-24","q":"Why do I see characters in other languages in the UI or AI output?","teaser":"AI language/prompt issue under fix — send a screenshot if it returns.","teaserHtml":"AI language/prompt issue under fix — send a screenshot if it returns.","a":"<p>Characters in other languages in the UI or AI output are treated as an <strong>AI language / prompt</strong> issue. The team is refining prompts.</p><p>If it continues, send a screenshot in <strong>General</strong> or your personal <strong>Beta Support</strong> group.</p>","alwaysOpen":false,"tags":["App & firmware","AI"]},{"id":"FB-015","cat":"recording-ai","tag":"Recording & AI","sortKey":"2026-10-23","q":"Can I leave recording on all day?","teaser":"Yes — leave it on all day. It only saves when someone speaks; auto-clears after phone sync.","teaserHtml":"Yes — leave it on all day. It only saves when someone speaks; auto-clears after phone sync.","a":"<p>Yes — you can leave recording on all day.</p><p>It <strong>only saves when someone is speaking</strong>. After sync to the phone, the device <strong>auto-clears</strong> (no manual purge).</p>","alwaysOpen":false,"tags":["Recording & AI","Battery"]},{"id":"FB-024","cat":"privacy","tag":"Privacy","sortKey":"2026-10-24","q":"Can I use Flip with other AIs via MCP under the NDA?","teaser":"Yes — MCP with other AIs is allowed in this beta.","teaserHtml":"Yes — <mark>MCP</mark> with other AIs is allowed in this beta.","a":"<p><code>MCP</code> is part of the beta. You’re free to try it with other AIs.</p>","alwaysOpen":false,"tags":["Privacy","MCP"]},{"id":"R1","cat":"feedback","tag":"Reporting","sortKey":"2026-10-22","q":"General channel","teaser":"Shared questions, announcements, and group bug reports.","teaserHtml":"Shared questions, announcements, and group bug reports.","a":"<p>Use <strong>General</strong> for shared questions, announcements, and bug reports the whole beta group can see.</p>","alwaysOpen":false,"tags":["Reporting","General"]},{"id":"R2","cat":"feedback","tag":"Reporting","sortKey":"2026-10-22","q":"Personal Beta Support group","teaser":"Private thread for shipment, SN, and one-to-one issues.","teaserHtml":"Private thread for shipment, <mark>SN</mark>, and one-to-one issues.","a":"<p>Your private thread for shipment details, <strong>serial number (<code>SN</code>)</strong>, and one-to-one issues.</p>","alwaysOpen":false,"tags":["Reporting","Support"]},{"id":"R3","cat":"feedback","tag":"Reporting","sortKey":"2026-10-24","q":"Which docs matter, and what should I include when reporting?","teaser":"Include SN, versions, and a screenshot; QuickStartGuide.pdf and Checklist_revised.pdf live in Announcements.","teaserHtml":"Include SN, versions, and a screenshot; <mark>QuickStartGuide.pdf</mark> and <mark>Checklist_revised.pdf</mark> live in Announcements.","a":"<p><strong>Announcements</strong> includes <code>QuickStartGuide.pdf</code> and <code>Checklist_revised.pdf</code>.</p><p>Helpful reports include repro steps, your <strong>serial number (<code>SN</code>)</strong>, app and firmware versions, and a screenshot or short video.</p>","alwaysOpen":false,"tags":["Reporting","Docs"]}];
 let tab="all", sortDir="newest";
 const list=document.getElementById("list"), qEl=document.getElementById("q"), sec=document.getElementById("sec");
+/* Size search input to placeholder text (snug to last letter — e.g. P in MCP) on mobile + desktop */
+(function fitSearchToPlaceholder(){
+  if(!qEl) return;
+  const wrap=qEl.closest(".search");
+  const ph=qEl.getAttribute("placeholder")||"";
+  function measure(){
+    try{
+      const cs=getComputedStyle(qEl);
+      const canvas=document.createElement("canvas");
+      const ctx=canvas.getContext("2d");
+      if(!ctx) return;
+      ctx.font=(cs.fontWeight||"400")+" "+(cs.fontSize||"13px")+" "+(cs.fontFamily||"sans-serif");
+      const w=Math.ceil(ctx.measureText(ph).width)+2; /* +2px optical end-cap */
+      qEl.style.width=w+"px";
+      if(wrap){ wrap.style.setProperty("--search-input-w", w+"px"); }
+    }catch(e){}
+  }
+  measure();
+  if(document.fonts&&document.fonts.ready) document.fonts.ready.then(measure).catch(function(){});
+  window.addEventListener("resize", measure, {passive:true});
+})();
 function esc(s){return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")}
 function pills(i){const tags=(i.tags&&i.tags.length)?i.tags:[i.tag||LABELS[i.cat]||i.cat];return tags.map(t=>`<span class="pill">${esc(t)}</span>`).join("")}
 function cardHtml(i, openIds){
@@ -1100,10 +1122,15 @@ function cardHtml(i, openIds){
 function paint(){
   const q=(qEl.value||"").trim().toLowerCase();
   let items=DATA.slice();
-  if(tab!=="all")items=items.filter(i=>i.cat===tab);
-  if(q)items=items.filter(i=>(i.q+" "+i.a+" "+i.teaser+" "+i.id+" "+(i.tags||[]).join(" ")).toLowerCase().includes(q));
+  /* Global search: non-empty query ignores topic tab so matches from all categories show */
+  if(q){
+    items=items.filter(i=>(i.q+" "+i.a+" "+i.teaser+" "+i.id+" "+(i.tags||[]).join(" ")).toLowerCase().includes(q));
+  }else if(tab!=="all"){
+    items=items.filter(i=>i.cat===tab);
+  }
   items.sort((a,b)=> sortDir==="newest" ? (b.sortKey||"").localeCompare(a.sortKey||"") : (a.sortKey||"").localeCompare(b.sortKey||""));
-  sec.textContent=(tab==="all"?`${items.length} answers`:`${items.length} in ${LABELS[tab]||"topic"}`);
+  if(q) sec.textContent=items.length===1?`1 match across topics`:`${items.length} matches across topics`;
+  else sec.textContent=(tab==="all"?`${items.length} answers`:`${items.length} in ${LABELS[tab]||"topic"}`);
   const openIds=new Set(Array.from(list.querySelectorAll("details.item[open]")).map(el=>el.dataset.id).filter(Boolean));
   let left=list.querySelector("#list-left");
   let right=list.querySelector("#list-right");
