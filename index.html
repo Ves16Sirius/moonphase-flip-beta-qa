@@ -78,7 +78,7 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/geist-mono@5.2.5/index.min.css" />
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" />
 <style>
-/* Overhaul 2026-10-25 v10.34 — Ask modal mobile bottom-sheet fit (safe-area, sticky foot, chip taps); sort equal-2px from v10.33 kept; island/theme untouched */
+/* Overhaul 2026-10-25 v10.35 — Ask modal reflow: one large textarea, in-place Organise (numbered, no placeholders, optional Details), single destination-aware Copy & open CTA, 85dvh sheet; v10.34 sheet/sort/island/theme untouched */
 :root{
   /* Surfaces */
   --bg:#F6F5FB;
@@ -873,7 +873,23 @@ footer{
   box-shadow:0 0 0 3px var(--accent-soft), var(--glass-highlight);
 }
 .modal textarea{min-height:96px;resize:vertical}
-.modal textarea.ask-preview{min-height:112px;max-height:220px;font-family:var(--mono);font-size:12px;line-height:1.5;letter-spacing:0}
+.modal textarea#askQ{min-height:260px;line-height:1.55;margin:0 0 8px}
+.modal .ask-actions{align-items:center}
+.modal .ask-undo{
+  display:inline-flex;align-items:center;height:36px;padding:0 6px;border:0;background:transparent;
+  font-size:12.5px;font-weight:500;color:var(--accent-deep);text-decoration:underline;text-underline-offset:3px;
+  -webkit-tap-highlight-color:transparent;cursor:pointer;
+}
+.modal .ask-undo[hidden]{display:none}
+.modal .ask-dest-help{margin:6px 2px 4px;font-size:12px;color:var(--muted);line-height:1.45}
+.modal .ask-dest-help[hidden]{display:none}
+.modal .ask-foot-stack{display:flex;flex-direction:column;align-items:stretch;gap:6px}
+.modal .ask-foot-stack .btn.primary{width:100%;height:44px;min-height:44px;font-size:13.5px}
+.modal .ask-cancel{
+  align-self:center;height:32px;padding:0 12px;border:0;background:transparent;border-radius:999px;
+  font-size:12.5px;font-weight:500;color:var(--muted);-webkit-tap-highlight-color:transparent;cursor:pointer;
+}
+.modal .ask-cancel:hover{color:var(--ink-soft)}
 .modal .ask-actions{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 12px}
 .modal .ask-note{margin:0 0 10px;font-size:12.5px;color:var(--muted);line-height:1.4}
 .modal .ask-note[hidden]{display:none}
@@ -1480,7 +1496,8 @@ footer{
   }
   .modal{
     width:100%;max-width:100%;
-    max-height:min(90dvh, 90svh);
+    height:85vh;height:85dvh;
+    max-height:85vh;max-height:85dvh;
     border-radius:20px 20px 0 0;
     border-left:0;border-right:0;border-bottom:0;
     transform:translateY(110%);
@@ -1501,7 +1518,7 @@ footer{
   .modal label{margin:0 0 5px}
   .modal select,.modal textarea{margin:0 0 10px;font-size:16px;/* iOS zoom guard */}
   .modal textarea{min-height:88px;resize:none}
-  .modal textarea.ask-preview{min-height:72px;max-height:140px}
+  .modal textarea#askQ{min-height:40vh;min-height:40dvh}
   .modal .ask-actions{margin:0 0 10px}
   .modal .ask-actions .btn{min-height:40px;height:40px;padding:0 16px}
   .ask-topics{gap:8px;margin:0 0 10px}
@@ -1516,22 +1533,8 @@ footer{
     padding:10px max(18px, env(safe-area-inset-right, 0px)) max(12px, env(safe-area-inset-bottom, 0px)) max(18px, env(safe-area-inset-left, 0px));
   }
   .modal .ask-note{margin:0 0 8px;font-size:12px}
-  .modal .row{
-    display:grid;
-    grid-template-columns:1fr 1fr;
-    gap:8px;
-    width:100%;
-  }
-  .modal .row .btn{
-    width:100%;height:44px;min-height:44px;justify-content:center;
-    font-size:13.5px;
-  }
-  .modal .row #askCopy{
-    grid-column:1 / -1;
-    order:-1;
-  }
-  .modal .row #askCancel{order:1}
-  .modal .row #askOpenWa{order:2}
+  .modal .ask-foot-stack{gap:4px}
+  .modal .ask-cancel{height:36px;font-size:13px}
 }
 
 /* Desktop/web: search + Newest/Oldest MUST stay one horizontal row */
@@ -1623,7 +1626,7 @@ footer{
   <div class="modal">
     <div class="modal-head">
       <h2 id="askTitle">Ask the beta team</h2>
-      <p class="hint">Jot messy notes below. Tap Organise for a clear numbered message, then <strong>Copy message</strong> and paste into WhatsApp — General or your Beta Support chat.</p>
+      <p class="hint">Write your question below — messy is fine (中文也行). <strong>Organise</strong> tidies it into a numbered message right in the box, then copy it into WhatsApp.</p>
     </div>
     <div class="modal-body">
       <label id="askCatLabel">Topic</label>
@@ -1637,27 +1640,26 @@ footer{
         <button type="button" class="ask-topic" data-topic="Other" aria-pressed="false">Other</button>
       </div>
       <input type="hidden" id="askCat" value="Getting started" />
-      <label for="askQ">Your notes</label>
-      <textarea id="askQ" placeholder="What are you seeing? Steps, SN, app build, firmware — messy notes are fine (中文也行)." maxlength="2000"></textarea>
+      <label for="askQ">Your question</label>
+      <textarea id="askQ" placeholder="What's happening? What did you try? Add SN / app build / firmware only if it's relevant — messy notes are fine (中文也行)." maxlength="4000"></textarea>
       <div class="ask-actions">
         <button type="button" class="btn" id="askOrganise">Organise</button>
+        <button type="button" class="ask-undo" id="askUndo" hidden>Undo</button>
       </div>
-      <label for="askPreview">Message preview</label>
-      <textarea id="askPreview" class="ask-preview" placeholder="Organised numbered message appears here — edit freely, then Copy message." maxlength="4000"></textarea>
       <label id="askDestLabel">Send to</label>
       <div class="ask-dest" role="group" aria-labelledby="askDestLabel" id="askDestSeg" data-dest="general">
         <span class="ask-dest-thumb" aria-hidden="true"></span>
         <button type="button" data-dest="general" aria-pressed="true">General</button>
-        <button type="button" data-dest="beta" aria-pressed="false">Beta Support</button>
+        <button type="button" data-dest="beta" aria-pressed="false">My Beta Support</button>
       </div>
+      <p class="ask-dest-help" id="askDestHelp" hidden>Each tester has a private Beta Support chat — we'll copy your message so you can paste it there.</p>
       <input type="hidden" id="askDest" value="general" />
     </div>
     <div class="modal-foot">
       <p class="ask-note" id="askNote" hidden></p>
-      <div class="row">
-        <button type="button" class="btn" id="askCancel">Cancel</button>
-        <button type="button" class="btn" id="askOpenWa">Open WhatsApp</button>
-        <button type="button" class="btn primary" id="askCopy">Copy message</button>
+      <div class="ask-foot-stack">
+        <button type="button" class="btn primary" id="askSend">Copy &amp; open General</button>
+        <button type="button" class="ask-cancel" id="askCancel">Cancel</button>
       </div>
     </div>
   </div>
@@ -1765,16 +1767,16 @@ if(document.fonts&&document.fonts.ready) document.fonts.ready.then(syncSortThumb
 requestAnimationFrame(syncSortThumb);
 qEl.addEventListener("input",()=>render());render();
 
-/* —— Ask modal: local organise + WhatsApp copy/jump (no GitHub Issues) ——
-   TODO: drop real WhatsApp group invite / chat deep links here when available.
-   Do NOT invent invite codes. Empty → copy + clear paste note; skip bare wa.me open. */
+/* —— Ask modal v10.35: in-place organise + WhatsApp copy/jump (no GitHub Issues) —— */
 const WA_LINKS={
-  general:"", /* TODO: Moonphase General WhatsApp invite URL, e.g. https://chat.whatsapp.com/... */
-  beta:""     /* TODO: Beta Support — usually per-tester; leave empty unless a shared deep link exists */
+  general:"", /* TODO: Invite link must be generated by a General group admin (Alex Guan or Tammy). Do not invent links. */
+  beta:""     /* Beta Support chats are private per tester — no shared link by design. */
 };
 const modal=document.getElementById("askModal");
 const askQ=document.getElementById("askQ");
-const askPreview=document.getElementById("askPreview");
+const askUndo=document.getElementById("askUndo");
+const askSend=document.getElementById("askSend");
+const askDestHelp=document.getElementById("askDestHelp");
 const askNote=document.getElementById("askNote");
 const askDest=document.getElementById("askDest");
 const askCat=document.getElementById("askCat");
@@ -1798,6 +1800,9 @@ function setAskDest(key){
     askDestSeg.querySelectorAll("button").forEach(b=>b.setAttribute("aria-pressed",b.dataset.dest===k?"true":"false"));
     syncAskDestThumb();
   }
+  if(askDestHelp) askDestHelp.hidden=(k!=="beta");
+  if(askSend) askSend.textContent=(k==="beta")?"Copy & open WhatsApp":"Copy & open General";
+  if(askNote){askNote.hidden=true;askNote.textContent=""}
 }
 if(askDestSeg){
   askDestSeg.querySelectorAll("button").forEach(btn=>btn.addEventListener("click",()=>setAskDest(btn.dataset.dest)));
@@ -1837,120 +1842,142 @@ document.getElementById("askCancel").addEventListener("click",closeAsk);
 modal.addEventListener("click",e=>{if(e.target===modal)closeAsk()});
 document.addEventListener("keydown",e=>{if(e.key==="Escape"&&modal.classList.contains("open"))closeAsk()});
 
-function cleanFiller(s){
-  return String(s||"")
-    .replace(/\b(um+|uh+|basically|kinda|sort of|i guess|you know)\b/gi," ")
-    .replace(/[ \t]+/g," ")
-    .replace(/\n{3,}/g,"\n\n")
-    .trim();
-}
+const ASK_HEADER_RE=/^\[[^\]\n]*\]\s*Question from a Flip beta tester\s*$/i;
+const CJK_RE=/[\u3400-\u9fff\uf900-\ufaff]/;
+/* Only what the user actually wrote — explicit SN / app build / firmware mentions */
+const META_RES={
+  sn:[/\b(?:SN|S\/N|serial(?:\s*(?:number|no\.?|#))?)\s*[:：#=]?\s*([A-Za-z0-9][A-Za-z0-9\-]{3,})/i, /序列号\s*[:：]?\s*([A-Za-z0-9][A-Za-z0-9\-]{3,})/],
+  app:[/\b(?:app|build|testflight)(?:\s*(?:version|ver\.?|build|版本))?\s*[:：#=]?\s*v?(\d+(?:\.\d+){1,3}(?:\s*\(\d+\))?)/i, /(?:应用|App)\s*版本\s*[:：]?\s*v?(\d+(?:\.\d+){1,3}(?:\s*\(\d+\))?)/i],
+  fw:[/\b(?:firmware|fw)(?:\s*(?:version|ver\.?))?\s*[:：#=]?\s*(v?\d+(?:\.\d+){1,3}[A-Za-z0-9\-]*)/i, /固件(?:版本)?\s*[:：]?\s*(v?\d+(?:\.\d+){1,3}[A-Za-z0-9\-]*)/]
+};
 function extractMeta(text){
-  const t=String(text||"");
-  const sn=(t.match(/\b(?:SN|S\/N|serial(?:\s+number)?|序列号)\s*[:：#]?\s*([A-Za-z0-9\-]{4,})\b/i)||[])[1]||"";
-  const fw=(t.match(/\b(?:firmware|fw|固件)\s*(?:version|ver\.?|版本)?\s*[:：#]?\s*(v?\d+(?:\.\d+){1,3})\b/i)||[])[1]
-    ||(t.match(/\b(1\.\d+\.\d+)\b/)||[])[1]||"";
-  const app=(t.match(/\b(?:app|build|TestFlight|应用|版本)\s*(?:version|ver\.?|build|版本)?\s*[:：#]?\s*([\d.]+(?:\s*\(\d+\))?)/i)||[])[1]||"";
-  return {sn, fw, app};
-}
-function splitBits(text){
-  const raw=cleanFiller(text);
-  if(!raw) return [];
-  let parts=raw.split(/\n+/).map(s=>s.trim()).filter(Boolean);
-  if(parts.length<=1){
-    /* EN needs space after .!? so versions like 1.0.1 stay intact; CJK 。！？； ok without space */
-    parts=raw.split(/(?<=[.!?])\s+|(?<=[。！？；])/).map(s=>s.trim()).filter(Boolean);
-  }
-  if(parts.length<=1 && /[\u4e00-\u9fff]/.test(raw) && raw.length>24){
-    /* soft-split long Chinese-only blobs every ~40 chars at punctuation or space */
-    const soft=[];
-    let buf="";
-    for(const ch of raw){
-      buf+=ch;
-      if(buf.length>=36 && /[，,、\s]/.test(ch)){
-        soft.push(buf.trim());
-        buf="";
+  let rest=String(text||"");
+  const meta={sn:"",app:"",fw:""};
+  for(const k of ["sn","app","fw"]){
+    for(const re of META_RES[k]){
+      const m=rest.match(re);
+      if(m && (k!=="sn"||/\d/.test(m[1]))){
+        meta[k]=m[1].trim();
+        rest=rest.replace(m[0]," ");
+        break;
       }
     }
-    if(buf.trim()) soft.push(buf.trim());
-    if(soft.length>1) parts=soft;
   }
-  return parts;
+  return {meta, rest};
 }
-/** Deterministic local "AI organise" — EN template; keeps Chinese/mixed body text */
+const LEAD_FILLER_RE=/^\s*(?:(?:hi|hello|hey)(?:\s+(?:team|all|guys|there|everyone))?|so|ok(?:ay)?|well|um+|uh+|like|and|also|嗯+|呃+|啊|那个|就是说|请问一下|你好|您好|大家好)(?:\s*[,，、!.:—-]+\s*|\s+|(?=[\u3400-\u9fff])|$)/i;
+function trimFiller(s){
+  let t=String(s||"").replace(/^\s*(?:[-*•·]+|\d+[.)、]|[（(]\d+[)）])\s*/,"");  /* bullets / old numbering */
+  for(let i=0;i<6;i++){ const n=t.replace(LEAD_FILLER_RE,""); if(n===t) break; t=n; }
+  /* connectors left dangling after SN/app/fw were lifted out */
+  t=t.replace(/\s*\b(?:and|or|on|with|using|plus|also)\s*[,;]?\s*$/i,"").replace(/[和及与，,]\s*$/,"");
+  if(/^\s*(?:and|or|on|with|using|plus|also|和|及|与|还有)?\s*[.。,，;；!！]*\s*$/i.test(t)) return "";
+  t=t
+    .replace(/\b(?:um+|uh+|basically|kinda|sort of|i guess|you know)\b[,]?\s*/gi,"")
+    .replace(/\s*(?:thanks|thank you|thx|ty)(?:\s+(?:so much|a lot|team|in advance))?\s*[!.]*\s*$/i,"")
+    .replace(/[，,]?\s*(?:谢谢|多谢|感谢)[！!。~～]*\s*$/,"")
+    .replace(/\s*[,;，；、]+\s*$/,"")
+    .replace(/^\s*[,;，；、:：.。]+\s*/,"")
+    .replace(/\s*\(\s*\)\s*/g," ")
+    .replace(/[ \t]{2,}/g," ")
+    .trim();
+  if(!/[A-Za-z0-9\u3400-\u9fff]/.test(t)) return "";
+  if(/^[a-z]/.test(t)) t=t[0].toUpperCase()+t.slice(1);
+  /* EN sentence end; leave CJK as typed */
+  if(/[A-Za-z0-9)]$/.test(t) && !CJK_RE.test(t.slice(-1))) t+=".";
+  return t;
+}
+function splitPoints(text){
+  const out=[];
+  String(text||"").split(/\n+/).forEach(line=>{
+    line=line.trim();
+    if(!line) return;
+    /* EN: .!?; followed by space (keeps 1.0.1); CJK: 。！？；… ; whitespace between CJK chars */
+    line.split(/(?<=[.!?;])\s+(?=\S)|(?<=[。！？；…])\s*|(?<=[\u3400-\u9fff，。])\s+(?=[\u3400-\u9fff])/)
+      .forEach(x=>{x=x.trim(); if(x) out.push(x)});
+  });
+  return out;
+}
+/** Deterministic local organise — rewrites the user's own words as a numbered message. No placeholders. */
 function organiseAsk(cat, draft){
-  const bits=splitBits(draft);
-  const meta=extractMeta(draft);
-  const seeing=bits[0]||"(describe what you're seeing)";
-  let steps="(add steps / context)";
-  let need="(what do you need from the team?)";
-  if(bits.length===2){
-    steps=bits[1];
-    /* short second line stays in steps only — don't also mirror into need */
-  }else if(bits.length>2){
-    const mid=bits.slice(1,-1);
-    const last=bits[bits.length-1];
-    steps=mid.length?mid.join(" "):"(add steps / context)";
-    /* avoid duplicating the same short closing into both steps and need */
-    if(last && last!==seeing && last!==steps) need=last;
-  }
-  /* single sentence → #1 only; #2/#4 stay English placeholders */
-  const snLine=meta.sn||"(add SN if you have it)";
-  const appLine=meta.app||"(add app build, e.g. 1.0.1 (1217))";
-  const fwLine=meta.fw||"(add firmware version)";
-  return [
-    "[Topic] "+cat,
-    "1. What I'm seeing: "+seeing,
-    "2. Steps / context: "+steps,
-    "3. SN / app / firmware: SN "+snLine+"; app "+appLine+"; firmware "+fwLine,
-    "4. What I need: "+need
-  ].join("\n");
+  let lines=String(draft||"").split(/\n/);
+  /* idempotent: drop our own header and fold Details back into meta */
+  lines=lines.filter(l=>!ASK_HEADER_RE.test(l.trim()));
+  const detailsLines=[];
+  lines=lines.filter(l=>{ if(/^\s*Details\s*[:：]/i.test(l)){detailsLines.push(l.replace(/^\s*Details\s*[:：]/i,"").replace(/·/g,";"));return false} return true });
+  const {meta, rest}=extractMeta(lines.join("\n")+(detailsLines.length?"\n"+detailsLines.join(" ; "):""));
+  const points=splitPoints(rest).map(trimFiller).filter(Boolean);
+  const out=["["+cat+"] Question from a Flip beta tester"];
+  points.forEach((pt,i)=>out.push((i+1)+". "+pt));
+  const det=[];
+  if(meta.sn) det.push("SN "+meta.sn);
+  if(meta.app) det.push("App "+meta.app);
+  if(meta.fw) det.push("Firmware "+meta.fw);
+  if(det.length) out.push("Details: "+det.join(" · "));
+  return out.join("\n");
 }
+let askOriginal=null;
+let askSettingValue=false;
 document.getElementById("askOrganise").addEventListener("click",()=>{
   const cat=(askCat&&askCat.value||"Other").trim();
-  const draft=askQ.value.trim();
-  if(!draft){askQ.focus();return}
-  askPreview.value=organiseAsk(cat, draft);
-  askPreview.focus();
+  const draft=askQ.value;
+  if(!draft.trim()){askQ.focus();return}
+  const next=organiseAsk(cat, draft);
+  if(next===draft) return;
+  askOriginal=draft;
+  askSettingValue=true;
+  askQ.value=next;
+  askSettingValue=false;
+  if(askUndo) askUndo.hidden=false;
+  if(askNote){askNote.hidden=true;askNote.textContent=""}
+});
+if(askUndo) askUndo.addEventListener("click",()=>{
+  if(askOriginal==null) return;
+  askQ.value=askOriginal;
+  askOriginal=null;
+  askUndo.hidden=true;
+  try{askQ.focus({preventScroll:true})}catch(e){}
+});
+askQ.addEventListener("input",()=>{
+  if(askSettingValue) return;
+  /* user edited the organised text — undo would discard that, so retire it */
+  askOriginal=null;
+  if(askUndo) askUndo.hidden=true;
 });
 async function copyAskMessage(){
-  let msg=(askPreview.value||"").trim();
-  if(!msg){
-    const cat=(askCat&&askCat.value||"Other").trim();
-    const draft=askQ.value.trim();
-    if(!draft){askQ.focus();return false}
-    msg=organiseAsk(cat, draft);
-    askPreview.value=msg;
-  }
+  const msg=(askQ.value||"").trim(); /* copy exactly what's in the box */
+  if(!msg){askQ.focus();return false}
+  let ok=false;
   try{
-    await navigator.clipboard.writeText(msg);
-  }catch(e){
-    askPreview.focus();
-    askPreview.select();
-    try{document.execCommand("copy")}catch(_){}
+    if(navigator.clipboard&&window.isSecureContext){await navigator.clipboard.writeText(msg);ok=true}
+  }catch(e){}
+  if(!ok){
+    try{
+      askQ.focus();
+      askQ.select();
+      ok=document.execCommand("copy");
+      askQ.setSelectionRange(askQ.value.length, askQ.value.length);
+    }catch(_){}
   }
   return true;
 }
-function destLabel(){
-  return (askDest&&askDest.value)==="beta"?"Beta Support":"General";
+function isMobileUA(){
+  const ua=navigator.userAgent||"";
+  return /Android|iPhone|iPad|iPod/i.test(ua) || (/Macintosh/.test(ua) && (navigator.maxTouchPoints||0)>1);
 }
-document.getElementById("askCopy").addEventListener("click",async()=>{
-  const ok=await copyAskMessage();
-  if(!ok) return;
-  askNote.hidden=false;
-  askNote.textContent="Message copied — paste into "+destLabel()+" in WhatsApp.";
-});
-document.getElementById("askOpenWa").addEventListener("click",async()=>{
+if(askSend) askSend.addEventListener("click",async()=>{
   const ok=await copyAskMessage();
   if(!ok) return;
   const key=(askDest&&askDest.value)==="beta"?"beta":"general";
-  const link=(WA_LINKS[key]||"").trim();
   askNote.hidden=false;
-  if(link){
-    askNote.textContent="Message copied — opening WhatsApp. Paste into "+destLabel()+" if needed.";
-    window.open(link,"_blank","noopener,noreferrer");
+  if(key==="general"){
+    askNote.textContent="Copied — paste it into the General group in WhatsApp.";
+    const link=(WA_LINKS.general||"").trim();
+    if(link){ window.open(link,"_blank","noopener,noreferrer"); }
+    else if(isMobileUA()){ window.location.href="whatsapp://"; }
   }else{
-    /* No invite configured — skip bare wa.me so it doesn't look like the group */
-    askNote.textContent="Message copied — open WhatsApp and paste into General / your Beta Support chat.";
+    askNote.textContent="Copied — open your own Beta Support chat in WhatsApp and paste.";
+    if(isMobileUA()) window.location.href="whatsapp://";
   }
 });
 /* fresh bar is non-sticky silk — no scroll hide */
