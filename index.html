@@ -74,7 +74,7 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/geist-mono@5.2.5/index.min.css" />
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600&display=swap" />
 <style>
-/* Overhaul 2026-10-25 v10.6 — default dark · deeper Center gold · glass moon|sun toggle */
+/* Overhaul 2026-10-25 v10.7 — liquid-glass toggle · Moonphase-letter height · spring slide · light purple titles */
 :root{
   /* Surfaces */
   --bg:#F6F5FB;
@@ -110,6 +110,8 @@
     0 24px 48px rgba(40,28,12,.055);
   --control-bg:rgba(255,255,255,.88);
   --ease:cubic-bezier(.22,1,.36,1);
+  /* Premium spring (stiffness~500, damping~20) — slight overshoot then settle */
+  --ease-spring:linear(0, 0.041, 0.145, 0.284, 0.438, 0.589, 0.728, 0.847, 0.942, 1.014, 1.063, 1.093, 1.106, 1.108, 1.1, 1.087, 1.071, 1.055, 1.039, 1.024, 1.012, 1.003, 0.996, 0.992, 0.989, 0.988, 0.989, 0.99, 0.991, 0.993, 0.995, 0.996, 1);
   --dur:180ms;
   --r:20px;
   /* Families */
@@ -334,30 +336,54 @@ a:hover{text-decoration:underline;text-underline-offset:3px}
   flex:0 0 auto;display:flex;align-items:flex-start;justify-content:center;
 }
 .brand .wm{height:32px;width:auto;display:block}
-/* Glass moon|sun switch — moon LEFT, sun RIGHT; both always visible; quiet gray glass */
+/* Glass moon|sun switch — Apple liquid glass · height = Moonphase letter box · spring thumb */
 .theme-toggle{
-  position:static;transform:none;
+  position:relative;transform:none;isolation:isolate;
   align-self:flex-start;
-  margin-top:0; /* TOP edge flush with Moonphase wordmark top */
-  height:28px;min-height:28px;width:52px;min-width:52px;padding:0;border-radius:999px;gap:0;
+  margin-top:0; /* TOP flush with Moonphase glyph tops (Flip P sits lower — ignore) */
+  /* Moonphase letters ≈15.2/21 of 32px wm → ~23px */
+  height:23px;min-height:23px;width:50px;min-width:50px;padding:0;border-radius:999px;gap:0;
   display:inline-flex;align-items:center;justify-content:center;
-  border:1px solid rgba(120,122,140,.16);
-  background:rgba(128,130,148,.14);
-  backdrop-filter:blur(18px) saturate(1.1);-webkit-backdrop-filter:blur(18px) saturate(1.1);
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.18), 0 1px 2px rgba(20,18,40,.04);
+  /* Quiet but readable glass — not muddy gray */
+  border:1px solid rgba(255,255,255,.26);
+  background:rgba(255,255,255,.12);
+  backdrop-filter:blur(12px) saturate(180%) brightness(1.08);
+  -webkit-backdrop-filter:blur(12px) saturate(180%) brightness(1.08);
+  box-shadow:
+    0 1px 2px rgba(0,0,0,.18),
+    0 4px 12px rgba(0,0,0,.10),
+    inset 0 1px 1px rgba(255,255,255,.50),
+    inset 0 -1px 1px rgba(255,255,255,.12),
+    inset 1px 0 1px rgba(255,255,255,.16),
+    inset -1px 0 1px rgba(255,255,255,.16);
   color:var(--muted);
+  overflow:visible;
   transition:background .28s var(--ease), border-color .28s var(--ease), box-shadow .28s var(--ease);
   -webkit-tap-highlight-color:transparent;
 }
+/* Diagonal glass sheen */
+.theme-toggle::after{
+  content:"";
+  position:absolute;inset:0;border-radius:inherit;pointer-events:none;z-index:0;
+  background:linear-gradient(135deg, rgba(255,255,255,.42) 0%, rgba(255,255,255,.08) 28%, transparent 56%);
+  mix-blend-mode:screen;
+  opacity:.85;
+}
 .theme-toggle:hover{
-  border-color:rgba(120,122,140,.26);
-  background:rgba(128,130,148,.20);
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.22), 0 2px 6px rgba(20,18,40,.06);
+  border-color:rgba(255,255,255,.34);
+  background:rgba(255,255,255,.16);
+  box-shadow:
+    0 2px 6px rgba(0,0,0,.20),
+    0 6px 16px rgba(0,0,0,.12),
+    inset 0 1px 1px rgba(255,255,255,.58),
+    inset 0 -1px 1px rgba(255,255,255,.14),
+    inset 1px 0 1px rgba(255,255,255,.18),
+    inset -1px 0 1px rgba(255,255,255,.18);
 }
 .theme-toggle:active{transform:none}
 .theme-toggle .tlabel{display:none!important}
 .theme-toggle .tt-track{
-  position:relative;
+  position:relative;z-index:1;
   display:block;
   width:100%;height:100%;
   border-radius:inherit;
@@ -365,66 +391,91 @@ a:hover{text-decoration:underline;text-underline-offset:3px}
 }
 .theme-toggle .tt-icon{
   position:absolute;top:50%;
-  width:12px;height:12px;
-  margin-top:-6px;
+  width:11px;height:11px;
+  margin-top:-5.5px;
   z-index:1;
   pointer-events:none;
   opacity:.62;
-  transition:opacity .28s var(--ease), color .28s var(--ease);
+  transition:opacity .32s var(--ease), color .32s var(--ease), transform .42s var(--ease-spring);
   color:rgba(110,112,128,.72);
 }
-.theme-toggle .tt-icon svg{width:12px;height:12px;display:block}
+.theme-toggle .tt-icon svg{width:11px;height:11px;display:block}
 /* Moon LEFT · Sun RIGHT — both always readable */
-.theme-toggle .icon-moon{left:7px;opacity:.72;color:#C9C4A8}
-.theme-toggle .icon-sun{right:7px;opacity:.72;color:#B8923A}
+.theme-toggle .icon-moon{left:6px;opacity:.78;color:#E8E2C4}
+.theme-toggle .icon-sun{right:6px;opacity:.78;color:#C9A24A}
 .theme-toggle .tt-thumb{
   position:absolute;
   top:2px;left:2px;
-  width:22px;height:22px;
+  width:19px;height:19px;
   border-radius:50%;
-  background:rgba(42,43,54,.92);
-  box-shadow:0 1px 2px rgba(0,0,0,.28), 0 2px 6px rgba(0,0,0,.18);
+  background:rgba(28,29,38,.94);
+  box-shadow:
+    0 1px 2px rgba(0,0,0,.34),
+    0 3px 8px rgba(0,0,0,.22),
+    inset 0 1px 0 rgba(255,255,255,.14);
   z-index:2;
   pointer-events:none;
   transform:translateX(0); /* default dark → over moon (left) */
-  transition:transform .32s cubic-bezier(.22,1,.36,1), background .28s var(--ease), box-shadow .28s var(--ease);
+  transition:transform .48s var(--ease-spring), background .28s var(--ease), box-shadow .28s var(--ease);
   will-change:transform;
 }
 /* Dark (default): thumb over moon (left); both icons still visible */
 @media (prefers-color-scheme: dark){
   :root:not([data-theme="light"]) .theme-toggle .tt-thumb{
     transform:translateX(0);
-    background:rgba(42,43,54,.92);
-    box-shadow:0 1px 2px rgba(0,0,0,.32), 0 2px 8px rgba(0,0,0,.22);
+    background:rgba(28,29,38,.94);
+    box-shadow:
+      0 1px 2px rgba(0,0,0,.38),
+      0 3px 10px rgba(0,0,0,.26),
+      inset 0 1px 0 rgba(255,255,255,.16);
   }
-  :root:not([data-theme="light"]) .theme-toggle .icon-moon{opacity:.95;color:#FFFBC1}
-  :root:not([data-theme="light"]) .theme-toggle .icon-sun{opacity:.55;color:#B8923A}
+  :root:not([data-theme="light"]) .theme-toggle .icon-moon{opacity:1;color:#FFFBC1;transform:scale(1.05)}
+  :root:not([data-theme="light"]) .theme-toggle .icon-sun{opacity:.62;color:#C9A24A;transform:scale(1)}
 }
 [data-theme="dark"] .theme-toggle .tt-thumb{
   transform:translateX(0);
-  background:rgba(42,43,54,.92);
-  box-shadow:0 1px 2px rgba(0,0,0,.32), 0 2px 8px rgba(0,0,0,.22);
+  background:rgba(28,29,38,.94);
+  box-shadow:
+    0 1px 2px rgba(0,0,0,.38),
+    0 3px 10px rgba(0,0,0,.26),
+    inset 0 1px 0 rgba(255,255,255,.16);
 }
-[data-theme="dark"] .theme-toggle .icon-moon{opacity:.95;color:#FFFBC1}
-[data-theme="dark"] .theme-toggle .icon-sun{opacity:.55;color:#B8923A}
+[data-theme="dark"] .theme-toggle .icon-moon{opacity:1;color:#FFFBC1;transform:scale(1.05)}
+[data-theme="dark"] .theme-toggle .icon-sun{opacity:.62;color:#C9A24A;transform:scale(1)}
 /* Light: thumb over sun (right); both icons still visible */
 [data-theme="light"] .theme-toggle .tt-thumb{
-  transform:translateX(26px);
-  background:rgba(255,255,255,.94);
-  box-shadow:0 1px 2px rgba(40,28,12,.10), 0 2px 6px rgba(40,28,12,.08);
+  transform:translateX(27px);
+  background:rgba(255,255,255,.96);
+  box-shadow:
+    0 1px 2px rgba(40,28,12,.12),
+    0 3px 8px rgba(40,28,12,.10),
+    inset 0 1px 0 rgba(255,255,255,.95);
 }
-[data-theme="light"] .theme-toggle .icon-sun{opacity:.95;color:#B8923A}
-[data-theme="light"] .theme-toggle .icon-moon{opacity:.55;color:#8A8670}
+[data-theme="light"] .theme-toggle .icon-sun{opacity:1;color:#B8923A;transform:scale(1.05)}
+[data-theme="light"] .theme-toggle .icon-moon{opacity:.55;color:#7A7688;transform:scale(1)}
 [data-theme="light"] .theme-toggle{
-  border-color:rgba(110,112,130,.18);
-  background:rgba(140,142,158,.12);
+  border-color:rgba(255,255,255,.72);
+  background:rgba(255,255,255,.46);
+  backdrop-filter:blur(14px) saturate(150%) brightness(1.04);
+  -webkit-backdrop-filter:blur(14px) saturate(150%) brightness(1.04);
+  box-shadow:
+    0 1px 3px rgba(40,30,80,.08),
+    0 4px 12px rgba(60,50,120,.06),
+    inset 0 1px 1px rgba(255,255,255,.92),
+    inset 0 -1px 1px rgba(40,30,80,.06);
+}
+[data-theme="light"] .theme-toggle::after{
+  background:linear-gradient(135deg, rgba(255,255,255,.78) 0%, rgba(255,255,255,.18) 30%, transparent 58%);
+  mix-blend-mode:normal;
+  opacity:1;
 }
 [data-theme="dark"] .theme-toggle{
-  border-color:rgba(160,162,180,.14);
-  background:rgba(150,152,170,.12);
+  border-color:rgba(255,255,255,.26);
+  background:rgba(255,255,255,.12);
 }
 @media (prefers-reduced-motion: reduce){
   .theme-toggle .tt-thumb{transition:none}
+  .theme-toggle .tt-icon{transition:opacity .15s ease, color .15s ease}
 }
 
 /* —— Hero: editorial air (8px rhythm) —— */
@@ -433,13 +484,13 @@ a:hover{text-decoration:underline;text-underline-offset:3px}
   text-align:center;display:flex;flex-direction:column;align-items:center;
 }
 .hero h1{
-  /* Light: warm official gold. Dark → ALL brand yellow #FFFBC1 (no white/coral split). */
+  /* Light: purple family (unified with violet aurora). Dark → brand yellow (overrides). */
   margin:0 0 12px;
   font-family:var(--display);
   font-size:var(--fs-hero);
   font-weight:400;font-style:normal;
   letter-spacing:-.01em;line-height:1.1;
-  color:#B8923A; /* warm official yellow/gold */
+  color:#5B54E8; /* violet — matches accent / aurora */
   text-shadow:none;
   text-wrap:balance;
 }
@@ -448,7 +499,7 @@ a:hover{text-decoration:underline;text-underline-offset:3px}
   font-style:italic;
   font-weight:400;
   letter-spacing:0;
-  color:#8F6520; /* slightly deeper gold for Center */
+  color:#4338CA; /* deeper indigo for Center */
   text-shadow:none;
 }
 .hero .sub{
@@ -833,10 +884,10 @@ footer{
   color-scheme:light;
 }
 [data-theme="light"] .hero h1{
-  color:#B8923A;
+  color:#5B54E8;
   text-shadow:none;
 }
-[data-theme="light"] .hero h1 em{color:#8F6520;text-shadow:none}
+[data-theme="light"] .hero h1 em{color:#4338CA;text-shadow:none}
 /* Light mode card / control polish — cool clean surfaces (match violet wash) */
 [data-theme="light"] .item{
   background:#FFFFFF;
@@ -866,10 +917,19 @@ footer{
   background:#fff;
   border-color:rgba(99,91,255,.22);
 }
-/* theme-toggle keeps quiet gray glass (not white slab) */
+/* Light Updated badge — violet status (match purple palette) */
+[data-theme="light"] .fresh i{
+  background:#635BFF;
+  box-shadow:0 0 0 3px rgba(99,91,255,.22);
+}
+[data-theme="light"] .fresh span{
+  color:#5B5678;
+  border-color:rgba(99,91,255,.14);
+}
+/* Light toggle hover — brighter glass, still quiet */
 [data-theme="light"] .theme-toggle:hover{
-  background:rgba(140,142,158,.20);
-  border-color:rgba(110,112,130,.26);
+  background:rgba(255,255,255,.58);
+  border-color:rgba(255,255,255,.84);
 }
 [data-theme="light"] .chip[aria-selected="true"],
 [data-theme="light"] .sort button[aria-pressed="true"]{
@@ -978,12 +1038,12 @@ html[data-theme="dark"] body,
 [data-theme="dark"] .fresh span{background:var(--control-bg);border-color:var(--line);color:var(--muted)}
 [data-theme="dark"] .fresh i{background:var(--ok);box-shadow:0 0 0 3px var(--ok-soft)}
 [data-theme="dark"] .theme-toggle{
-  background:rgba(150,152,170,.12);color:var(--muted);
-  border-color:rgba(160,162,180,.14);
+  background:rgba(255,255,255,.12);color:var(--muted);
+  border-color:rgba(255,255,255,.26);
 }
 [data-theme="dark"] .theme-toggle:hover{
-  background:rgba(150,152,170,.20);color:var(--ink);
-  border-color:rgba(160,162,180,.24);
+  background:rgba(255,255,255,.18);color:var(--ink);
+  border-color:rgba(255,255,255,.34);
 }
 [data-theme="dark"] .chip{background:var(--control-bg);color:var(--ink-soft)}
 [data-theme="dark"] .chip:hover{background:var(--surface)}
@@ -1033,12 +1093,12 @@ html[data-theme="dark"] body,
   :root:not([data-theme="light"]) .fresh span{background:var(--control-bg);border-color:var(--line);color:var(--muted)}
   :root:not([data-theme="light"]) .fresh i{background:var(--ok);box-shadow:0 0 0 3px var(--ok-soft)}
   :root:not([data-theme="light"]) .theme-toggle{
-    background:rgba(150,152,170,.12);color:var(--muted);
-    border-color:rgba(160,162,180,.14);
+    background:rgba(255,255,255,.12);color:var(--muted);
+    border-color:rgba(255,255,255,.26);
   }
   :root:not([data-theme="light"]) .theme-toggle:hover{
-    background:rgba(150,152,170,.20);color:var(--ink);
-    border-color:rgba(160,162,180,.24);
+    background:rgba(255,255,255,.18);color:var(--ink);
+    border-color:rgba(255,255,255,.34);
   }
   :root:not([data-theme="light"]) .chip{background:var(--control-bg);color:var(--ink-soft)}
   :root:not([data-theme="light"]) .chip:hover{background:var(--surface)}
@@ -1108,14 +1168,15 @@ html[data-theme="dark"] body,
   .brand-slot{min-height:28px;align-items:flex-start}
   .brand .wm{height:28px}
   .theme-toggle{
-    height:26px;min-height:26px;width:48px;min-width:48px;padding:0;gap:0;
-    margin-top:0; /* TOP flush with wordmark on mobile too */
+    /* Moonphase letters ≈15.2/21 of 28px wm → ~20px */
+    height:20px;min-height:20px;width:44px;min-width:44px;padding:0;gap:0;
+    margin-top:0; /* TOP flush with Moonphase glyph tops */
   }
-  .theme-toggle .tt-thumb{width:20px;height:20px;top:2px;left:2px}
-  .theme-toggle .tt-icon{width:11px;height:11px;margin-top:-5.5px}
-  .theme-toggle .tt-icon svg{width:11px;height:11px}
-  .theme-toggle .icon-moon{left:6px}
-  .theme-toggle .icon-sun{right:6px}
+  .theme-toggle .tt-thumb{width:16px;height:16px;top:2px;left:2px}
+  .theme-toggle .tt-icon{width:10px;height:10px;margin-top:-5px}
+  .theme-toggle .tt-icon svg{width:10px;height:10px}
+  .theme-toggle .icon-moon{left:5px}
+  .theme-toggle .icon-sun{right:5px}
   @media (prefers-color-scheme: dark){
     :root:not([data-theme="light"]) .theme-toggle .tt-thumb{transform:translateX(0)}
   }
