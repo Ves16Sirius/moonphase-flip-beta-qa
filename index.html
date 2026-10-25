@@ -46,7 +46,7 @@
         if(metaL) metaL.setAttribute('content', LIGHT_TC);
         if(metaD) metaD.setAttribute('content', DARK_TC);
       }
-      /* Paint --bg (same hex as theme-color) BEFORE first paint; dual-layer aurora fades by opacity. */
+      /* Paint --bg (same hex as theme-color) BEFORE first paint; aurora/sticky painted sync on theme apply. */
       try{
         document.documentElement.style.setProperty('--bg', bg);
         document.documentElement.style.setProperty('--aurora-top', bg);
@@ -78,10 +78,12 @@
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/geist-sans@5.2.5/index.min.css" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/geist-sans@5.2.5/500.min.css" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/geist-sans@5.2.5/600.min.css" />
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/geist-mono@5.2.5/index.min.css" />
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600&display=swap" />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:opsz,wght@14..32,400;14..32,500;14..32,560;14..32,600&display=swap" />
 <style>
-/* Overhaul 2026-10-25 v10.19 — v10.17 header kept · dual-layer aurora crossfade · premium glass · same-tick theme-color */
+/* Overhaul 2026-10-25 v10.20 — island wash sync paint · v10.17 header · premium glass · title/body polish · header rhythm */
 :root{
   /* Surfaces */
   --bg:#F6F5FB;
@@ -139,7 +141,8 @@
   --mono:"Geist Mono",ui-monospace,"SF Mono",Menlo,Consolas,monospace;
   /* Type scale */
   --fs-hero:clamp(2.5rem,5.4vw,3.5rem);
-  --fs-title:16.5px; /* card Q — Linear/Cursor-like list title */
+  --fs-title:16.5px; /* card Q — Geist/Inter premium list title */
+  --fw-title:600;
   --fs-body:14.5px;
   --fs-ui:13.5px;
   --fs-meta:12.5px;
@@ -181,9 +184,9 @@ body{
   width:100%;max-width:100%;
   position:relative;
 }
-/* FIXED dual-layer aurora — baked-hex washes (no var(--bg) lag).
-   Outgoing fades out / incoming fades in (~200ms) so island never flashes wrong then snaps.
-   #aurora-sticky = thin backup wash if iOS Safari drops the fixed compositor layer. */
+/* FIXED aurora + sticky — sync-painted on theme toggle (v10.20).
+   Opacity crossfade (v10.19) left island wash stuck on iOS; containers get inline
+   theme gradients same tick as --bg / theme-color. Layers kept as backup wash. */
 .aurora,.aurora-stack{
   position:fixed;
   top:0;left:0;right:0;
@@ -194,10 +197,20 @@ body{
   z-index:0;
   overflow:hidden;
   isolation:isolate;
+  will-change:transform;
   transform:translateZ(0);
   -webkit-backface-visibility:hidden;
   backface-visibility:hidden;
-  background:transparent;
+  /* Dark-first CSS fallback until JS paints inline */
+  background:linear-gradient(180deg,
+    color-mix(in srgb, #5B66C4 32%, #0E0F14) 0%,
+    color-mix(in srgb, #5B66C4 22%, #0E0F14) 20%,
+    color-mix(in srgb, #6B78E8 12%, #0E0F14) 42%,
+    color-mix(in srgb, #4A54B0 5%, #0E0F14) 68%,
+    transparent 100%);
+  opacity:1;
+  -webkit-mask-image:linear-gradient(180deg,#000 0%,#000 40%,rgba(0,0,0,.55) 70%,transparent 100%);
+  mask-image:linear-gradient(180deg,#000 0%,#000 40%,rgba(0,0,0,.55) 70%,transparent 100%);
 }
 #aurora-sticky{
   position:fixed;
@@ -207,26 +220,16 @@ body{
   margin:0;padding:0;
   pointer-events:none;
   z-index:0;
+  will-change:transform;
   transform:translateZ(0);
-  background:transparent;
   overflow:hidden;
+  background:linear-gradient(180deg,
+    color-mix(in srgb, #5B66C4 26%, #0E0F14) 0%,
+    color-mix(in srgb, #5B66C4 12%, #0E0F14) 55%,
+    #0E0F14 100%);
+  opacity:1;
 }
-/* Per-theme wash layers — hard hex mix so opacity crossfade is the only change */
-.aurora-layer{
-  position:absolute;inset:0;
-  pointer-events:none;
-  opacity:0;
-  will-change:opacity;
-  transition:opacity var(--aurora-xfade, 200ms) cubic-bezier(.22,1,.36,1);
-  transform:translateZ(0);
-}
-.aurora-layer.is-active{opacity:1}
-/* Main aurora (masked fade to transparent) */
-.aurora > .aurora-layer{
-  -webkit-mask-image:linear-gradient(180deg,#000 0%,#000 40%,rgba(0,0,0,.55) 70%,transparent 100%);
-  mask-image:linear-gradient(180deg,#000 0%,#000 40%,rgba(0,0,0,.55) 70%,transparent 100%);
-}
-.aurora > .aurora-layer.layer-light{
+[data-theme="light"] .aurora{
   background:linear-gradient(180deg,
     color-mix(in srgb, #A898FF 28%, #F6F5FB) 0%,
     color-mix(in srgb, #A898FF 18%, #F6F5FB) 22%,
@@ -234,8 +237,13 @@ body{
     color-mix(in srgb, #C8BCFF 4%, #F6F5FB) 72%,
     transparent 100%);
 }
-.aurora > .aurora-layer.layer-dark{
-  /* Keep dark #5B66C4 aurora */
+[data-theme="light"] #aurora-sticky{
+  background:linear-gradient(180deg,
+    color-mix(in srgb, #A898FF 22%, #F6F5FB) 0%,
+    color-mix(in srgb, #A898FF 10%, #F6F5FB) 55%,
+    #F6F5FB 100%);
+}
+[data-theme="dark"] .aurora{
   background:linear-gradient(180deg,
     color-mix(in srgb, #5B66C4 32%, #0E0F14) 0%,
     color-mix(in srgb, #5B66C4 22%, #0E0F14) 20%,
@@ -243,35 +251,17 @@ body{
     color-mix(in srgb, #4A54B0 5%, #0E0F14) 68%,
     transparent 100%);
 }
-/* Sticky thin wash (no mask; solid to --bg hex) */
-#aurora-sticky > .aurora-layer.layer-light{
-  background:linear-gradient(180deg,
-    color-mix(in srgb, #A898FF 22%, #F6F5FB) 0%,
-    color-mix(in srgb, #A898FF 10%, #F6F5FB) 55%,
-    #F6F5FB 100%);
-}
-#aurora-sticky > .aurora-layer.layer-dark{
+[data-theme="dark"] #aurora-sticky{
   background:linear-gradient(180deg,
     color-mix(in srgb, #5B66C4 26%, #0E0F14) 0%,
     color-mix(in srgb, #5B66C4 12%, #0E0F14) 55%,
     #0E0F14 100%);
 }
-/* Default (no attr yet / dark-first): dark layers on */
-.aurora > .aurora-layer.layer-dark,
-#aurora-sticky > .aurora-layer.layer-dark{opacity:1}
-[data-theme="light"] .aurora > .aurora-layer.layer-dark,
-[data-theme="light"] #aurora-sticky > .aurora-layer.layer-dark{opacity:0}
-[data-theme="light"] .aurora > .aurora-layer.layer-light,
-[data-theme="light"] #aurora-sticky > .aurora-layer.layer-light{opacity:1}
-[data-theme="dark"] .aurora > .aurora-layer.layer-light,
-[data-theme="dark"] #aurora-sticky > .aurora-layer.layer-light{opacity:0}
-[data-theme="dark"] .aurora > .aurora-layer.layer-dark,
-[data-theme="dark"] #aurora-sticky > .aurora-layer.layer-dark{opacity:1}
+/* Layers unused for paint (containers hold wash); hide to avoid stale opacity stuck under island */
+.aurora-layer{display:none!important}
 .aurora-crown{display:none!important}
 .aurora-blobs{display:none!important}
-@media (prefers-reduced-motion:reduce){
-  .aurora-layer{transition:none!important}
-}
+.aurora.aurora-repaint,#aurora-sticky.aurora-repaint{opacity:.999;will-change:transform,opacity}
 .fresh,.shell,.modal-backdrop{position:relative;z-index:1}
 .modal-backdrop{z-index:100}
 button,input,select,textarea{font:inherit;color:inherit}
@@ -329,8 +319,8 @@ a:hover{text-decoration:underline;text-underline-offset:3px}
    Updated badge is BELOW this row (centered). Hero stays the headline. */
 .brand{
   display:flex;align-items:flex-start;justify-content:space-between;gap:8px;
-  /* Island / notch clearance lives here now (was on .fresh) */
-  margin:0 0 12px;padding:calc(env(safe-area-inset-top, 0px) + 14px) 0 0;
+  /* Island / notch clearance; extra air to Updated (Linear/Vercel header rhythm) */
+  margin:0 0 20px;padding:calc(env(safe-area-inset-top, 0px) + 14px) 0 0;
   position:relative;min-height:22px;
 }
 .brand-slot{
@@ -744,10 +734,19 @@ a:hover{text-decoration:underline;text-underline-offset:3px}
 }
 .item:hover summary::after{border-color:var(--muted)}
 .item .q{
-  font-family:var(--font); /* Geist Sans / ui-sans — Cursor/Linear card lists */
-  font-size:var(--fs-title);font-weight:var(--fw-semibold);letter-spacing:-.028em;line-height:var(--lh-title);
-  color:var(--ink);margin:0 0 10px;
-  -webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;
+  /* v10.20: real premium list title — Geist Sans / Inter @600 (weights loaded), ink not muted */
+  font-family:"Geist Sans",Geist,Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,sans-serif;
+  font-size:16.5px;
+  font-weight:600;
+  font-style:normal;
+  font-synthesis:none;
+  letter-spacing:-0.02em;
+  line-height:1.3;
+  color:var(--ink);
+  margin:0 0 10px;
+  -webkit-font-smoothing:antialiased;
+  -moz-osx-font-smoothing:grayscale;
+  text-rendering:optimizeLegibility;
 }
 .item .teaser{
   margin:0 0 14px;font-size:var(--fs-ui);font-weight:var(--fw-regular);letter-spacing:-.01em;
@@ -865,14 +864,22 @@ footer{
   .item:hover{transform:none}
 }
 
-/* Dual wordmark */
+/* Dual wordmark — light default muted to Updated chip ink (#5B5678).
+   Easy toggle: add class "wm-full-ink" on <html> for full-black mark. */
+.brand .wm{transition:filter 160ms var(--ease), opacity 160ms var(--ease)}
 .brand .wm-dark{display:none}
 @media (prefers-color-scheme: dark){
   :root:not([data-theme="light"]) .brand .wm-light{display:none}
-  :root:not([data-theme="light"]) .brand .wm-dark{display:block}
+  :root:not([data-theme="light"]) .brand .wm-dark{display:block;filter:none;opacity:1}
 }
 [data-theme="dark"] .brand .wm-light{display:none}
-[data-theme="dark"] .brand .wm-dark{display:block}
+[data-theme="dark"] .brand .wm-dark{display:block;filter:none;opacity:1}
+/* Shipped: subtle muted tint matching Updated (#5B5678) */
+[data-theme="light"] .brand .wm-light{
+  filter:opacity(.76) brightness(.90) contrast(1.04);
+  opacity:1;
+}
+[data-theme="light"].wm-full-ink .brand .wm-light{filter:none;opacity:1}
 
 /* ---- Dark tokens ---- */
 @media (prefers-color-scheme: dark){
@@ -1008,6 +1015,12 @@ footer{
   color:#5B5678;
   border-color:rgba(99,91,255,.14);
 }
+/* Light card body = Updated muted ink (user-loved tone) */
+[data-theme="light"] .item .body,
+[data-theme="light"] .item .body p{color:#5B5678}
+[data-theme="light"] .item .body strong{color:var(--ink)}
+[data-theme="light"] .item .q{color:var(--ink);font-weight:600;letter-spacing:-0.02em}
+
 /* Light toggle hover — brighter glass */
 [data-theme="light"] .theme-toggle:hover{
   border-color:rgba(40,30,80,.20);
@@ -1044,7 +1057,7 @@ footer{
 [data-theme="light"] .pill::before{background:#635BFF;box-shadow:0 0 6px rgba(99,91,255,.45)}
 [data-theme="light"] .pill:hover{background:rgba(99,91,255,.14);color:#3730A3}
 
-/* Dual-layer aurora washes are baked in .aurora-layer (no var(--bg) cascade lag).
+/* Aurora containers sync-painted on theme toggle (v10.20).
    Title colors preserved (dark gold / light violet). */
 @media (prefers-color-scheme: dark){
   /* Dark v10.15: lighter gold on Beta Q&A / h1, deeper gold on Center (em) */
@@ -1199,7 +1212,7 @@ footer{
     height:calc(env(safe-area-inset-top, 0px) + 88px);
   }
   .brand{
-    margin:0 0 10px;min-height:20px;align-items:flex-start;
+    margin:0 0 18px;min-height:20px;align-items:flex-start;
     padding:calc(env(safe-area-inset-top, 0px) + 12px) 0 0;
   }
   .brand-slot{min-height:20px;align-items:flex-start}
@@ -1452,7 +1465,8 @@ document.getElementById("askSubmit").addEventListener("click",()=>{
 });
 /* fresh bar is non-sticky silk — no scroll hide */
 
-/* Theme toggle v10.19 — dual-layer aurora crossfade + same-tick --bg/theme-color.
+/* Theme toggle v10.20 — sync island wash (aurora + sticky) + --bg/theme-color same tick.
+   v10.19 opacity crossfade left Dynamic Island top stuck; paint container backgrounds inline.
    First visit defaults to DARK (manual-v8). Toggle persists light/dark. */
 (function(){
   const MANUAL='flip-beta-qa-theme-manual-v8';
@@ -1478,15 +1492,30 @@ document.getElementById("askSubmit").addEventListener("click",()=>{
     if(a==='dark'||a==='light') return a;
     return 'dark';
   }
-  /* Sync dual-layer aurora: outgoing fades out, incoming fades in via CSS opacity (~200ms). */
-  function syncAuroraLayers(theme){
-    const t=theme==='light'?'light':'dark';
-    document.querySelectorAll('.aurora-layer').forEach(function(layer){
-      const on=layer.getAttribute('data-aurora')===t;
-      layer.classList.toggle('is-active', on);
-    });
+  /* Explicit washes (resolved hex) — inline so island top matches body same frame. */
+  function auroraWash(theme, kind){
+    const bg=theme==='dark'?DARK_BG:LIGHT_BG;
+    if(theme==='dark'){
+      if(kind==='sticky'){
+        return 'linear-gradient(180deg, color-mix(in srgb, #5B66C4 26%, '+bg+') 0%, color-mix(in srgb, #5B66C4 12%, '+bg+') 55%, '+bg+' 100%)';
+      }
+      return 'linear-gradient(180deg, color-mix(in srgb, #5B66C4 32%, '+bg+') 0%, color-mix(in srgb, #5B66C4 22%, '+bg+') 20%, color-mix(in srgb, #6B78E8 12%, '+bg+') 42%, color-mix(in srgb, #4A54B0 5%, '+bg+') 68%, transparent 100%)';
+    }
+    if(kind==='sticky'){
+      return 'linear-gradient(180deg, color-mix(in srgb, #A898FF 22%, '+bg+') 0%, color-mix(in srgb, #A898FF 10%, '+bg+') 55%, '+bg+' 100%)';
+    }
+    return 'linear-gradient(180deg, color-mix(in srgb, #A898FF 28%, '+bg+') 0%, color-mix(in srgb, #A898FF 18%, '+bg+') 22%, color-mix(in srgb, #B8A8FF 10%, '+bg+') 48%, color-mix(in srgb, #C8BCFF 4%, '+bg+') 72%, transparent 100%)';
   }
-  /* SAME TICK: --bg + html/body + ALL theme-color metas + aurora layer classes. */
+  function clearStaleInline(el){
+    if(!el||!el.style) return;
+    try{
+      el.style.removeProperty('filter');
+      el.style.removeProperty('will-change');
+      el.style.removeProperty('background-image');
+      el.classList.remove('aurora-repaint');
+    }catch(e){}
+  }
+  /* SAME TICK: --bg + html/body + theme-color + BOTH aurora + #aurora-sticky washes. */
   function paintTheme(theme){
     const t=theme==='light'?'light':'dark';
     const tc=t==='dark'?DARK_TC:LIGHT_TC;
@@ -1505,7 +1534,6 @@ document.getElementById("askSubmit").addEventListener("click",()=>{
     if(meta) meta.setAttribute('content', tc);
     if(metaL) metaL.setAttribute('content', tc);
     if(metaD) metaD.setAttribute('content', tc);
-    /* Bounce theme-color metas so iOS Safari chrome updates same frame */
     try{
       ['themeColorMeta','themeColorMetaLight','themeColorMetaDark'].forEach(function(id){
         const el=document.getElementById(id);
@@ -1515,7 +1543,35 @@ document.getElementById("askSubmit").addEventListener("click",()=>{
         el.parentNode.replaceChild(next, el);
       });
     }catch(e){}
-    syncAuroraLayers(t);
+    const aurora=document.getElementById('aurora');
+    const sticky=document.getElementById('aurora-sticky');
+    try{
+      if(aurora){
+        clearStaleInline(aurora);
+        aurora.style.setProperty('background', auroraWash(t, 'main'));
+        aurora.style.setProperty('opacity', '1');
+        aurora.style.setProperty('visibility', 'visible');
+        aurora.style.setProperty('display', 'block');
+        aurora.style.setProperty('transform', 'translateZ(0)');
+        void aurora.offsetHeight;
+      }
+      if(sticky){
+        clearStaleInline(sticky);
+        sticky.style.setProperty('background', auroraWash(t, 'sticky'));
+        sticky.style.setProperty('opacity', '1');
+        sticky.style.setProperty('visibility', 'visible');
+        sticky.style.setProperty('display', 'block');
+        sticky.style.setProperty('transform', 'translateZ(0)');
+        void sticky.offsetHeight;
+      }
+      /* Clear any stale layer inlines from v10.19 */
+      document.querySelectorAll('.aurora-layer').forEach(function(layer){
+        try{
+          layer.style.cssText='';
+          layer.classList.toggle('is-active', layer.getAttribute('data-aurora')===t);
+        }catch(e){}
+      });
+    }catch(e){}
     if(btn){
       btn.setAttribute('aria-label', t==='dark'?'Switch to light theme':'Switch to dark theme');
       btn.title=t==='dark'?'Light':'Dark';
@@ -1528,12 +1584,10 @@ document.getElementById("askSubmit").addEventListener("click",()=>{
   }
   function applyManual(theme){
     const t=theme==='light'?'light':'dark';
-    /* data-theme + paint in one synchronous turn — body & island share the frame */
     root.setAttribute('data-theme', t);
     root.style.colorScheme=t;
     try{localStorage.setItem(MANUAL, t)}catch(e){}
     paintTheme(t);
-    /* one follow-up rAF: re-assert theme-color if Safari deferred chrome */
     requestAnimationFrame(function(){ paintTheme(t); });
   }
   const saved=manualPref();
@@ -1542,12 +1596,18 @@ document.getElementById("askSubmit").addEventListener("click",()=>{
   if(btn) btn.addEventListener('click',function(){
     applyManual(current()==='dark'?'light':'dark');
   });
-  /* Re-sync layers after bfcache / tab return (do not rebuild — opacity classes only) */
-  function resync(){ syncAuroraLayers(current()); paintTheme(current()); }
+  function resync(){ paintTheme(current()); }
   window.addEventListener('pageshow', resync);
   document.addEventListener('visibilitychange', function(){
     if(document.visibilityState==='visible') resync();
   });
+  if(window.visualViewport){
+    let vvT=null;
+    window.visualViewport.addEventListener('resize', function(){
+      clearTimeout(vvT);
+      vvT=setTimeout(resync, 60);
+    });
+  }
 })();
 
 
