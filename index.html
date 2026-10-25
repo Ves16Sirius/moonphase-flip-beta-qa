@@ -76,7 +76,7 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/geist-mono@5.2.5/index.min.css" />
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600&display=swap" />
 <style>
-/* Overhaul 2026-10-25 v10.15 — aurora persist + theme-toggle repaint · title shade swap · #5B66C4 · theme-color=--bg · submit kept */
+/* Overhaul 2026-10-25 v10.16 — small top-left Moonphase wordmark · Updated under island · aurora/toggle/title from v10.15 kept */
 :root{
   /* Surfaces */
   --bg:#F6F5FB;
@@ -268,21 +268,22 @@ a:hover{text-decoration:underline;text-underline-offset:3px}
 }
 .shell > *{position:relative;z-index:1}
 
-/* —— Brand row —— */
+/* —— Brand row —— v10.16: small Moonphase wordmark TOP-LEFT + theme toggle TOP-RIGHT
+   Updated chip stays above (centered under island). Hero title remains the headline. */
 .brand{
   /* Toggle TOP == MOONPHASE wordmark TOP */
   display:flex;align-items:flex-start;justify-content:space-between;gap:8px;
-  margin:24px 0 32px;position:relative;min-height:32px;
+  margin:18px 0 28px;position:relative;min-height:22px;
 }
 .brand-slot{
-  flex:1 1 0;display:flex;align-items:flex-start;min-width:0;min-height:32px;
+  flex:1 1 0;display:flex;align-items:flex-start;min-width:0;min-height:22px;
 }
 .brand-slot-start{justify-content:flex-start}
 .brand-slot-end{justify-content:flex-end}
 .brand-mark{
-  flex:0 0 auto;display:flex;align-items:flex-start;justify-content:center;
+  flex:0 0 auto;display:flex;align-items:flex-start;justify-content:flex-start;
 }
-.brand .wm{height:32px;width:auto;display:block}
+.brand .wm{height:21px;width:auto;display:block}
 /* Glass moon|sun switch — clear glass track · thumb CONTAINS active icon · spring slide
    Dims: --tt-w/--tt-h track, --tt-pad inset, --tt-thumb size, --tt-travel = w - 2*pad - thumb */
 .theme-toggle{
@@ -1152,9 +1153,9 @@ footer{
   #aurora-sticky{
     height:calc(env(safe-area-inset-top, 0px) + 88px);
   }
-  .brand{margin:22px 0 24px;min-height:28px;padding:0;align-items:flex-start}
-  .brand-slot{min-height:28px;align-items:flex-start}
-  .brand .wm{height:28px}
+  .brand{margin:16px 0 22px;min-height:20px;padding:0;align-items:flex-start}
+  .brand-slot{min-height:20px;align-items:flex-start}
+  .brand .wm{height:20px}
   .theme-toggle{
     /* Outer height matches Updated badge; travel = 58 - 2*3 - 22 = 30 */
     --tt-w:58px;
@@ -1225,10 +1226,11 @@ footer{
 <div class="fresh" role="status"><span><i aria-hidden="true"></i> Updated Oct 25, 2026</span></div>
 <div class="shell">
   <div class="brand">
-    <div class="brand-slot brand-slot-start" aria-hidden="true"></div>
-    <div class="brand-mark">
-      <img class="wm wm-light" src="wordmark-flip.svg" width="236" height="32" alt="Moonphase Flip" decoding="async" />
-      <img class="wm wm-dark" src="wordmark-flip-white.svg" width="236" height="32" alt="Moonphase Flip" decoding="async" />
+    <div class="brand-slot brand-slot-start">
+      <div class="brand-mark">
+        <img class="wm wm-light" src="wordmark-flip.svg" width="155" height="21" alt="Moonphase Flip" decoding="async" />
+        <img class="wm wm-dark" src="wordmark-flip-white.svg" width="155" height="21" alt="Moonphase Flip" decoding="async" />
+      </div>
     </div>
     <div class="brand-slot brand-slot-end">
       <button type="button" class="theme-toggle" id="themeToggle" aria-label="Switch to dark theme" title="Theme">
