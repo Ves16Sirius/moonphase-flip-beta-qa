@@ -73,7 +73,7 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/geist-mono@5.2.5/index.min.css" />
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600&display=swap" />
 <style>
-/* Overhaul 2026-10-25 v10.4 — brand yellow titles · island continuous wash · sliding moon/sun toggle */
+/* Overhaul 2026-10-25 v10.5 — clean top-curtain aurora · unified controls · snug search · toggle flush wordmark */
 :root{
   /* Surfaces */
   --bg:#F6F5FB;
@@ -154,8 +154,9 @@ html::before{
   content:"";
   position:fixed;
   top:0;left:0;right:0;
-  height:env(safe-area-inset-top, 0px);
-  min-height:env(safe-area-inset-top, 0px);
+  /* Island strip + 2px seam — solid --bg continuous with theme-color */
+  height:calc(env(safe-area-inset-top, 0px) + 2px);
+  min-height:calc(env(safe-area-inset-top, 0px) + 2px);
   background:var(--bg);
   background-color:var(--bg);
   pointer-events:none;
@@ -181,6 +182,24 @@ html[data-theme="dark"]::before{
     background-color:#0E0F14 !important;
   }
 }
+/* Full-viewport fixed underlay — overscroll / rubber-band always shows --bg (never white/black gap) */
+html::after{
+  content:"";
+  position:fixed;
+  inset:0;
+  background:var(--bg);
+  background-color:var(--bg);
+  pointer-events:none;
+  z-index:-1;
+}
+html[data-theme="light"]::after{background:#F6F5FB!important;background-color:#F6F5FB!important}
+html[data-theme="dark"]::after{background:#0E0F14!important;background-color:#0E0F14!important}
+@media (prefers-color-scheme: light){
+  :root:not([data-theme="dark"])::after{background:#F6F5FB!important;background-color:#F6F5FB!important}
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"])::after{background:#0E0F14!important;background-color:#0E0F14!important}
+}
 /* Force --bg into status chrome; never a white strip under the island */
 html[data-theme="light"],
 html[data-theme="light"] body,
@@ -205,47 +224,44 @@ body{
   width:100%;max-width:100%;
   position:relative;
 }
-/* FIXED horizontal top-curtain aurora (Moonphase-style band from viewport top).
-   Starts under Dynamic Island; --bg continuous into wash. No blob / side frame. */
+/* FIXED horizontal top-curtain aurora (Moonphase-style).
+   Hangs from Dynamic Island / visible top as a CLEAN horizontal band.
+   --bg solid through island (matches theme-color); soft wash fades downward.
+   NO radial blob / side frame — linear curtain only. */
 .aurora{
-  /* FIXED top curtain: hangs from visible screen top (under Dynamic Island).
-     Horizontal band — not a blob. Continuously matches --bg at y=0. */
   position:fixed;
   top:0;left:0;right:0;
   width:100%;
-  height:calc(env(safe-area-inset-top, 0px) + min(320px, 42vh));
+  height:calc(env(safe-area-inset-top, 0px) + min(300px, 40vh));
   margin:0;padding:0;
   pointer-events:none;
   z-index:0;
   overflow:hidden;
   isolation:isolate;
-  /* Horizontal band: --bg crown → soft violet wash → fade. Wide flat ellipse only. */
-  background:
-    linear-gradient(180deg,
-      var(--bg) 0%,
-      var(--bg) env(safe-area-inset-top, 0px),
-      color-mix(in srgb, #A898FF 22%, var(--bg)) calc(env(safe-area-inset-top, 0px) + 8px),
-      color-mix(in srgb, #B8A8FF 14%, var(--bg)) calc(env(safe-area-inset-top, 0px) + 72px),
-      color-mix(in srgb, #C8BCFF 6%, var(--bg)) calc(env(safe-area-inset-top, 0px) + 160px),
-      transparent 100%),
-    radial-gradient(ellipse 160% 55% at 50% calc(env(safe-area-inset-top, 0px) + 0px),
-      rgba(124,110,255,.20) 0%, transparent 72%);
+  /* Pure horizontal curtain: --bg crown → soft violet sheet → transparent */
+  background:linear-gradient(180deg,
+    var(--bg) 0%,
+    var(--bg) env(safe-area-inset-top, 0px),
+    color-mix(in srgb, #A898FF 20%, var(--bg)) calc(env(safe-area-inset-top, 0px) + 6px),
+    color-mix(in srgb, #B8A8FF 12%, var(--bg)) calc(env(safe-area-inset-top, 0px) + 64px),
+    color-mix(in srgb, #C8BCFF 5%, var(--bg)) calc(env(safe-area-inset-top, 0px) + 150px),
+    transparent 100%);
   filter:none;
   opacity:1;
-  -webkit-mask-image:linear-gradient(180deg,#000 0%,#000 40%,rgba(0,0,0,.55) 70%,transparent 100%);
-  mask-image:linear-gradient(180deg,#000 0%,#000 40%,rgba(0,0,0,.55) 70%,transparent 100%);
+  -webkit-mask-image:linear-gradient(180deg,#000 0%,#000 42%,rgba(0,0,0,.5) 72%,transparent 100%);
+  mask-image:linear-gradient(180deg,#000 0%,#000 42%,rgba(0,0,0,.5) 72%,transparent 100%);
 }
-/* Crown: solid --bg through safe-area, soft fade below — continuous with html::before + theme-color */
+/* Crown: solid --bg through safe-area — continuous with html::before + theme-color */
 .aurora-crown{
   display:block!important;
   position:absolute;
   left:0;right:0;top:0;
-  height:calc(env(safe-area-inset-top, 0px) + 28px);
+  height:calc(env(safe-area-inset-top, 0px) + 32px);
   margin:0;padding:0;
   pointer-events:none;
   background:linear-gradient(180deg,
     var(--bg) 0%,
-    var(--bg) env(safe-area-inset-top, 0px),
+    var(--bg) calc(env(safe-area-inset-top, 0px) + 2px),
     transparent 100%);
   filter:none;
   opacity:1;
@@ -321,7 +337,7 @@ a:hover{text-decoration:underline;text-underline-offset:3px}
 .theme-toggle{
   position:static;transform:none;
   align-self:flex-start;
-  margin-top:2px; /* optical face with wordmark */
+  margin-top:0; /* TOP edge flush with Moonphase wordmark top */
   height:28px;min-height:28px;width:52px;min-width:52px;padding:0;border-radius:999px;gap:0;
   display:inline-flex;align-items:center;justify-content:center;
   border:1px solid var(--line);
@@ -486,13 +502,14 @@ a:hover{text-decoration:underline;text-underline-offset:3px}
 }
 .search{
   position:relative;display:inline-flex;align-items:center;
-  width:auto;height:var(--control-h);padding:0 12px 0 36px;
+  width:auto;height:var(--control-h);padding:0 14px 0 36px;
   border-radius:999px;border:1px solid var(--line);
   background:var(--control-bg);
   backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
   box-shadow:var(--shadow-sm);
   transition:border-color var(--dur) var(--ease), box-shadow var(--dur) var(--ease);
   flex:0 0 auto;max-width:100%;min-width:0;
+  overflow:visible;
 }
 .search:focus-within{
   border-color:color-mix(in srgb, var(--accent) 36%, var(--line));
@@ -502,12 +519,15 @@ a:hover{text-decoration:underline;text-underline-offset:3px}
   position:absolute;left:13px;width:14px;height:14px;color:var(--faint);pointer-events:none;
 }
 .search input{
-  width:var(--search-input-w, 31ch);height:100%;border:0;outline:0;background:transparent;
-  font-size:13px;letter-spacing:-.01em;color:var(--ink);
-  min-width:0;max-width:100%;
+  width:var(--search-input-w, 48ch);height:100%;border:0;outline:0;background:transparent;
+  font-size:var(--fs-ui);font-weight:var(--fw-medium);letter-spacing:-.011em;color:var(--ink);
+  min-width:0;max-width:none;
   field-sizing:fixed;
+  overflow:visible;
+  text-overflow:clip;
+  white-space:nowrap;
 }
-.search input::placeholder{color:var(--faint)}
+.search input::placeholder{color:var(--faint);opacity:1;overflow:visible;text-overflow:clip}
 .search input::-webkit-search-cancel-button{-webkit-appearance:none}
 
 .sort{
@@ -520,13 +540,14 @@ a:hover{text-decoration:underline;text-underline-offset:3px}
 }
 .sort button{
   height:calc(var(--control-h) - 6px);padding:0 14px;border-radius:999px;
-  font-size:13px;font-weight:500;letter-spacing:-.01em;color:var(--muted);
+  font-size:var(--fs-ui);font-weight:var(--fw-medium);letter-spacing:-.011em;color:var(--muted);
   transition:background var(--dur) var(--ease), color var(--dur) var(--ease), box-shadow var(--dur) var(--ease);
 }
 .sort button[aria-pressed="true"]{
+  /* Same selected language as .chip[aria-selected=true] */
   background:color-mix(in srgb, var(--accent) 12%, #fff);
   color:var(--accent-deep);
-  box-shadow:0 1px 3px rgba(99,91,255,.08);
+  box-shadow:none;
 }
 
 .sec{
@@ -837,19 +858,22 @@ footer{
   background:#fff;
   border-color:rgba(99,91,255,.22);
 }
-[data-theme="light"] .chip[aria-selected="true"]{
+[data-theme="light"] .chip[aria-selected="true"],
+[data-theme="light"] .sort button[aria-pressed="true"]{
+  /* Unified selected language across chips + Newest/Oldest */
   background:color-mix(in srgb, var(--accent) 14%, #fff);
-  /* White pill border only — purple fill clipped inside (no outer glow/outline) */
-  border:1.5px solid #FFFFFF;
+  border-color:color-mix(in srgb, var(--accent) 28%, transparent);
   outline:none;
   color:var(--accent-deep);
-  box-shadow:inset 0 0 0 1px color-mix(in srgb, var(--accent) 18%, transparent);
+  box-shadow:none;
   overflow:hidden;
 }
+[data-theme="light"] .chip[aria-selected="true"]{
+  border:1px solid color-mix(in srgb, var(--accent) 28%, transparent);
+}
 [data-theme="light"] .sort button[aria-pressed="true"]{
-  background:color-mix(in srgb, var(--accent) 14%, #fff);
-  color:var(--accent-deep);
-  box-shadow:0 0 0 2px rgba(99,91,255,.08);
+  /* fill lives inside the shared .sort pill — no extra outer ring */
+  border-color:transparent;
 }
 [data-theme="light"] .pill{
   background:rgba(99,91,255,.08);
@@ -874,25 +898,23 @@ html[data-theme="dark"] body,
     background-color:#0E0F14 !important;
   }
 }
-/* Dark top-curtain aurora — horizontal band from viewport top (not a blob) */
+/* Dark top-curtain aurora — clean horizontal sheet (no blob / weird glow) */
 @media (prefers-color-scheme: dark){
   :root:not([data-theme="light"]) .aurora{
-    background:
-      linear-gradient(180deg,
-        var(--bg) 0%,
-        var(--bg) env(safe-area-inset-top, 0px),
-        color-mix(in srgb, #5A64C8 26%, var(--bg)) calc(env(safe-area-inset-top, 0px) + 8px),
-        color-mix(in srgb, #4A54B0 12%, var(--bg)) calc(env(safe-area-inset-top, 0px) + 80px),
-        transparent 100%),
-      radial-gradient(ellipse 160% 50% at 50% calc(env(safe-area-inset-top, 0px) + 0px),
-        rgba(100,110,210,.22) 0%, transparent 70%);
+    background:linear-gradient(180deg,
+      var(--bg) 0%,
+      var(--bg) env(safe-area-inset-top, 0px),
+      color-mix(in srgb, #5B66C4 20%, var(--bg)) calc(env(safe-area-inset-top, 0px) + 6px),
+      color-mix(in srgb, #4A54B0 10%, var(--bg)) calc(env(safe-area-inset-top, 0px) + 72px),
+      color-mix(in srgb, #3A4470 4%, var(--bg)) calc(env(safe-area-inset-top, 0px) + 150px),
+      transparent 100%);
     filter:none;
     opacity:1;
   }
   :root:not([data-theme="light"]) .aurora-crown{
     background:linear-gradient(180deg,
       var(--bg) 0%,
-      var(--bg) env(safe-area-inset-top, 0px),
+      var(--bg) calc(env(safe-area-inset-top, 0px) + 2px),
       transparent 100%);
     opacity:1;
   }
@@ -901,44 +923,39 @@ html[data-theme="dark"] body,
   :root:not([data-theme="light"]) .hero h1 em{color:#FFFBC1;text-shadow:none;opacity:1}
 }
 [data-theme="dark"] .aurora{
-  background:
-    linear-gradient(180deg,
-      var(--bg) 0%,
-      var(--bg) env(safe-area-inset-top, 0px),
-      color-mix(in srgb, #5A64C8 26%, var(--bg)) calc(env(safe-area-inset-top, 0px) + 8px),
-      color-mix(in srgb, #4A54B0 12%, var(--bg)) calc(env(safe-area-inset-top, 0px) + 80px),
-      transparent 100%),
-    radial-gradient(ellipse 160% 50% at 50% calc(env(safe-area-inset-top, 0px) + 0px),
-      rgba(100,110,210,.22) 0%, transparent 70%);
+  background:linear-gradient(180deg,
+    var(--bg) 0%,
+    var(--bg) env(safe-area-inset-top, 0px),
+    color-mix(in srgb, #5B66C4 20%, var(--bg)) calc(env(safe-area-inset-top, 0px) + 6px),
+    color-mix(in srgb, #4A54B0 10%, var(--bg)) calc(env(safe-area-inset-top, 0px) + 72px),
+    color-mix(in srgb, #3A4470 4%, var(--bg)) calc(env(safe-area-inset-top, 0px) + 150px),
+    transparent 100%);
   filter:none;
   opacity:1;
 }
 [data-theme="dark"] .aurora-crown{
   background:linear-gradient(180deg,
     var(--bg) 0%,
-    var(--bg) env(safe-area-inset-top, 0px),
+    var(--bg) calc(env(safe-area-inset-top, 0px) + 2px),
     transparent 100%);
   opacity:1;
 }
 /* Explicit light reset when user forces light over system dark */
 [data-theme="light"] .aurora{
-  background:
-    linear-gradient(180deg,
-      var(--bg) 0%,
-      var(--bg) env(safe-area-inset-top, 0px),
-      color-mix(in srgb, #A898FF 22%, var(--bg)) calc(env(safe-area-inset-top, 0px) + 8px),
-      color-mix(in srgb, #B8A8FF 14%, var(--bg)) calc(env(safe-area-inset-top, 0px) + 72px),
-      color-mix(in srgb, #C8BCFF 6%, var(--bg)) calc(env(safe-area-inset-top, 0px) + 160px),
-      transparent 100%),
-    radial-gradient(ellipse 160% 55% at 50% calc(env(safe-area-inset-top, 0px) + 0px),
-      rgba(124,110,255,.20) 0%, transparent 72%);
+  background:linear-gradient(180deg,
+    var(--bg) 0%,
+    var(--bg) env(safe-area-inset-top, 0px),
+    color-mix(in srgb, #A898FF 20%, var(--bg)) calc(env(safe-area-inset-top, 0px) + 6px),
+    color-mix(in srgb, #B8A8FF 12%, var(--bg)) calc(env(safe-area-inset-top, 0px) + 64px),
+    color-mix(in srgb, #C8BCFF 5%, var(--bg)) calc(env(safe-area-inset-top, 0px) + 150px),
+    transparent 100%);
   filter:none;
   opacity:1;
 }
 [data-theme="light"] .aurora-crown{
   background:linear-gradient(180deg,
     var(--bg) 0%,
-    var(--bg) env(safe-area-inset-top, 0px),
+    var(--bg) calc(env(safe-area-inset-top, 0px) + 2px),
     transparent 100%);
   opacity:1;
 }
@@ -962,6 +979,7 @@ html[data-theme="dark"] body,
 [data-theme="dark"] .sort button[aria-pressed="true"]{
   background:color-mix(in srgb, var(--accent) 18%, var(--surface));
   color:var(--accent-deep);
+  box-shadow:none;
 }
 [data-theme="dark"] .ask-cta{
   background:var(--cta);color:var(--cta-ink);border-color:var(--cta-border);
@@ -1010,6 +1028,7 @@ html[data-theme="dark"] body,
   :root:not([data-theme="light"]) .sort button[aria-pressed="true"]{
     background:color-mix(in srgb, var(--accent) 18%, var(--surface));
     color:var(--accent-deep);
+    box-shadow:none;
   }
   :root:not([data-theme="light"]) .ask-cta{
     background:var(--cta);color:var(--cta-ink);border-color:var(--cta-border);
@@ -1055,17 +1074,17 @@ html[data-theme="dark"] body,
     padding-right:max(18px, env(safe-area-inset-right, 0px));
   }
   .aurora{
-    height:calc(env(safe-area-inset-top, 0px) + min(260px, 36vh));
+    height:calc(env(safe-area-inset-top, 0px) + min(250px, 34vh));
   }
   .aurora-crown{
-    height:calc(env(safe-area-inset-top, 0px) + 24px);
+    height:calc(env(safe-area-inset-top, 0px) + 28px);
   }
   .brand{margin:22px 0 24px;min-height:28px;padding:0;align-items:flex-start}
   .brand-slot{min-height:28px;align-items:flex-start}
   .brand .wm{height:28px}
   .theme-toggle{
     height:26px;min-height:26px;width:48px;min-width:48px;padding:0;gap:0;
-    margin-top:1px; /* face-align with Moonphase */
+    margin-top:0; /* TOP flush with wordmark on mobile too */
   }
   .theme-toggle .tt-thumb{width:20px;height:20px;top:2px;left:2px}
   .theme-toggle .tt-icon{width:11px;height:11px;margin-top:-5.5px}
@@ -1083,7 +1102,8 @@ html[data-theme="dark"] body,
   .hero .sub{font-size:14.5px;max-width:320px;margin-bottom:24px}
   .controls{padding:0;margin:0 auto 28px;gap:12px}
   .chips{gap:8px}
-  .search{width:auto;max-width:100%;flex:0 0 auto;align-self:center}
+  .search{width:auto;max-width:min(100%, 100vw - 36px);flex:0 0 auto;align-self:center;overflow:visible}
+  .search input{max-width:none}
   .toolbar{flex-direction:column;flex-wrap:wrap;align-items:center}
   .sort{align-self:center;flex:0 0 auto}
   .sec{margin:0 0 12px}
@@ -1160,7 +1180,7 @@ html[data-theme="dark"] body,
       <div class="toolbar">
         <div class="search">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
-          <input id="q" type="search" placeholder="Search shipping, firmware, MCP" size="31" autocomplete="off" />
+          <input id="q" type="search" placeholder="Search shipping, SN, firmware, TestFlight, MCP" size="48" autocomplete="off" enterkeyhint="search" />
         </div>
         <div class="sort" role="group" aria-label="Sort order">
           <button type="button" data-sort="newest" aria-pressed="true">Newest</button>
@@ -1208,7 +1228,7 @@ const LABELS={"all":"All answers","getting-started":"Getting started","device":"
 const DATA=[{"id":"FB-004","cat":"getting-started","tag":"Getting started","sortKey":"2026-10-22","q":"How do I track shipping, and where do I report bugs?","teaser":"UPS delivery; tracking arrives by email. Report bugs in General or Beta Support.","teaserHtml":"<mark>UPS</mark> delivery; tracking arrives by email. Report bugs in <mark>General</mark> or <mark>Beta Support</mark>.","a":"<p>Devices ship with <code>UPS</code>. You’ll get an email from the team; tracking can take a little while to appear.</p><p>For bugs, post in <strong>General</strong> or your personal <strong>Beta Support</strong> group.</p>","alwaysOpen":false,"tags":["Getting started","Shipping"]},{"id":"FB-035","cat":"getting-started","tag":"Getting started","sortKey":"2026-10-24","q":"My device just arrived — what should I do first?","teaser":"Follow Checklist_revised.pdf steps 1–7 (share SN), wait for us to remind you, then continue from step 8.","teaserHtml":"Follow <mark>Checklist_revised.pdf</mark> steps 1–7 (share SN), wait for us to remind you, then continue from step 8.","a":"<p>In the WhatsApp beta community, open <strong>Announcements</strong> and use <code>Checklist_revised.pdf</code> and <code>QuickStartGuide.pdf</code> as your guides.</p><p>Follow <code>Checklist_revised.pdf</code> step by step through <strong>steps 1–7</strong> (including sharing your <strong>serial number (<code>SN</code>)</strong>). Then <strong>stop</strong> and wait for us to remind you.</p><p>After our reminder, continue from <strong>step 8</strong> and set up the device.</p>","alwaysOpen":false,"tags":["Getting started","Setup"]},{"id":"FB-014","cat":"device","tag":"Device","sortKey":"2026-10-24","q":"Recording shows activity, but nothing returns — or I’m stuck on firmware 1.0.68?","teaser":"Share your SN, wait for our firmware-push notice, then follow Checklist_revised.pdf.","teaserHtml":"Share your <mark>SN</mark>, wait for our firmware-push notice, then follow <mark>Checklist_revised.pdf</mark>.","a":"<p>Devices often ship on older firmware (including <code>1.0.68</code>). Send your <strong>serial number (<code>SN</code>)</strong> in <strong>General</strong> or your private <strong>Beta Support</strong> group.</p><p><strong>Wait</strong> for our notice that new firmware was pushed to your device. The app’s Firmware Update screen may not show it right away.</p><p>After that notice, open <strong>Announcements</strong> and follow <code>Checklist_revised.pdf</code> (use the <code>TestFlight</code> build the checklist names). Then keep app and firmware current, and <strong>unbind and re-pair</strong> if data still needs to sync to the Flip screen.</p>","alwaysOpen":false,"tags":["Device","Firmware"]},{"id":"FB-034","cat":"app-firmware","tag":"App & firmware","sortKey":"2026-10-24","q":"Which iOS app build should I install?","teaser":"Use the listed TestFlight build for iOS beta.","teaserHtml":"Use the listed <mark>TestFlight</mark> build for iOS beta.","a":"<p>Install via <code>TestFlight</code>.</p><p>Current build: <strong>1.0.1 (1217)</strong>.</p>","alwaysOpen":false,"tags":["App & firmware","iOS"]},{"id":"FB-009","cat":"app-firmware","tag":"App & firmware","sortKey":"2026-10-24","q":"Calendar shows in the app but not on the device — or Bluetooth is connected with no voice actions?","teaser":"Usually an app + firmware mismatch — share SN if asked, then wait for our push.","teaserHtml":"Usually an <mark>app + firmware</mark> mismatch — share SN if asked, then wait for our push.","a":"<p>This is usually an <strong>app and firmware version</strong> mismatch.</p><p>Send your <strong>serial number (<code>SN</code>)</strong> if asked, then <strong>wait for our notification</strong> that a firmware update has been pushed. After the push, calendars listed in the app should be able to sync to the device.</p><p>Android / Fold calendar feedback is noted; <strong>no commitment yet</strong>.</p>","alwaysOpen":false,"tags":["App & firmware","Sync"]},{"id":"FB-028","cat":"app-firmware","tag":"App & firmware","sortKey":"2026-10-24","q":"Why do I see characters in other languages in the UI or AI output?","teaser":"AI language/prompt issue under fix — send a screenshot if it returns.","teaserHtml":"AI language/prompt issue under fix — send a screenshot if it returns.","a":"<p>Characters in other languages in the UI or AI output are treated as an <strong>AI language / prompt</strong> issue. The team is refining prompts.</p><p>If it continues, send a screenshot in <strong>General</strong> or your personal <strong>Beta Support</strong> group.</p>","alwaysOpen":false,"tags":["App & firmware","AI"]},{"id":"FB-015","cat":"recording-ai","tag":"Recording & AI","sortKey":"2026-10-23","q":"Can I leave recording on all day?","teaser":"Yes — leave it on all day. It only saves when someone speaks; auto-clears after phone sync.","teaserHtml":"Yes — leave it on all day. It only saves when someone speaks; auto-clears after phone sync.","a":"<p>Yes — you can leave recording on all day.</p><p>It <strong>only saves when someone is speaking</strong>. After sync to the phone, the device <strong>auto-clears</strong> (no manual purge).</p>","alwaysOpen":false,"tags":["Recording & AI","Battery"]},{"id":"FB-024","cat":"privacy","tag":"Privacy","sortKey":"2026-10-24","q":"Can I use Flip with other AIs via MCP under the NDA?","teaser":"Yes — MCP with other AIs is allowed in this beta.","teaserHtml":"Yes — <mark>MCP</mark> with other AIs is allowed in this beta.","a":"<p><code>MCP</code> is part of the beta. You’re free to try it with other AIs.</p>","alwaysOpen":false,"tags":["Privacy","MCP"]},{"id":"R1","cat":"feedback","tag":"Reporting","sortKey":"2026-10-22","q":"General channel","teaser":"Shared questions, announcements, and group bug reports.","teaserHtml":"Shared questions, announcements, and group bug reports.","a":"<p>Use <strong>General</strong> for shared questions, announcements, and bug reports the whole beta group can see.</p>","alwaysOpen":false,"tags":["Reporting","General"]},{"id":"R2","cat":"feedback","tag":"Reporting","sortKey":"2026-10-22","q":"Personal Beta Support group","teaser":"Private thread for shipment, SN, and one-to-one issues.","teaserHtml":"Private thread for shipment, <mark>SN</mark>, and one-to-one issues.","a":"<p>Your private thread for shipment details, <strong>serial number (<code>SN</code>)</strong>, and one-to-one issues.</p>","alwaysOpen":false,"tags":["Reporting","Support"]},{"id":"R3","cat":"feedback","tag":"Reporting","sortKey":"2026-10-24","q":"Which docs matter, and what should I include when reporting?","teaser":"Include SN, versions, and a screenshot; QuickStartGuide.pdf and Checklist_revised.pdf live in Announcements.","teaserHtml":"Include SN, versions, and a screenshot; <mark>QuickStartGuide.pdf</mark> and <mark>Checklist_revised.pdf</mark> live in Announcements.","a":"<p><strong>Announcements</strong> includes <code>QuickStartGuide.pdf</code> and <code>Checklist_revised.pdf</code>.</p><p>Helpful reports include repro steps, your <strong>serial number (<code>SN</code>)</strong>, app and firmware versions, and a screenshot or short video.</p>","alwaysOpen":false,"tags":["Reporting","Docs"]}];
 let tab="all", sortDir="newest";
 const list=document.getElementById("list"), qEl=document.getElementById("q"), sec=document.getElementById("sec");
-/* Size search input to placeholder text (snug to last letter — e.g. P in MCP) on mobile + desktop */
+/* Size search input to placeholder — snug, last letter fully visible (mobile + desktop) */
 (function fitSearchToPlaceholder(){
   if(!qEl) return;
   const wrap=qEl.closest(".search");
@@ -1220,8 +1240,10 @@ const list=document.getElementById("list"), qEl=document.getElementById("q"), se
       const ctx=canvas.getContext("2d");
       if(!ctx) return;
       ctx.font=(cs.fontWeight||"400")+" "+(cs.fontSize||"13px")+" "+(cs.fontFamily||"sans-serif");
-      const w=Math.ceil(ctx.measureText(ph).width)+2; /* +2px optical end-cap */
+      /* +8px optical end-cap so last glyph (P) never clips on mobile Safari / desktop */
+      const w=Math.ceil(ctx.measureText(ph).width)+8;
       qEl.style.width=w+"px";
+      qEl.setAttribute("size", String(Math.max(ph.length, 12)));
       if(wrap){ wrap.style.setProperty("--search-input-w", w+"px"); }
     }catch(e){}
   }
