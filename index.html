@@ -77,7 +77,8 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/geist-mono@5.2.5/index.min.css" />
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&display=swap" />
 <style>
-/* Overhaul 2026-10-25 v10.44 — Entry ids: FB-xxx → readable kebab-case slugs (e.g. first-steps, ios-build); #slug / ?id=slug deep links open + scroll to the card; legacy #FB-xxx / ?id=FB-xxx resolve via LEGACY_IDS. Mobile Ask sheet loosened (spacing only): 22px sides, ~24px section rhythm, 10px label gap, 34px/14px topic + phone chips, textarea 14/16 padding at 1.5 line-height, 44px Cancel target, body scrolls instead of squeezing. Colors, fonts, aurora, sort thumb, page chips, Ask behavior unchanged. */
+/* Overhaul 2026-10-25 v10.45 — Ask sheet: (1) head/body boundary — .modal-head gets 14px (desktop) / 16px (mobile) bottom padding (body top padding trimmed so the resting gap is ~unchanged); while .modal-body is scrolled (scrollTop>0 → .is-scrolled on the sheet) a --line hairline shows under the head and the top 12px of the scroll area fades, so content clips cleanly instead of butting into the subtitle. (2) Single scroller — #askQ has no max-height and overflow:hidden; it autogrows to full content height and only .modal-body scrolls (overscroll-behavior:contain). While typing, the body nudges (instant, only when needed) to keep the caret line visible above the keyboard/visualViewport. Colors, fonts, drag-dismiss rules, matching, opaque bottom, ids unchanged. */
+/* v10.44 — Entry ids: FB-xxx → readable kebab-case slugs (e.g. first-steps, ios-build); #slug / ?id=slug deep links open + scroll to the card; legacy #FB-xxx / ?id=FB-xxx resolve via LEGACY_IDS. Mobile Ask sheet loosened (spacing only): 22px sides, ~24px section rhythm, 10px label gap, 34px/14px topic + phone chips, textarea 14/16 padding at 1.5 line-height, 44px Cancel target, body scrolls instead of squeezing. Colors, fonts, aurora, sort thumb, page chips, Ask behavior unchanged. */
 :root{
   /* Surfaces */
   --bg:#F6F5FB;
@@ -850,7 +851,18 @@ footer{
 .modal-backdrop.open .modal{transform:none}
 .modal-head{
   flex:0 0 auto;position:relative;
-  padding:22px 24px 0;
+  padding:22px 24px 14px; /* v10.45: was 0 bottom — head never butts into scrolled body content */
+}
+/* v10.45 scroll edge: hairline under the head + short top fade on the scroll area, only while body is scrolled */
+.modal-head::after{
+  content:"";position:absolute;left:0;right:0;bottom:0;height:1px;
+  background:var(--line);opacity:0;pointer-events:none;
+  transition:opacity 160ms var(--ease);
+}
+.modal.is-scrolled .modal-head::after{opacity:1}
+.modal.is-scrolled .modal-body{
+  -webkit-mask-image:linear-gradient(to bottom, transparent 0, #000 12px);
+  mask-image:linear-gradient(to bottom, transparent 0, #000 12px);
 }
 .sheet-grabber{display:none}
 /* v10.42 desktop close: bare thin × glyph — no circle, no fill, no rim (Airbnb / Vercel / Radix dialog style).
@@ -875,7 +887,7 @@ footer{
   overflow-x:hidden;overflow-y:auto;
   -webkit-overflow-scrolling:touch;
   overscroll-behavior:contain;
-  padding:12px 24px 8px;
+  padding:4px 24px 8px; /* v10.45: 12→4 top; head now carries 14px bottom */
 }
 .modal-foot{
   flex:0 0 auto;
@@ -903,11 +915,12 @@ footer{
   box-shadow:0 0 0 3px var(--accent-soft), var(--glass-highlight);
 }
 .modal textarea{min-height:96px;resize:vertical}
-/* v10.38 auto-grow: ~3 lines by default, JS grows to content, scrolls past max */
+/* v10.38 auto-grow: ~3 lines by default, JS grows to content.
+   v10.45 single scroller: no max-height, no inner scroll — the textarea is always full content height, .modal-body scrolls */
 .modal textarea#askQ{
   display:block;line-height:1.55;margin:0 0 8px;resize:none;
   min-height:calc(4 * 1.55em + 22px);height:calc(4 * 1.55em + 22px);
-  max-height:320px;overflow-y:auto;
+  max-height:none;overflow:hidden;
 }
 /* Live matches — same glass language as ask chips, no new colors */
 .ask-matches{margin:0 0 12px}
@@ -1516,7 +1529,7 @@ footer{
   .modal label{margin:0 0 5px}
   .modal select,.modal textarea{margin:0 0 10px;font-size:16px;/* iOS zoom guard */}
   .modal textarea{min-height:88px;resize:none}
-  .modal textarea#askQ{max-height:40vh;max-height:40dvh}
+  .modal textarea#askQ{max-height:none} /* v10.45: was 40dvh — no nested scroller */
   /* v10.42: typed text stays 16px (iOS zoom guard); placeholder is quieter at 14px */
   .modal textarea#askQ::placeholder{font-size:14px;letter-spacing:-.006em}
   /* v10.42 opaque sheet: solid --surface (same color, no translucency/blur) so nothing behind shows through.
@@ -1543,7 +1556,6 @@ footer{
   .modal-backdrop.kb-open{padding-top:0}
   .modal-backdrop.kb-open .modal{max-height:calc(var(--vvh, 100dvh) - 8px + var(--sheet-over))}
   .modal-backdrop.kb-open .modal-foot{padding-bottom:10px}
-  .modal-backdrop.kb-open .modal textarea#askQ{max-height:calc(var(--vvh, 100dvh) * .32)}
   /* v10.44 roomier Ask sheet (spacing only — colors, fonts, behavior unchanged): 22px sides, ~24px between
      sections, 10px label→content, lighter 34px chips, 14/16 textarea padding at 1.5 line-height, 44px Cancel */
   .modal-head{padding-left:max(22px, env(safe-area-inset-left, 0px));padding-right:max(22px, env(safe-area-inset-right, 0px))}
@@ -1567,6 +1579,9 @@ footer{
   .modal-foot{padding:12px max(22px, env(safe-area-inset-right, 0px)) max(6px, env(safe-area-inset-bottom, 0px)) max(22px, env(safe-area-inset-left, 0px))}
   .ask-cancel{height:44px;line-height:44px;margin:0}
   .ask-cancel::after{top:0;bottom:0}
+  /* v10.45 head/body boundary: 16px under the subtitle (was 0); body top 24→10 keeps the resting gap ~equal */
+  .modal-head{padding-bottom:16px}
+  .modal-body{padding-top:10px}
 }
 
 /* Desktop/web: search + Newest/Oldest MUST stay one horizontal row */
@@ -1822,14 +1837,50 @@ document.querySelectorAll("#askOs .ask-topic").forEach(btn=>btn.addEventListener
   askOs=(askOs===v)?"":v;
   document.querySelectorAll("#askOs .ask-topic").forEach(b=>b.setAttribute("aria-pressed",(askOs&&b.dataset.os===askOs)?"true":"false"));
 }));
-/* Auto-grow: CSS min = ~4 lines (fits 3-line placeholder + wrap), CSS max = 40dvh mobile / 320px desktop, then scrolls inside */
+/* Auto-grow: CSS min = ~4 lines (fits 3-line placeholder + wrap); v10.45: no max — grows to full content, body scrolls.
+   Keep the body's scrollTop across the height:auto reset so the sheet doesn't jump while typing. */
 function growAsk(){
+  const st=askBody?askBody.scrollTop:0;
   askQ.style.height="auto";
   askQ.style.height=(askQ.scrollHeight+2)+"px";
+  if(askBody&&askBody.scrollTop!==st) askBody.scrollTop=st;
 }
 const askSheet=document.getElementById("askSheet");
 const askHead=document.getElementById("askHead");
 const askBody=askSheet.querySelector(".modal-body");
+/* v10.45: flag the sheet while its body is scrolled → hairline under head + top fade (CSS .is-scrolled) */
+function syncAskScrolled(){askSheet.classList.toggle("is-scrolled", askBody.scrollTop>0)}
+askBody.addEventListener("scroll",syncAskScrolled,{passive:true});
+/* v10.45 caret follow: measure the caret line with an offscreen mirror of the textarea, then nudge .modal-body
+   (instant, only when the caret leaves the visible band — clipped by the body and by the visualViewport/keyboard). */
+let askMirror=null;
+function askCaretRect(){
+  const cs=getComputedStyle(askQ);
+  if(!askMirror){askMirror=document.createElement("div");askMirror.setAttribute("aria-hidden","true");document.body.appendChild(askMirror)}
+  const m=askMirror.style;
+  m.position="absolute";m.visibility="hidden";m.top="0";m.left="-9999px";m.overflow="hidden";
+  m.whiteSpace="pre-wrap";m.overflowWrap="break-word";m.wordBreak=cs.wordBreak;m.boxSizing=cs.boxSizing;
+  m.width=askQ.getBoundingClientRect().width+"px";
+  ["fontFamily","fontSize","fontWeight","fontStyle","letterSpacing","lineHeight","textTransform","textIndent","tabSize",
+   "paddingTop","paddingRight","paddingBottom","paddingLeft","borderTopWidth","borderRightWidth","borderBottomWidth","borderLeftWidth","borderStyle"]
+    .forEach(k=>{m[k]=cs[k]});
+  const pos=(askQ.selectionEnd==null)?askQ.value.length:askQ.selectionEnd;
+  askMirror.textContent=askQ.value.slice(0,pos);
+  const mark=document.createElement("span");mark.textContent="\u200b";askMirror.appendChild(mark);
+  const r=askQ.getBoundingClientRect();
+  const lh=parseFloat(cs.lineHeight)||parseFloat(cs.fontSize)*1.5;
+  const top=r.top+mark.offsetTop;
+  return {top:top,bottom:top+lh};
+}
+function ensureAskCaret(){
+  if(modal.hidden||document.activeElement!==askQ) return;
+  const c=askCaretRect(), br=askBody.getBoundingClientRect();
+  let visTop=br.top, visBottom=br.bottom;
+  if(vv&&sheetMQ.matches){visTop=Math.max(visTop, vv.offsetTop);visBottom=Math.min(visBottom, vv.offsetTop+vv.height)}
+  const pad=12;
+  if(c.bottom+pad>visBottom) askBody.scrollTop+=Math.ceil(c.bottom+pad-visBottom);
+  else if(c.top-pad<visTop) askBody.scrollTop-=Math.ceil(visTop-(c.top-pad));
+}
 const askSendLabel=askSend?askSend.querySelector(".ask-send-label"):null;
 const ASK_SEND_TEXT="Copy & open WhatsApp";
 const sheetMQ=window.matchMedia("(max-width:719px)");
@@ -1956,11 +2007,7 @@ function syncAskViewport(){
     modal.style.top=vv.offsetTop+"px";modal.style.bottom="auto";modal.style.height=vv.height+"px";
     modal.style.setProperty("--vvh", vv.height+"px");
     if(document.activeElement===askQ){
-      requestAnimationFrame(()=>{
-        const br=askBody.getBoundingClientRect(), tr=askQ.getBoundingClientRect();
-        if(tr.bottom>br.bottom) askBody.scrollTop+=Math.min(tr.bottom-br.bottom+8, tr.top-br.top-4);
-        else if(tr.top<br.top) askBody.scrollTop-=(br.top-tr.top+4);
-      });
+      requestAnimationFrame(ensureAskCaret); /* v10.45: keep the caret line (not the textarea edges) in view */
     }
   }else clearAskViewport();
 }
@@ -2151,6 +2198,7 @@ if(document.readyState==="complete") setTimeout(openFromLocation,0); else window
 let askMatchTimer=0;
 askQ.addEventListener("input",()=>{
   growAsk();
+  ensureAskCaret(); /* v10.45: single scroller — body follows the caret */
   if(askNote&&askNote.textContent){askNote.textContent=""}
   clearTimeout(askMatchTimer);
   askMatchTimer=setTimeout(updateAskMatches,150);
