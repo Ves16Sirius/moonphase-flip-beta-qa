@@ -78,7 +78,7 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/geist-mono@5.2.5/index.min.css" />
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" />
 <style>
-/* Overhaul 2026-10-25 v10.26 — header rhythm (+8 brand→Updated), light wm→#5B5678, Geist Sans 600 card titles; island aurora untouched */
+/* Overhaul 2026-10-25 v10.27 — light wordmark A muted-black (user pick); keep v10.27 rhythm/Geist/body */
 :root{
   /* Surfaces */
   --bg:#F6F5FB;
@@ -702,7 +702,7 @@ a:hover{text-decoration:underline;text-underline-offset:3px}
 }
 .item:hover summary::after{border-color:var(--muted)}
 .item .q{
-  /* v10.26: Geist Sans 600 (fontsource loaded) — Linear/Vercel card-title weight; Inter fallback */
+  /* v10.27: Geist Sans 600 (fontsource loaded) — Linear/Vercel card-title weight; Inter fallback */
   font-family:"Geist Sans",Geist,Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
   font-size:var(--fs-title);
   font-weight:600;
@@ -832,8 +832,8 @@ footer{
   .item:hover{transform:none}
 }
 
-/* Dual wordmark — light default B: tint toward Updated ink #5B5678.
-   A/B: html.wm-ab-A = prior muted-black; html.wm-full-ink = solid black. */
+/* Dual wordmark — light default A: muted-black (user pick).
+   Optional: html.wm-ab-B = Updated-ink #5B5678; html.wm-full-ink = solid black. */
 .brand .wm{transition:filter 160ms var(--ease), opacity 160ms var(--ease)}
 .brand .wm-dark{display:none}
 @media (prefers-color-scheme: dark){
@@ -842,14 +842,14 @@ footer{
 }
 [data-theme="dark"] .brand .wm-light{display:none}
 [data-theme="dark"] .brand .wm-dark{display:block;filter:none;opacity:1}
-/* B (default live): CSS filter approximating #5B5678 on black SVG */
+/* A (default live): muted-black wordmark */
 [data-theme="light"] .brand .wm-light{
-  filter:invert(34%) sepia(18%) saturate(980%) hue-rotate(210deg) brightness(92%) contrast(88%);
+  filter:opacity(.76) brightness(.90) contrast(1.04);
   opacity:1;
 }
-/* A (compare): prior v10.25 muted-black treatment */
-[data-theme="light"].wm-ab-A .brand .wm-light{
-  filter:opacity(.76) brightness(.90) contrast(1.04);
+/* B (optional): tint toward Updated ink #5B5678 */
+[data-theme="light"].wm-ab-B .brand .wm-light{
+  filter:invert(34%) sepia(18%) saturate(980%) hue-rotate(210deg) brightness(92%) contrast(88%);
   opacity:1;
 }
 [data-theme="light"].wm-full-ink .brand .wm-light{filter:none;opacity:1}
