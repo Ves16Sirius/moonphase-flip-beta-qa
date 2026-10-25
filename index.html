@@ -73,7 +73,7 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/geist-mono@5.2.5/index.min.css" />
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600&display=swap" />
 <style>
-/* Overhaul 2026-10-25 v10.3 — fixed top-curtain aurora · kill island white gap · toggle↑ · brand coral titles */
+/* Overhaul 2026-10-25 v10.4 — brand yellow titles · island continuous wash · sliding moon/sun toggle */
 :root{
   /* Surfaces */
   --bg:#F6F5FB;
@@ -147,10 +147,40 @@ html{
   min-height:100%;
   min-height:100dvh;
 }
-/* Status / Dynamic Island: paint --bg only (no separate white veil slab).
-   Aurora (fixed) continues the same --bg into the top curtain — no white strip. */
-html::before{content:none;display:none}
 html,body{-webkit-overflow-scrolling:touch;overscroll-behavior-y:none}
+/* Fixed safe-area wash: solid --bg under Dynamic Island / status.
+   Continuous with theme-color + html/body + aurora crown — never white/black strip. */
+html::before{
+  content:"";
+  position:fixed;
+  top:0;left:0;right:0;
+  height:env(safe-area-inset-top, 0px);
+  min-height:env(safe-area-inset-top, 0px);
+  background:var(--bg);
+  background-color:var(--bg);
+  pointer-events:none;
+  z-index:3;
+}
+html[data-theme="light"]::before{
+  background:#F6F5FB !important;
+  background-color:#F6F5FB !important;
+}
+html[data-theme="dark"]::before{
+  background:#0E0F14 !important;
+  background-color:#0E0F14 !important;
+}
+@media (prefers-color-scheme: light){
+  :root:not([data-theme="dark"])::before{
+    background:#F6F5FB !important;
+    background-color:#F6F5FB !important;
+  }
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"])::before{
+    background:#0E0F14 !important;
+    background-color:#0E0F14 !important;
+  }
+}
 /* Force --bg into status chrome; never a white strip under the island */
 html[data-theme="light"],
 html[data-theme="light"] body,
@@ -205,15 +235,18 @@ body{
   -webkit-mask-image:linear-gradient(180deg,#000 0%,#000 40%,rgba(0,0,0,.55) 70%,transparent 100%);
   mask-image:linear-gradient(180deg,#000 0%,#000 40%,rgba(0,0,0,.55) 70%,transparent 100%);
 }
-/* Crown folded into .aurora gradient — keep node for DOM compat, paint nothing extra */
+/* Crown: solid --bg through safe-area, soft fade below — continuous with html::before + theme-color */
 .aurora-crown{
   display:block!important;
   position:absolute;
   left:0;right:0;top:0;
-  height:calc(env(safe-area-inset-top, 0px) + 24px);
+  height:calc(env(safe-area-inset-top, 0px) + 28px);
   margin:0;padding:0;
   pointer-events:none;
-  background:linear-gradient(180deg, var(--bg) 0%, transparent 100%);
+  background:linear-gradient(180deg,
+    var(--bg) 0%,
+    var(--bg) env(safe-area-inset-top, 0px),
+    transparent 100%);
   filter:none;
   opacity:1;
 }
@@ -284,34 +317,89 @@ a:hover{text-decoration:underline;text-underline-offset:3px}
   flex:0 0 auto;display:flex;align-items:flex-start;justify-content:center;
 }
 .brand .wm{height:32px;width:auto;display:block}
+/* Horizontal moon/sun switch — track + sliding thumb (Moonphase-quiet) */
 .theme-toggle{
   position:static;transform:none;
   align-self:flex-start;
-  margin-top:1px; /* optical raise: face with Moonphase (SVG has tiny top pad) */
-  height:30px;min-height:30px;width:30px;min-width:30px;padding:0;border-radius:999px;gap:0;
+  margin-top:2px; /* optical face with wordmark */
+  height:28px;min-height:28px;width:52px;min-width:52px;padding:0;border-radius:999px;gap:0;
   display:inline-flex;align-items:center;justify-content:center;
   border:1px solid var(--line);
   background:var(--control-bg);
   backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
   box-shadow:var(--shadow-sm);
   color:var(--muted);
-  transition:background var(--dur) var(--ease), border-color var(--dur) var(--ease), color var(--dur) var(--ease), box-shadow var(--dur) var(--ease);
+  transition:background .28s var(--ease), border-color .28s var(--ease), box-shadow .28s var(--ease);
+  -webkit-tap-highlight-color:transparent;
 }
 .theme-toggle:hover{
-  color:var(--ink);border-color:var(--line2);background:#fff;
+  border-color:var(--line2);background:#fff;
   box-shadow:var(--shadow-md);
 }
 .theme-toggle:active{transform:none}
-.theme-toggle svg{width:14px;height:14px;display:block;flex:0 0 auto}
-.theme-toggle .tlabel{display:none!important;line-height:1} /* icon-only; never show Light/Dark text */
-.theme-toggle .icon-sun{display:none}
-.theme-toggle .icon-moon{display:block}
-@media (prefers-color-scheme: dark){
-  :root:not([data-theme="light"]) .theme-toggle .icon-sun{display:block}
-  :root:not([data-theme="light"]) .theme-toggle .icon-moon{display:none}
+.theme-toggle .tlabel{display:none!important}
+.theme-toggle .tt-track{
+  position:relative;
+  display:block;
+  width:100%;height:100%;
+  border-radius:inherit;
+  overflow:hidden;
 }
-[data-theme="dark"] .theme-toggle .icon-sun{display:block}
-[data-theme="dark"] .theme-toggle .icon-moon{display:none}
+.theme-toggle .tt-icon{
+  position:absolute;top:50%;
+  width:12px;height:12px;
+  margin-top:-6px;
+  z-index:1;
+  pointer-events:none;
+  opacity:.42;
+  transition:opacity .28s var(--ease), color .28s var(--ease);
+  color:var(--muted);
+}
+.theme-toggle .tt-icon svg{width:12px;height:12px;display:block}
+.theme-toggle .icon-sun{left:7px}
+.theme-toggle .icon-moon{right:7px}
+.theme-toggle .tt-thumb{
+  position:absolute;
+  top:2px;left:2px;
+  width:22px;height:22px;
+  border-radius:50%;
+  background:#FFFFFF;
+  box-shadow:0 1px 2px rgba(40,28,12,.10), 0 2px 6px rgba(40,28,12,.08);
+  z-index:2;
+  pointer-events:none;
+  transform:translateX(0);
+  transition:transform .32s cubic-bezier(.22,1,.36,1), background .28s var(--ease), box-shadow .28s var(--ease);
+  will-change:transform;
+}
+/* Light: thumb over sun (left); sun lit */
+.theme-toggle .icon-sun{opacity:.85;color:#B8923A}
+.theme-toggle .icon-moon{opacity:.38}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]) .theme-toggle .tt-thumb{
+    transform:translateX(26px);
+    background:#2A2B36;
+    box-shadow:0 1px 2px rgba(0,0,0,.35), 0 2px 8px rgba(0,0,0,.28);
+  }
+  :root:not([data-theme="light"]) .theme-toggle .icon-moon{opacity:.9;color:#FFFBC1}
+  :root:not([data-theme="light"]) .theme-toggle .icon-sun{opacity:.35;color:var(--muted)}
+}
+[data-theme="dark"] .theme-toggle .tt-thumb{
+  transform:translateX(26px);
+  background:#2A2B36;
+  box-shadow:0 1px 2px rgba(0,0,0,.35), 0 2px 8px rgba(0,0,0,.28);
+}
+[data-theme="dark"] .theme-toggle .icon-moon{opacity:.9;color:#FFFBC1}
+[data-theme="dark"] .theme-toggle .icon-sun{opacity:.35;color:var(--muted)}
+[data-theme="light"] .theme-toggle .tt-thumb{
+  transform:translateX(0);
+  background:#FFFFFF;
+  box-shadow:0 1px 2px rgba(40,28,12,.10), 0 2px 6px rgba(40,28,12,.08);
+}
+[data-theme="light"] .theme-toggle .icon-sun{opacity:.85;color:#B8923A}
+[data-theme="light"] .theme-toggle .icon-moon{opacity:.38;color:var(--muted)}
+@media (prefers-reduced-motion: reduce){
+  .theme-toggle .tt-thumb{transition:none}
+}
 
 /* —— Hero: editorial air (8px rhythm) —— */
 .hero{
@@ -319,13 +407,13 @@ a:hover{text-decoration:underline;text-underline-offset:3px}
   text-align:center;display:flex;flex-direction:column;align-items:center;
 }
 .hero h1{
-  /* Light default: deep ink + brand red Center (#b3402e from hellomoonphase). Dark → white + coral. */
+  /* Light: warm official gold. Dark → ALL brand yellow #FFFBC1 (no white/coral split). */
   margin:0 0 12px;
   font-family:var(--display);
   font-size:var(--fs-hero);
   font-weight:400;font-style:normal;
   letter-spacing:-.01em;line-height:1.1;
-  color:#1A1917;
+  color:#B8923A; /* warm official yellow/gold */
   text-shadow:none;
   text-wrap:balance;
 }
@@ -334,7 +422,7 @@ a:hover{text-decoration:underline;text-underline-offset:3px}
   font-style:italic;
   font-weight:400;
   letter-spacing:0;
-  color:#b3402e; /* Moonphase brand red */
+  color:#8F6520; /* slightly deeper gold for Center */
   text-shadow:none;
 }
 .hero .sub{
@@ -714,10 +802,10 @@ footer{
   color-scheme:light;
 }
 [data-theme="light"] .hero h1{
-  color:#1A1917;
+  color:#B8923A;
   text-shadow:none;
 }
-[data-theme="light"] .hero h1 em{color:#b3402e;text-shadow:none}
+[data-theme="light"] .hero h1 em{color:#8F6520;text-shadow:none}
 /* Light mode card / control polish — cool clean surfaces (match violet wash) */
 [data-theme="light"] .item{
   background:#FFFFFF;
@@ -802,12 +890,15 @@ html[data-theme="dark"] body,
     opacity:1;
   }
   :root:not([data-theme="light"]) .aurora-crown{
-    background:linear-gradient(180deg, var(--bg) 0%, transparent 100%);
+    background:linear-gradient(180deg,
+      var(--bg) 0%,
+      var(--bg) env(safe-area-inset-top, 0px),
+      transparent 100%);
     opacity:1;
   }
-  /* Dark: Beta Q&A white · Center brand coral #ffb3a7 (hellomoonphase) */
-  :root:not([data-theme="light"]) .hero h1{color:#FFFFFF;text-shadow:none;filter:none}
-  :root:not([data-theme="light"]) .hero h1 em{color:#ffb3a7;text-shadow:none;opacity:1}
+  /* Dark: ALL brand yellow #FFFBC1 — Beta Q&A + Center (no white/coral split) */
+  :root:not([data-theme="light"]) .hero h1{color:#FFFBC1;text-shadow:0 0 28px rgba(255,251,193,.18);filter:none}
+  :root:not([data-theme="light"]) .hero h1 em{color:#FFFBC1;text-shadow:none;opacity:1}
 }
 [data-theme="dark"] .aurora{
   background:
@@ -823,7 +914,10 @@ html[data-theme="dark"] body,
   opacity:1;
 }
 [data-theme="dark"] .aurora-crown{
-  background:linear-gradient(180deg, var(--bg) 0%, transparent 100%);
+  background:linear-gradient(180deg,
+    var(--bg) 0%,
+    var(--bg) env(safe-area-inset-top, 0px),
+    transparent 100%);
   opacity:1;
 }
 /* Explicit light reset when user forces light over system dark */
@@ -842,11 +936,14 @@ html[data-theme="dark"] body,
   opacity:1;
 }
 [data-theme="light"] .aurora-crown{
-  background:linear-gradient(180deg, var(--bg) 0%, transparent 100%);
+  background:linear-gradient(180deg,
+    var(--bg) 0%,
+    var(--bg) env(safe-area-inset-top, 0px),
+    transparent 100%);
   opacity:1;
 }
-[data-theme="dark"] .hero h1{color:#FFFFFF;text-shadow:none;filter:none}
-[data-theme="dark"] .hero h1 em{color:#ffb3a7;text-shadow:none;opacity:1}
+[data-theme="dark"] .hero h1{color:#FFFBC1;text-shadow:0 0 28px rgba(255,251,193,.18);filter:none}
+[data-theme="dark"] .hero h1 em{color:#FFFBC1;text-shadow:none;opacity:1}
 [data-theme="dark"] .shell::after{opacity:.05;mix-blend-mode:screen}
 [data-theme="dark"] .fresh span{background:var(--control-bg);border-color:var(--line);color:var(--muted)}
 [data-theme="dark"] .fresh i{background:var(--ok);box-shadow:0 0 0 3px var(--ok-soft)}
@@ -941,8 +1038,8 @@ html[data-theme="dark"] body,
     box-shadow:0 1px 2px rgba(0,0,0,.2);
   }
   :root:not([data-theme="light"]) ::selection{background:var(--accent-soft);color:var(--ink)}
-  :root:not([data-theme="light"]) .hero h1{color:#FFFFFF;text-shadow:none;filter:none}
-  :root:not([data-theme="light"]) .hero h1 em{color:#ffb3a7;text-shadow:none;opacity:1}
+  :root:not([data-theme="light"]) .hero h1{color:#FFFBC1;text-shadow:0 0 28px rgba(255,251,193,.18);filter:none}
+  :root:not([data-theme="light"]) .hero h1 em{color:#FFFBC1;text-shadow:none;opacity:1}
 }
 
 /* —— Mobile rhythm —— */
@@ -961,16 +1058,25 @@ html[data-theme="dark"] body,
     height:calc(env(safe-area-inset-top, 0px) + min(260px, 36vh));
   }
   .aurora-crown{
-    height:calc(env(safe-area-inset-top, 0px) + 20px);
+    height:calc(env(safe-area-inset-top, 0px) + 24px);
   }
   .brand{margin:22px 0 24px;min-height:28px;padding:0;align-items:flex-start}
   .brand-slot{min-height:28px;align-items:flex-start}
   .brand .wm{height:28px}
   .theme-toggle{
-    height:26px;min-height:26px;width:26px;min-width:26px;padding:0;gap:0;
+    height:26px;min-height:26px;width:48px;min-width:48px;padding:0;gap:0;
     margin-top:1px; /* face-align with Moonphase */
   }
-  .theme-toggle svg{width:13px;height:13px}
+  .theme-toggle .tt-thumb{width:20px;height:20px;top:2px;left:2px}
+  .theme-toggle .tt-icon{width:11px;height:11px;margin-top:-5.5px}
+  .theme-toggle .tt-icon svg{width:11px;height:11px}
+  .theme-toggle .icon-sun{left:6px}
+  .theme-toggle .icon-moon{right:6px}
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]) .theme-toggle .tt-thumb{transform:translateX(24px)}
+  }
+  [data-theme="dark"] .theme-toggle .tt-thumb{transform:translateX(24px)}
+  [data-theme="light"] .theme-toggle .tt-thumb{transform:translateX(0)}
   .theme-toggle .tlabel{display:none!important}
   .hero{margin:0 auto 32px;padding:0}
   .hero h1{font-size:clamp(2rem,8.5vw,2.5rem);letter-spacing:-.01em;line-height:1.1;margin-bottom:10px}
@@ -1026,8 +1132,11 @@ html[data-theme="dark"] body,
     </div>
     <div class="brand-slot brand-slot-end">
       <button type="button" class="theme-toggle" id="themeToggle" aria-label="Switch to dark theme" title="Theme">
-        <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 14.5A8.5 8.5 0 0 1 9.5 3 7 7 0 1 0 21 14.5z"/></svg>
-        <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
+        <span class="tt-track" aria-hidden="true">
+          <span class="tt-icon icon-sun"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg></span>
+          <span class="tt-icon icon-moon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 14.5A8.5 8.5 0 0 1 9.5 3 7 7 0 1 0 21 14.5z"/></svg></span>
+          <span class="tt-thumb"></span>
+        </span>
       </button>
     </div>
   </div>
