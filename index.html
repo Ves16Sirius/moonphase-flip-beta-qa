@@ -77,6 +77,7 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/geist-mono@5.2.5/index.min.css" />
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&display=swap" />
 <style>
+/* Overhaul 2026-10-25 v10.48 — (1) Mobile ≤719 keyboard open (.kb-open from visualViewport, or #askQ focused with vv noticeably shorter than layout): .modal-foot hidden (display:none) so composer + matches get the full sheet; footer returns on blur/keyboard close (re-sync on focusout). Caret-follow re-runs after the footer hides. (2) Footer helper .ask-shots paragraph → .ask-where two-row list (General / Beta Support, name in --fw-medium --ink-soft, description --muted) + 12px --faint note “Attach screenshots in WhatsApp.” Existing colors, fonts, drag, matching, ids unchanged. */
 /* Overhaul 2026-10-25 v10.47 — Copy-only: hero .sub → “Common beta questions, answered. Search, browse, or ask the team.”; Ask .ask-shots → General/Beta Support preference + screenshots. No colors, layout, fonts, behavior. */
 /* Overhaul 2026-10-25 v10.46 — Ask sheet underfill (mobile ≤719): stop relying on clipped box-shadow fill (overflow:hidden killed the v10.42 60vh surface shadow). Raise --sheet-over to min(70vh,560px) so the sheet's own solid --surface physically extends far below the viewport (padding-bottom + negative margin-bottom); box-shadow is elevation only. Force solid --surface + no backdrop-filter on .modal / .modal-head / .modal-foot (all themes) so Safari dark glass never peeks; stronger warm scrim with deeper bottom overflow. Head stays opaque while body scrolls. Desktop ≥720 modal unchanged. Also: light-mode theme-toggle sun face/icon → bright #FFD84D (was muted #8A6410); dark-mode moon unchanged. Colors otherwise, fonts, drag, matching, ids unchanged. */
 /* v10.45 — Ask sheet: (1) head/body boundary — .modal-head gets 14px (desktop) / 16px (mobile) bottom padding (body top padding trimmed so the resting gap is ~unchanged); while .modal-body is scrolled (scrollTop>0 → .is-scrolled on the sheet) a --line hairline shows under the head and the top 12px of the scroll area fades, so content clips cleanly instead of butting into the subtitle. (2) Single scroller — #askQ has no max-height and overflow:hidden; it autogrows to full content height and only .modal-body scrolls (overscroll-behavior:contain). While typing, the body nudges (instant, only when needed) to keep the caret line visible above the keyboard/visualViewport. Colors, fonts, drag-dismiss rules, matching, opaque bottom, ids unchanged. */
@@ -942,7 +943,12 @@ footer{
 .ask-match-q{display:block;font-size:13.5px;font-weight:var(--fw-medium);letter-spacing:-.01em;color:var(--ink);line-height:1.35}
 .ask-match-a{display:block;margin-top:3px;font-size:12.5px;color:var(--muted);line-height:1.45}
 .modal .ask-os{margin:0 0 12px}
-.modal .ask-shots{margin:2px 0 4px;font-size:12px;letter-spacing:-.003em;color:var(--faint);line-height:1.4}
+/* v10.48 channel options: two scannable rows + a tiny note (existing tokens only) */
+.modal .ask-where{list-style:none;margin:2px 0 0;padding:0;display:flex;flex-direction:column;gap:5px;font-size:12.5px;letter-spacing:-.004em;line-height:1.4}
+.modal .ask-where li{margin:0;padding:0;color:var(--muted)}
+.modal .ask-where b{font-weight:var(--fw-medium);color:var(--ink-soft)}
+.modal .ask-where .sep{color:var(--faint);padding:0 4px}
+.modal .ask-shots{margin:6px 0 4px;font-size:12px;letter-spacing:-.003em;color:var(--faint);line-height:1.4}
 .modal-foot .btn.primary{width:100%;height:44px;min-height:44px;font-size:14px;font-weight:var(--fw-medium);letter-spacing:-.008em}
 /* Copy confirmation lives in an sr-only live region; the button label swaps visually */
 .modal .ask-note{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
@@ -1570,6 +1576,11 @@ footer{
   .modal-backdrop.kb-open{padding-top:0}
   .modal-backdrop.kb-open .modal{max-height:calc(var(--vvh, 100dvh) - 8px + var(--sheet-over))}
   .modal-backdrop.kb-open .modal-foot{padding-bottom:10px}
+  /* v10.48: keyboard up → hide the footer entirely so the composer + matches get the space; it returns on blur */
+  .modal-backdrop.kb-open .modal-foot,
+  .modal-backdrop.kb-typing .modal-foot{display:none}
+  .modal-backdrop.kb-open .modal-body,
+  .modal-backdrop.kb-typing .modal-body{padding-bottom:16px}
   /* v10.44 roomier Ask sheet (spacing only — colors, fonts, behavior unchanged): 22px sides, ~24px between
      sections, 10px label→content, lighter 34px chips, 14/16 textarea padding at 1.5 line-height, 44px Cancel */
   .modal-head{padding-left:max(22px, env(safe-area-inset-left, 0px));padding-right:max(22px, env(safe-area-inset-right, 0px))}
@@ -1589,7 +1600,8 @@ footer{
   .ask-match{margin:0 0 8px}
   .ask-match:last-child{margin-bottom:0}
   .modal .ask-os{margin:0 0 14px}
-  .modal .ask-shots{margin:0 0 4px;line-height:1.45}
+  .modal .ask-where{margin:0}
+  .modal .ask-shots{margin:6px 0 4px;line-height:1.45}
   .modal-foot{padding:12px max(22px, env(safe-area-inset-right, 0px)) max(6px, env(safe-area-inset-bottom, 0px)) max(22px, env(safe-area-inset-left, 0px))}
   .ask-cancel{height:44px;line-height:44px;margin:0}
   .ask-cancel::after{top:0;bottom:0}
@@ -1713,7 +1725,11 @@ footer{
         <button type="button" class="ask-topic" data-os="iOS" aria-pressed="false">iOS</button>
         <button type="button" class="ask-topic" data-os="Android" aria-pressed="false">Android</button>
       </div>
-      <p class="ask-shots">Prefer General so others can chime in — or your Beta Support group if you’d rather keep it private.<br>Screenshots help either way.</p>
+      <ul class="ask-where" aria-label="Where to post">
+        <li><b>General</b><span class="sep" aria-hidden="true">·</span>ask openly, others can help</li>
+        <li><b>Beta Support</b><span class="sep" aria-hidden="true">·</span>private, just you and the team</li>
+      </ul>
+      <p class="ask-shots">Attach screenshots in WhatsApp.</p>
     </div>
     <div class="modal-foot">
       <p class="ask-note" id="askNote" role="status" aria-live="polite"></p>
@@ -2009,13 +2025,16 @@ askBody.addEventListener("touchcancel",()=>{if(bodyTouch.track&&askDrag.on) drag
    so the footer sits right above the keyboard and the focused textarea stays visible above it. —— */
 const vv=window.visualViewport||null;
 function clearAskViewport(){
-  modal.classList.remove("kb-open");
+  modal.classList.remove("kb-open","kb-typing");
   modal.style.top="";modal.style.height="";modal.style.bottom="";
   modal.style.removeProperty("--vvh");
 }
 function syncAskViewport(){
   if(!vv||modal.hidden||!sheetMQ.matches){clearAskViewport();return}
   const kb=window.innerHeight-vv.height-vv.offsetTop;
+  /* v10.48: textarea focused + visual viewport noticeably shorter than layout → treat as keyboard up (hide footer) */
+  const typing=document.activeElement===askQ && vv.height<window.innerHeight*0.85;
+  modal.classList.toggle("kb-typing", typing);
   if(kb>80){
     modal.classList.add("kb-open");
     modal.style.top=vv.offsetTop+"px";modal.style.bottom="auto";modal.style.height=vv.height+"px";
@@ -2023,10 +2042,12 @@ function syncAskViewport(){
     if(document.activeElement===askQ){
       requestAnimationFrame(ensureAskCaret); /* v10.45: keep the caret line (not the textarea edges) in view */
     }
-  }else clearAskViewport();
+  }else{clearAskViewport();if(typing){modal.classList.add("kb-typing");requestAnimationFrame(ensureAskCaret)}}
 }
 if(vv){vv.addEventListener("resize",syncAskViewport);vv.addEventListener("scroll",syncAskViewport)}
 askQ.addEventListener("focus",()=>setTimeout(syncAskViewport,300));
+/* v10.48: footer comes back as soon as the textarea blurs (and again once the keyboard has animated away) */
+askQ.addEventListener("blur",()=>{modal.classList.remove("kb-typing");setTimeout(syncAskViewport,0);setTimeout(syncAskViewport,350)});
 sheetMQ.addEventListener&&sheetMQ.addEventListener("change",()=>{askSheet.style.transform="";syncAskViewport()});
 modal.addEventListener("click",e=>{if(e.target===modal)closeAsk()});
 document.addEventListener("keydown",e=>{if(e.key==="Escape"&&modal.classList.contains("open"))closeAsk()});
