@@ -78,7 +78,7 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/geist-mono@5.2.5/index.min.css" />
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" />
 <style>
-/* Overhaul 2026-10-25 v10.29 — light type: soft violet inks, no pure-black titles; keep wordmark A + island aurora */
+/* Overhaul 2026-10-25 v10.30 — sort glass thumb motion; Ask → WhatsApp copy+jump (local AI organise); keep island aurora */
 :root{
   /* Surfaces */
   --bg:#F6F5FB;
@@ -598,6 +598,8 @@ a:hover{text-decoration:underline;text-underline-offset:3px}
 .search input::-webkit-search-cancel-button{-webkit-appearance:none}
 
 .sort{
+  /* Glass track + sliding thumb — mirror .theme-toggle motion language */
+  position:relative;
   display:inline-flex;align-items:center;height:var(--control-h);padding:3px;
   border-radius:999px;border:1px solid var(--glass-rim);
   background:var(--glass-fill);
@@ -605,17 +607,39 @@ a:hover{text-decoration:underline;text-underline-offset:3px}
   -webkit-backdrop-filter:blur(var(--glass-blur)) saturate(var(--glass-sat));
   box-shadow:var(--glass-shadow), var(--glass-highlight);
   flex:0 0 auto;
+  isolation:isolate;
+  overflow:hidden;
+}
+.sort-thumb{
+  position:absolute;
+  top:3px;left:3px;
+  height:calc(var(--control-h) - 6px);
+  width:50%;
+  border-radius:999px;
+  pointer-events:none;
+  z-index:0;
+  background:color-mix(in srgb, var(--accent) 12%, #fff);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.55);
+  transform:translateX(0);
+  transition:transform .42s var(--ease-spring), width .28s var(--ease), background .28s var(--ease), box-shadow .28s var(--ease);
+  will-change:transform;
 }
 .sort button{
+  position:relative;z-index:1;
   height:calc(var(--control-h) - 6px);padding:0 14px;border-radius:999px;
   font-size:var(--fs-ui);font-weight:var(--fw-medium);letter-spacing:-.011em;color:var(--muted);
-  transition:background var(--dur) var(--ease), color var(--dur) var(--ease), box-shadow var(--dur) var(--ease);
+  background:transparent;border:0;box-shadow:none;
+  transition:color var(--dur) var(--ease);
+  -webkit-tap-highlight-color:transparent;
 }
 .sort button[aria-pressed="true"]{
-  /* Same selected language as .chip[aria-selected=true] */
-  background:color-mix(in srgb, var(--accent) 12%, #fff);
+  /* Active text sits on glass thumb — no sudden fill swap */
+  background:transparent;
   color:var(--accent-deep);
   box-shadow:none;
+}
+@media (prefers-reduced-motion: reduce){
+  .sort-thumb{transition:none}
 }
 
 .sec{
@@ -816,7 +840,11 @@ footer{
   box-shadow:0 0 0 3px var(--accent-soft);
 }
 .modal textarea{min-height:100px;resize:vertical}
-.modal .row{display:flex;justify-content:flex-end;gap:8px;margin-top:4px}
+.modal textarea.ask-preview{min-height:140px;font-family:var(--mono);font-size:12px;line-height:1.5;letter-spacing:0}
+.modal .ask-actions{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 14px}
+.modal .ask-note{margin:-6px 0 12px;font-size:12.5px;color:var(--muted);line-height:1.4}
+.modal .ask-note[hidden]{display:none}
+.modal .row{display:flex;justify-content:flex-end;flex-wrap:wrap;gap:8px;margin-top:4px}
 .btn{
   height:36px;padding:0 15px;border-radius:999px;border:1px solid var(--line);
   font-size:12.5px;font-weight:500;color:var(--ink-soft);background:transparent;
@@ -1029,23 +1057,26 @@ footer{
     inset 0 1px 0 rgba(255,255,255,.95),
     inset 0 -0.5px 0 rgba(40,30,80,.07);
 }
-[data-theme="light"] .chip[aria-selected="true"],
-[data-theme="light"] .sort button[aria-pressed="true"]{
-  /* Unified selected language across chips + Newest/Oldest */
+[data-theme="light"] .chip[aria-selected="true"]{
+  /* Unified selected language for topic chips */
   background:color-mix(in srgb, var(--accent) 14%, #fff);
-  border-color:color-mix(in srgb, var(--accent) 28%, transparent);
+  border:1px solid color-mix(in srgb, var(--accent) 28%, transparent);
   outline:none;
   color:var(--accent-deep);
   box-shadow:none;
   overflow:hidden;
 }
-[data-theme="light"] .chip[aria-selected="true"]{
-  border:1px solid color-mix(in srgb, var(--accent) 28%, transparent);
+[data-theme="light"] .sort-thumb{
+  background:color-mix(in srgb, var(--accent) 14%, #fff);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.78), 0 1px 2px rgba(40,28,12,.04);
 }
 [data-theme="light"] .sort button[aria-pressed="true"]{
-  /* fill lives inside the shared .sort pill — no extra outer ring */
+  background:transparent;
   border-color:transparent;
+  color:var(--accent-deep);
+  box-shadow:none;
 }
+[data-theme="light"] .sort button[aria-pressed="false"]{color:var(--muted)}
 [data-theme="light"] .pill{
   background:rgba(99,91,255,.08);
   border:1px solid rgba(99,91,255,.14);
@@ -1142,11 +1173,16 @@ footer{
 }
 [data-theme="dark"] .search,
 [data-theme="dark"] .sort{background:var(--glass-fill);border-color:var(--glass-rim);box-shadow:var(--glass-shadow), var(--glass-highlight)}
-[data-theme="dark"] .sort button[aria-pressed="true"]{
+[data-theme="dark"] .sort-thumb{
   background:color-mix(in srgb, var(--accent) 18%, var(--surface));
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.12);
+}
+[data-theme="dark"] .sort button[aria-pressed="true"]{
+  background:transparent;
   color:var(--accent-deep);
   box-shadow:none;
 }
+[data-theme="dark"] .sort button[aria-pressed="false"]{color:var(--muted)}
 [data-theme="dark"] .ask-cta{
   background:var(--cta);color:var(--cta-ink);border-color:var(--cta-border);
   box-shadow:0 1px 2px rgba(0,0,0,.2);
@@ -1201,8 +1237,12 @@ footer{
   }
   :root:not([data-theme="light"]) .search,
   :root:not([data-theme="light"]) .sort{background:var(--control-bg)}
-  :root:not([data-theme="light"]) .sort button[aria-pressed="true"]{
+  :root:not([data-theme="light"]) .sort-thumb{
     background:color-mix(in srgb, var(--accent) 18%, var(--surface));
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.12);
+  }
+  :root:not([data-theme="light"]) .sort button[aria-pressed="true"]{
+    background:transparent;
     color:var(--accent-deep);
     box-shadow:none;
   }
@@ -1356,7 +1396,7 @@ footer{
   <div class="hero">
     <h1>Beta Q&amp;A <em>Center</em></h1>
     <p class="sub">Answers for Flip beta testers — search a topic, or open a card.</p>
-    <button type="button" class="ask-cta" id="askOpen">Submit a question…</button>
+    <button type="button" class="ask-cta" id="askOpen">Ask a question…</button>
   </div>
   <div class="layout">
     <div class="main">
@@ -1375,7 +1415,8 @@ footer{
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
           <input id="q" type="search" placeholder="Search shipping, SN, firmware, TestFlight, MCP" size="48" autocomplete="off" enterkeyhint="search" />
         </div>
-        <div class="sort" role="group" aria-label="Sort order">
+        <div class="sort" role="group" aria-label="Sort order" data-dir="newest">
+          <span class="sort-thumb" aria-hidden="true"></span>
           <button type="button" data-sort="newest" aria-pressed="true">Newest</button>
           <button type="button" data-sort="oldest" aria-pressed="false">Oldest</button>
         </div>
@@ -1393,7 +1434,7 @@ footer{
 <div class="modal-backdrop" id="askModal" role="dialog" aria-modal="true" aria-labelledby="askTitle" hidden>
   <div class="modal">
     <h2 id="askTitle">Ask the beta team</h2>
-    <p class="hint">Write your question below. We’ll open a GitHub Issue so the team can triage it — WhatsApp not required.</p>
+    <p class="hint">Jot messy notes below. Organise into a clear report, copy, then paste into WhatsApp — Moonphase General or your Beta Support group.</p>
     <label for="askCat">Topic</label>
     <select id="askCat">
       <option value="Getting started">Getting started</option>
@@ -1404,11 +1445,23 @@ footer{
       <option value="How to report">How to report</option>
       <option value="Other">Other</option>
     </select>
-    <label for="askQ">Your question</label>
-    <textarea id="askQ" placeholder="What are you seeing? Include SN, app build, and firmware version if you have them." maxlength="2000"></textarea>
+    <label for="askQ">Your notes</label>
+    <textarea id="askQ" placeholder="What are you seeing? Steps, SN, app build, firmware — messy notes are fine." maxlength="2000"></textarea>
+    <div class="ask-actions">
+      <button type="button" class="btn" id="askOrganise">Organise with AI</button>
+    </div>
+    <label for="askPreview">Message preview</label>
+    <textarea id="askPreview" class="ask-preview" placeholder="Organised message appears here — edit freely before copying." maxlength="4000"></textarea>
+    <label for="askDest">Send to</label>
+    <select id="askDest">
+      <option value="general">Moonphase General (WhatsApp)</option>
+      <option value="beta">My Beta Support group (WhatsApp)</option>
+    </select>
+    <p class="ask-note" id="askNote" hidden></p>
     <div class="row">
       <button type="button" class="btn" id="askCancel">Cancel</button>
-      <button type="button" class="btn primary" id="askSubmit">Open GitHub to submit</button>
+      <button type="button" class="btn" id="askOpenWa">Open WhatsApp</button>
+      <button type="button" class="btn primary" id="askCopy">Copy message</button>
     </div>
   </div>
 </div>
@@ -1490,23 +1543,139 @@ function render(){
   /* Instant paint — prior soft:true waited 150ms + opacity .4, felt laggy on topic chips */
   paint();
 }
-document.querySelectorAll(".sort button").forEach(btn=>btn.addEventListener("click",()=>{sortDir=btn.dataset.sort;document.querySelectorAll(".sort button").forEach(b=>b.setAttribute("aria-pressed",b===btn?"true":"false"));render()}));
+/* Sort glass thumb — slides under active Newest/Oldest */
+const sortEl=document.querySelector(".sort");
+const sortThumb=sortEl&&sortEl.querySelector(".sort-thumb");
+function syncSortThumb(){
+  if(!sortEl||!sortThumb) return;
+  const active=sortEl.querySelector('button[aria-pressed="true"]')||sortEl.querySelector("button");
+  if(!active) return;
+  sortEl.dataset.dir=active.dataset.sort||"newest";
+  const pad=3;
+  const w=active.offsetWidth;
+  const x=Math.max(0, active.offsetLeft - pad);
+  sortThumb.style.width=w+"px";
+  sortThumb.style.transform="translateX("+x+"px)";
+}
+document.querySelectorAll(".sort button").forEach(btn=>btn.addEventListener("click",()=>{
+  sortDir=btn.dataset.sort;
+  document.querySelectorAll(".sort button").forEach(b=>b.setAttribute("aria-pressed",b===btn?"true":"false"));
+  syncSortThumb();
+  render();
+}));
+window.addEventListener("resize", syncSortThumb, {passive:true});
+if(document.fonts&&document.fonts.ready) document.fonts.ready.then(syncSortThumb).catch(function(){});
+requestAnimationFrame(syncSortThumb);
 qEl.addEventListener("input",()=>render());render();
+
+/* —— Ask modal: local organise + WhatsApp copy/jump (no GitHub Issues) ——
+   TODO: drop real WhatsApp group invite / chat deep links here when available.
+   Do NOT invent invite codes. Empty → copy works; Open WhatsApp falls back to wa.me + paste note. */
+const WA_LINKS={
+  general:"", /* TODO: Moonphase General WhatsApp invite URL, e.g. https://chat.whatsapp.com/... */
+  beta:""     /* TODO: Beta Support — usually per-tester; leave empty unless a shared deep link exists */
+};
+const WA_FALLBACK="https://wa.me/";
 const modal=document.getElementById("askModal");
-function openAsk(){modal.hidden=false;requestAnimationFrame(()=>modal.classList.add("open"));document.getElementById("askQ").focus()}
+const askQ=document.getElementById("askQ");
+const askPreview=document.getElementById("askPreview");
+const askNote=document.getElementById("askNote");
+const askDest=document.getElementById("askDest");
+function openAsk(){
+  if(askNote){askNote.hidden=true;askNote.textContent=""}
+  modal.hidden=false;
+  requestAnimationFrame(()=>modal.classList.add("open"));
+  askQ.focus();
+}
 function closeAsk(){modal.classList.remove("open");setTimeout(()=>{modal.hidden=true},200)}
 document.getElementById("askOpen").addEventListener("click",openAsk);
 document.getElementById("askCancel").addEventListener("click",closeAsk);
 modal.addEventListener("click",e=>{if(e.target===modal)closeAsk()});
 document.addEventListener("keydown",e=>{if(e.key==="Escape"&&modal.classList.contains("open"))closeAsk()});
-document.getElementById("askSubmit").addEventListener("click",()=>{
+
+function cleanFiller(s){
+  return String(s||"")
+    .replace(/\b(um+|uh+|basically|kinda|sort of|i guess|you know)\b/gi," ")
+    .replace(/[ \t]+/g," ")
+    .replace(/\n{3,}/g,"\n\n")
+    .trim();
+}
+function extractMeta(text){
+  const t=String(text||"");
+  const sn=(t.match(/\b(?:SN|S\/N|serial(?:\s+number)?)\s*[:#]?\s*([A-Za-z0-9\-]{4,})\b/i)||[])[1]||"";
+  const fw=(t.match(/\b(?:firmware|fw)\s*(?:version|ver\.?)?\s*[:#]?\s*(v?\d+(?:\.\d+){1,3})\b/i)||[])[1]
+    ||(t.match(/\b(1\.\d+\.\d+)\b/)||[])[1]||"";
+  const app=(t.match(/\b(?:app|build|TestFlight)\s*(?:version|ver\.?|build)?\s*[:#]?\s*([\d.]+(?:\s*\(\d+\))?)/i)||[])[1]||"";
+  return {sn, fw, app};
+}
+function splitBits(text){
+  const raw=cleanFiller(text);
+  if(!raw) return [];
+  let parts=raw.split(/\n+/).map(s=>s.trim()).filter(Boolean);
+  if(parts.length<=1){
+    parts=raw.split(/(?<=[.!?])\s+/).map(s=>s.trim()).filter(Boolean);
+  }
+  return parts;
+}
+/** Deterministic local "AI organise" — no backend */
+function organiseAsk(cat, draft){
+  const bits=splitBits(draft);
+  const meta=extractMeta(draft);
+  const seeing=bits[0]||"(describe what you're seeing)";
+  const steps=bits.length>1?bits.slice(1).join(" "):"(add steps / context)";
+  const snLine=meta.sn||"(add SN if you have it)";
+  const appLine=meta.app||"(add app build, e.g. 1.0.1 (1217))";
+  const fwLine=meta.fw||"(add firmware version)";
+  const need=bits.length>2?bits[bits.length-1]:"(what do you need from the team?)";
+  return [
+    "[Topic] "+cat,
+    "1. What I'm seeing: "+seeing,
+    "2. Steps / context: "+steps,
+    "3. SN / app / firmware: SN "+snLine+"; app "+appLine+"; firmware "+fwLine,
+    "4. What I need: "+need
+  ].join("\n");
+}
+document.getElementById("askOrganise").addEventListener("click",()=>{
   const cat=document.getElementById("askCat").value.trim();
-  const question=document.getElementById("askQ").value.trim();
-  if(!question){document.getElementById("askQ").focus();return}
-  const title=`[Beta Q&A] ${cat}: ${question.slice(0,80)}`;
-  const body=`### Topic\n${cat}\n\n### Question\n${question}\n\n---\nSubmitted from the Flip Beta Q&A Center. Please add SN / app / firmware if relevant.`;
-  window.open(`https://github.com/Ves16Sirius/moonphase-flip-beta-qa/issues/new?title=${encodeURIComponent(title)}&body=${encodeURIComponent(body)}`,"_blank","noopener,noreferrer");
-  closeAsk();
+  const draft=askQ.value.trim();
+  if(!draft){askQ.focus();return}
+  askPreview.value=organiseAsk(cat, draft);
+  askPreview.focus();
+});
+async function copyAskMessage(){
+  let msg=(askPreview.value||"").trim();
+  if(!msg){
+    const cat=document.getElementById("askCat").value.trim();
+    const draft=askQ.value.trim();
+    if(!draft){askQ.focus();return false}
+    msg=organiseAsk(cat, draft);
+    askPreview.value=msg;
+  }
+  try{
+    await navigator.clipboard.writeText(msg);
+  }catch(e){
+    askPreview.focus();
+    askPreview.select();
+    try{document.execCommand("copy")}catch(_){}
+  }
+  const dest=askDest.value==="beta"?"Beta Support":"General";
+  askNote.hidden=false;
+  askNote.textContent="Copied. Paste into "+dest+" in WhatsApp.";
+  return true;
+}
+document.getElementById("askCopy").addEventListener("click",()=>{copyAskMessage()});
+document.getElementById("askOpenWa").addEventListener("click",async()=>{
+  await copyAskMessage();
+  const key=askDest.value==="beta"?"beta":"general";
+  const link=(WA_LINKS[key]||"").trim();
+  if(link){
+    window.open(link,"_blank","noopener,noreferrer");
+  }else{
+    askNote.hidden=false;
+    const dest=key==="beta"?"Beta Support":"General";
+    askNote.textContent="Copied. Paste into "+dest+" in WhatsApp (no group invite URL configured yet).";
+    window.open(WA_FALLBACK,"_blank","noopener,noreferrer");
+  }
 });
 /* fresh bar is non-sticky silk — no scroll hide */
 
