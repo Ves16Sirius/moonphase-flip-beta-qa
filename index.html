@@ -307,7 +307,7 @@ a:hover{text-decoration:underline;text-underline-offset:3px}
 .brand{
   display:flex;align-items:flex-start;justify-content:space-between;gap:8px;
   /* Island / notch clearance; +8px air wordmark→Updated (Linear/Vercel 8px rhythm; Updated↔hero unchanged) */
-  margin:0 0 28px;padding:calc(env(safe-area-inset-top, 0px) + 14px) 0 0;
+  margin:0 0 28px;padding:calc(env(safe-area-inset-top, 0px) + 26px) 0 0; /* TG11 top air: 14→26 (wordmark center ≈36px; Linear/Stripe/OpenAI 32–38) */
   position:relative;min-height:22px;
 }
 .brand-slot{
@@ -1453,7 +1453,7 @@ footer{
   }
   .brand{
     margin:0 0 26px;min-height:20px;align-items:flex-start;
-    padding:calc(env(safe-area-inset-top, 0px) + 12px) 0 0;
+    padding:calc(env(safe-area-inset-top, 0px) + 22px) 0 0; /* TG11 top air: 12→22 below safe area (wordmark center ≈32px = Linear/Vercel/Stripe/Notion mobile) */
   }
   .brand-slot{min-height:20px;align-items:flex-start}
   .brand .wm{height:20px}
@@ -1812,7 +1812,16 @@ footer{
       </div>
     </div>
     <div class="brand-slot brand-slot-end">
-      <button type="button" class="tt1" id="themeToggle" aria-label="Switch theme" title="Theme"><span class="tt1-ic tt1-sun"><svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle class="sun-disc" cx="12" cy="12" r="4.2"/><path class="sun-rays" d="M12 2.6v2.1M12 19.3v2.1M4.9 4.9l1.5 1.5M17.6 17.6l1.5 1.5M2.6 12h2.1M19.3 12h2.1M4.9 19.1l1.5-1.5M17.6 6.4l1.5-1.5"/></svg></span><span class="tt1-ic tt1-moon"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M21 14.5A8.5 8.5 0 0 1 9.5 3 7 7 0 1 0 21 14.5z"/></svg></span></button>
+      <button type="button" class="theme-toggle" id="themeToggle" aria-label="Switch to dark theme" title="Theme">
+        <span class="tt-track" aria-hidden="true">
+          <span class="tt-icon icon-moon"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M21 14.5A8.5 8.5 0 0 1 9.5 3 7 7 0 1 0 21 14.5z"/></svg></span>
+          <span class="tt-icon icon-sun"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4" fill="currentColor" stroke="none"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg></span>
+          <span class="tt-thumb">
+            <span class="tt-thumb-face tt-face-moon"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M21 14.5A8.5 8.5 0 0 1 9.5 3 7 7 0 1 0 21 14.5z"/></svg></span>
+            <span class="tt-thumb-face tt-face-sun"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4" fill="currentColor" stroke="none"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg></span>
+          </span>
+        </span>
+      </button>
     </div>
   </div>
   <div class="fresh" role="status"><span><i aria-hidden="true"></i> Updated Oct 25, 2026</span></div>
