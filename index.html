@@ -4,10 +4,10 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 <meta name="color-scheme" content="light dark" />
-<!-- theme-color = page --bg (Safari chrome). Aurora is a fixed soft wash on top — original #5B66C4 / #A898FF hues. -->
-<meta name="theme-color" content="#F6F5FB" media="(prefers-color-scheme: light)" id="themeColorMetaLight" />
-<meta name="theme-color" content="#0E0F14" media="(prefers-color-scheme: dark)" id="themeColorMetaDark" />
-<meta name="theme-color" content="#0E0F14" id="themeColorMeta" />
+<!-- theme-color = aurora top tone at y=0 (v10.53; was --bg → seam under status bar). Aurora is a fixed soft wash on top — original #5B66C4 / #A898FF hues. -->
+<meta name="theme-color" content="#DFDAFB" media="(prefers-color-scheme: light)" id="themeColorMetaLight" />
+<meta name="theme-color" content="#262A4C" media="(prefers-color-scheme: dark)" id="themeColorMetaDark" />
+<meta name="theme-color" content="#262A4C" id="themeColorMeta" />
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 <title>Moonphase Flip — Beta Q&amp;A Center</title>
@@ -21,7 +21,7 @@
     'flip-beta-qa-theme-manual','flip-beta-qa-theme-v3','flip-beta-qa-theme-manual-v4',
     'flip-beta-qa-theme-manual-v5','flip-beta-qa-theme-manual-v6','flip-beta-qa-theme-manual-v7'
   ];
-  var LIGHT_TC='#F6F5FB', DARK_TC='#0E0F14';
+  var LIGHT_TC='#DFDAFB', DARK_TC='#262A4C'; /* v10.53: = aurora top tone at y=0 (28% #A898FF / 32% #5B66C4 over --bg) */
   var LIGHT_BG='#F6F5FB', DARK_BG='#0E0F14';
   try{
     for(var i=0;i<STALE.length;i++){
@@ -217,7 +217,8 @@ body{
   /* Light default: soft lavender from physical top (no cream slab / purple cliff) */
   background:linear-gradient(180deg,
     color-mix(in srgb, #A898FF 28%, var(--bg)) 0%,
-    color-mix(in srgb, #A898FF 18%, var(--bg)) 22%,
+    color-mix(in srgb, #A898FF 28%, var(--bg)) env(safe-area-inset-top, 0px), /* v10.53: flat under status bar → no seam */
+    color-mix(in srgb, #A898FF 18%, var(--bg)) calc(env(safe-area-inset-top, 0px) + 22%),
     color-mix(in srgb, #B8A8FF 10%, var(--bg)) 48%,
     color-mix(in srgb, #C8BCFF 4%, var(--bg)) 72%,
     transparent 100%);
@@ -1237,7 +1238,8 @@ footer{
   :root:not([data-theme="light"]) .aurora{
     background:linear-gradient(180deg,
       color-mix(in srgb, #5B66C4 32%, var(--bg)) 0%,
-      color-mix(in srgb, #5B66C4 22%, var(--bg)) 20%,
+    color-mix(in srgb, #5B66C4 32%, var(--bg)) env(safe-area-inset-top, 0px), /* v10.53: flat under status bar → no seam */
+      color-mix(in srgb, #5B66C4 22%, var(--bg)) calc(env(safe-area-inset-top, 0px) + 20%),
       color-mix(in srgb, #6B78E8 12%, var(--bg)) 42%,
       color-mix(in srgb, #4A54B0 5%, var(--bg)) 68%,
       transparent 100%);
@@ -1258,7 +1260,8 @@ footer{
 [data-theme="dark"] .aurora{
   background:linear-gradient(180deg,
     color-mix(in srgb, #5B66C4 32%, var(--bg)) 0%,
-    color-mix(in srgb, #5B66C4 22%, var(--bg)) 20%,
+    color-mix(in srgb, #5B66C4 32%, var(--bg)) env(safe-area-inset-top, 0px), /* v10.53: flat under status bar → no seam */
+    color-mix(in srgb, #5B66C4 22%, var(--bg)) calc(env(safe-area-inset-top, 0px) + 20%),
     color-mix(in srgb, #6B78E8 12%, var(--bg)) 42%,
     color-mix(in srgb, #4A54B0 5%, var(--bg)) 68%,
     transparent 100%);
@@ -1275,7 +1278,8 @@ footer{
 [data-theme="light"] .aurora{
   background:linear-gradient(180deg,
     color-mix(in srgb, #A898FF 28%, var(--bg)) 0%,
-    color-mix(in srgb, #A898FF 18%, var(--bg)) 22%,
+    color-mix(in srgb, #A898FF 28%, var(--bg)) env(safe-area-inset-top, 0px), /* v10.53: flat under status bar → no seam */
+    color-mix(in srgb, #A898FF 18%, var(--bg)) calc(env(safe-area-inset-top, 0px) + 22%),
     color-mix(in srgb, #B8A8FF 10%, var(--bg)) 48%,
     color-mix(in srgb, #C8BCFF 4%, var(--bg)) 72%,
     transparent 100%);
@@ -1795,6 +1799,21 @@ footer{
 .empty-ask .tx q{display:block;color:var(--ink-soft);quotes:"“" "”";white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .empty-ask .go{width:16px;height:16px;color:var(--cta-ink);flex:0 0 auto;display:inline-flex}.empty-ask .go svg{width:16px;height:16px}
 
+/* v10.53 — (a) solid fixed status-bar strip in the aurora top tone so Safari's top-edge
+   color sampling (iOS 26) gets a flat colour instead of falling back to --bg; (b) toggle level
+   with the MOONPHASE glyphs: ink box = top 0 → 15.2 of the 21-unit wordmark. Scale the exact
+   v10.49 pill (look/proportions untouched) via individual scale/translate so hover/:active
+   transforms and layout stay as-is. */
+body::before{
+  content:"";position:fixed;top:0;left:0;right:0;height:env(safe-area-inset-top, 0px);
+  z-index:0;pointer-events:none;
+  background-color:color-mix(in srgb, #A898FF 28%, var(--bg));
+}
+[data-theme="dark"] body::before{background-color:color-mix(in srgb, #5B66C4 32%, var(--bg))}
+.theme-toggle{transform-origin:100% 0;scale:.542857;translate:0 2px} /* 15.2/28; 60x28 → 32.6x15.2 */
+@media (max-width:719px){
+  .theme-toggle{scale:.517143;translate:0 3px} /* (15.2*20/21)/28; 58x28 → 30x14.48 */
+}
 </style>
 </head>
 <body>
@@ -2631,8 +2650,8 @@ if(askSend) askSend.addEventListener("click",async()=>{
   const meta=document.getElementById('themeColorMeta');
   const metaL=document.getElementById('themeColorMetaLight');
   const metaD=document.getElementById('themeColorMetaDark');
-  const LIGHT_TC='#F6F5FB'; /* theme-color = --bg */
-  const DARK_TC='#0E0F14';
+  const LIGHT_TC='#DFDAFB'; /* v10.53: theme-color = aurora top tone at y=0 */
+  const DARK_TC='#262A4C';
   const LIGHT_BG='#F6F5FB';
   const DARK_BG='#0E0F14';
   for(const k of STALE){try{localStorage.removeItem(k)}catch(e){}}
