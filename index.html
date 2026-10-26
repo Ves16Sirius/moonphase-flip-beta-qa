@@ -692,6 +692,7 @@ a:hover{text-decoration:underline;text-underline-offset:3px}
 .list-col{
   display:flex;flex-direction:column;gap:16px;min-width:0;
 }
+.list-col:empty{display:none} /* v10.55: empty right column adds no grid gap on mobile */
 .item{
   display:block;
   width:100%;
@@ -2046,7 +2047,7 @@ function paint(){
   /* Odd/even split: stable columns — open only pushes within its column.
      v10.51: while searching on a single-column (mobile) layout, keep pure relevance order in one column */
   const L=[], R=[];
-  const oneCol=!!q&&!wideMQ.matches;
+  const oneCol=!wideMQ.matches; /* v10.55: one visible column (<720px) = true sorted order, not odd/even stacked */
   items.forEach((it,idx)=>{(oneCol||idx%2===0?L:R).push(it)});
   left.innerHTML=L.map(i=>cardHtml(i,openIds,hits&&hits.get(i.id))).join("");
   right.innerHTML=R.map(i=>cardHtml(i,openIds,hits&&hits.get(i.id))).join("");
@@ -2079,7 +2080,7 @@ window.addEventListener("resize", syncSortThumb, {passive:true});
 if(document.fonts&&document.fonts.ready) document.fonts.ready.then(syncSortThumb).catch(function(){});
 requestAnimationFrame(syncSortThumb);
 qEl.addEventListener("input",()=>render());qEl.addEventListener("compositionend",()=>render());
-wideMQ.addEventListener&&wideMQ.addEventListener("change",()=>{if((qEl.value||"").trim()) render()});
+wideMQ.addEventListener&&wideMQ.addEventListener("change",()=>render()); /* v10.55: re-split on breakpoint change */
 render();
 
 /* —— Ask modal v10.39 (multi-topic, smarter matching); v10.38: auto-grow textarea, live Q&A matching, optional OS, WhatsApp copy/jump —— */
