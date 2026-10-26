@@ -1696,8 +1696,6 @@ footer{
 .modal.cf .cf-scroll::-webkit-scrollbar{display:none}
 .modal.cf .ask-topic{height:32px;min-height:32px;padding:0 13px;font-size:13.5px;display:inline-flex;align-items:center;flex:0 0 auto;background:transparent;border:1px solid var(--line2);box-shadow:none;backdrop-filter:none;-webkit-backdrop-filter:none;color:var(--ink-soft)}
 .modal.cf .ask-topic[aria-pressed="true"]{background:var(--accent-soft);border-color:var(--cta-border);color:var(--cta-ink)}
-.modal.cf .cf-seg{display:inline-flex;gap:0;padding:2px;border:1px solid var(--line2);border-radius:999px}
-.modal.cf .cf-seg .ask-topic{border-color:transparent;height:30px;min-height:30px;padding:0 16px}
 .modal.cf .modal-foot{border-top:1px solid var(--line);padding-top:14px}
 .cf-where-label{font-size:12px;font-weight:var(--fw-medium);color:var(--faint);margin:0 2px 8px}
 .cf-channels{list-style:none;margin:0 0 12px;padding:0;border:1px solid var(--line);border-radius:14px;overflow:hidden}
@@ -1821,6 +1819,12 @@ body::before{
 .tt-hit{position:absolute;z-index:2;width:48px;height:48px;padding:0;margin:0;border:0;background:transparent;
   top:calc(10px - 24px);right:calc(21.43px - 24px);cursor:pointer;-webkit-tap-highlight-color:transparent}
 @media (max-width:719px){.tt-hit{width:44px;height:44px;top:calc(9.52px - 22px);right:calc(19.73px - 22px)}}
+/* v10.58 — iOS Safari zooms into any focused field under 16px. Mobile: every field is 16px
+   (placeholder keeps its smaller visual size). No focus scale/expand anywhere — type in place. */
+@media (max-width:719px){
+  .search input,.modal input,.modal select,.modal textarea{font-size:16px}
+  .search input::placeholder{font-size:var(--fs-ui)}
+}
 </style>
 </head>
 <body>
@@ -1920,9 +1924,9 @@ body::before{
           <button type="button" class="ask-topic" data-topic="Other" aria-pressed="false">Other</button>
         </div>
         <div class="cf-row-label">Phone</div>
-        <div class="ask-topics ask-os cf-seg" role="group" aria-label="Phone" id="askOs">
-          <button type="button" class="ask-topic" data-os="iOS" aria-pressed="false">iOS</button>
-          <button type="button" class="ask-topic" data-os="Android" aria-pressed="false">Android</button>
+        <div class="ask-topics ask-os" role="radiogroup" aria-label="Phone" id="askOs">
+          <button type="button" class="ask-topic" role="radio" data-os="iOS" aria-pressed="false" aria-checked="false">iOS</button>
+          <button type="button" class="ask-topic" role="radio" data-os="Android" aria-pressed="false" aria-checked="false">Android</button>
         </div>
       </div>
     </div>
@@ -2084,7 +2088,7 @@ document.querySelectorAll("#askTopics .ask-topic").forEach(btn=>btn.addEventList
 document.querySelectorAll("#askOs .ask-topic").forEach(btn=>btn.addEventListener("click",()=>{
   const v=btn.dataset.os||"";
   askOs=(askOs===v)?"":v;
-  document.querySelectorAll("#askOs .ask-topic").forEach(b=>b.setAttribute("aria-pressed",(askOs&&b.dataset.os===askOs)?"true":"false"));
+  document.querySelectorAll("#askOs .ask-topic").forEach(b=>{const on=(askOs&&b.dataset.os===askOs)?"true":"false";b.setAttribute("aria-pressed",on);b.setAttribute("aria-checked",on)}); /* v10.58: two separate single-select pills */
 }));
 /* Auto-grow: CSS min = ~4 lines (fits 3-line placeholder + wrap); v10.45: no max — grows to full content, body scrolls.
    Keep the body's scrollTop across the height:auto reset so the sheet doesn't jump while typing. */
