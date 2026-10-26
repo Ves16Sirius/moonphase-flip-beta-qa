@@ -1821,19 +1821,6 @@ body::before{
 .tt-hit{position:absolute;z-index:2;width:48px;height:48px;padding:0;margin:0;border:0;background:transparent;
   top:calc(10.5px - 24px);right:calc(22.5px - 24px);cursor:pointer;-webkit-tap-highlight-color:transparent}
 @media (max-width:719px){.tt-hit{width:44px;height:44px;top:calc(10px - 22px);right:calc(20.7px - 22px)}}
-/* v10.56 — iOS Safari / Google-iOS status-bar scrim: tint + blur ONLY behind the status bar
-   (safe area), then a short feather (min(12px, safe area)) — content below stays crisp.
-   No safe area (desktop) → height 0. Invisible at scrollY 0. Never takes taps. */
-.top-blur{position:fixed;top:0;left:0;right:0;
-  height:calc(env(safe-area-inset-top, 0px) + min(12px, env(safe-area-inset-top, 0px)));
-  z-index:50;pointer-events:none;opacity:0;transition:opacity .2s ease;
-  background:color-mix(in srgb, #DFDAFB 80%, transparent);
-  -webkit-backdrop-filter:blur(16px) saturate(140%);backdrop-filter:blur(16px) saturate(140%);
-  -webkit-mask-image:linear-gradient(180deg,#000 0,#000 env(safe-area-inset-top, 0px),transparent 100%);
-  mask-image:linear-gradient(180deg,#000 0,#000 env(safe-area-inset-top, 0px),transparent 100%)}
-[data-theme="dark"] .top-blur{background:color-mix(in srgb, #262A4C 80%, transparent)}
-html.page-scrolled .top-blur{opacity:1}
-@media (prefers-reduced-transparency: reduce){.top-blur{-webkit-backdrop-filter:none;backdrop-filter:none;background:#DFDAFB}[data-theme="dark"] .top-blur{background:#262A4C}}
 </style>
 </head>
 <body>
@@ -1842,7 +1829,6 @@ html.page-scrolled .top-blur{opacity:1}
   <div class="aurora-crown"></div>
   <div class="aurora-blobs"></div>
 </div>
-<div class="top-blur" aria-hidden="true"></div>
 <div class="shell">
   <div class="brand">
     <div class="brand-slot brand-slot-start">
@@ -2835,14 +2821,10 @@ list.addEventListener('click',e=>{if(e.target.closest('.empty-ask')) openCompose
 list.addEventListener('click',e=>{if(!e.target.closest('.empty-all')) return;tab='all';document.querySelectorAll('.chip').forEach(b=>b.setAttribute('aria-selected',b.dataset.tab==='all'?'true':'false'));render()});
 </script>
 <script>
-/* v10.54: forward the transparent 44px hit area to the toggle; top scroll-blur on/off */
+/* v10.54: forward the transparent 44px hit area to the toggle */
 (function(){
   var hit=document.querySelector('.tt-hit'), btn=document.getElementById('themeToggle');
   if(hit&&btn) hit.addEventListener('click',function(e){e.preventDefault();btn.click();});
-  var root=document.documentElement, on=null, raf=0;
-  function upd(){raf=0;var s=(window.scrollY||root.scrollTop||0)>0;if(s!==on){on=s;root.classList.toggle("page-scrolled",s);}}
-  addEventListener('scroll',function(){if(!raf)raf=requestAnimationFrame(upd);},{passive:true});
-  upd();
 })();
 </script>
 </body>
