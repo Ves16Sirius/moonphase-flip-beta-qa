@@ -1809,16 +1809,16 @@ body::before{
   background-color:color-mix(in srgb, #A898FF 28%, var(--bg));
 }
 [data-theme="dark"] body::before{background-color:color-mix(in srgb, #5B66C4 32%, var(--bg))}
-.theme-toggle{transform-origin:100% 0;scale:.714286;translate:0 2px} /* v10.57: top = MOONPHASE ink top, bottom = wordmark ink bottom (20 of 21 SVG units) → 60x28 → 42.86x20 */
+.theme-toggle{transform-origin:100% 0;scale:.714286;translate:0 -.37px} /* v10.62: pill centre = MOONPHASE ink centre (was v10.57 top-flush), bottom = wordmark ink bottom (20 of 21 SVG units) → 60x28 → 42.86x20 */
 @media (max-width:719px){
-  .theme-toggle{scale:.680272;translate:0 3px} /* v10.57: ink 20/21 of 20px box = 19.05 → 58x28 → 39.46x19.05 */
+  .theme-toggle{scale:.680272;translate:0 .63px} /* v10.57: ink 20/21 of 20px box = 19.05 → 58x28 → 39.46x19.05 */
 }
 /* v10.54 — transparent ≥44px tap target centred on the scaled pill (button clips its own overflow,
    so a sibling catches taps and forwards them to #themeToggle). */
 .brand-slot-end{position:relative}
 .tt-hit{position:absolute;z-index:2;width:48px;height:48px;padding:0;margin:0;border:0;background:transparent;
-  top:calc(10px - 24px);right:calc(21.43px - 24px);cursor:pointer;-webkit-tap-highlight-color:transparent}
-@media (max-width:719px){.tt-hit{width:44px;height:44px;top:calc(9.52px - 22px);right:calc(19.73px - 22px)}}
+  top:calc(7.63px - 24px);right:calc(21.43px - 24px);cursor:pointer;-webkit-tap-highlight-color:transparent}
+@media (max-width:719px){.tt-hit{width:44px;height:44px;top:calc(7.15px - 22px);right:calc(19.73px - 22px)}}
 /* v10.58 — iOS Safari zooms into any focused field under 16px. Mobile: every field is 16px
    (placeholder keeps its smaller visual size). No focus scale/expand anywhere — type in place. */
 @media (max-width:719px){
