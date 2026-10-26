@@ -1810,10 +1810,38 @@ body::before{
   background-color:color-mix(in srgb, #A898FF 28%, var(--bg));
 }
 [data-theme="dark"] body::before{background-color:color-mix(in srgb, #5B66C4 32%, var(--bg))}
-.theme-toggle{transform-origin:100% 0;scale:.542857;translate:0 2px} /* 15.2/28; 60x28 → 32.6x15.2 */
+.theme-toggle{transform-origin:100% 0;scale:.75;translate:0 2px} /* v10.54: height = full wordmark box 21px → 60x28 → 45x21 */
 @media (max-width:719px){
-  .theme-toggle{scale:.517143;translate:0 3px} /* (15.2*20/21)/28; 58x28 → 30x14.48 */
+  .theme-toggle{scale:.714286;translate:0 3px} /* v10.54: 20/28 → 58x28 → 41.4x20, level with 20px wordmark */
 }
+/* v10.54 — transparent ≥44px tap target centred on the scaled pill (button clips its own overflow,
+   so a sibling catches taps and forwards them to #themeToggle). */
+.brand-slot-end{position:relative}
+.tt-hit{position:absolute;z-index:2;width:48px;height:48px;padding:0;margin:0;border:0;background:transparent;
+  top:calc(10.5px - 24px);right:calc(22.5px - 24px);cursor:pointer;-webkit-tap-highlight-color:transparent}
+@media (max-width:719px){.tt-hit{width:44px;height:44px;top:calc(10px - 22px);right:calc(20.7px - 22px)}}
+/* v10.54 — iOS-style progressive scroll blur under the status bar / top edge (Safari 26 / Google iOS).
+   3 stacked backdrop layers, increasing blur, each masked to fade downward; tinted with the
+   v10.53 top tone so the status bar stays seamless. Hidden at scrollY ≤ 8. Never takes taps. */
+.top-blur{position:fixed;top:0;left:0;right:0;height:calc(env(safe-area-inset-top, 0px) + 36px);
+  z-index:50;pointer-events:none;opacity:0;transition:opacity .22s ease;}
+html.page-scrolled .top-blur{opacity:1}
+.top-blur i{position:absolute;inset:0;display:block;pointer-events:none}
+.top-blur i:nth-child(1){-webkit-backdrop-filter:blur(2px);backdrop-filter:blur(2px);
+  -webkit-mask-image:linear-gradient(180deg,#000 0%,#000 calc(100% - 14px),transparent 100%);mask-image:linear-gradient(180deg,#000 0%,#000 calc(100% - 14px),transparent 100%)}
+.top-blur i:nth-child(2){-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);
+  -webkit-mask-image:linear-gradient(180deg,#000 0%,#000 55%,transparent 85%);mask-image:linear-gradient(180deg,#000 0%,#000 55%,transparent 85%)}
+.top-blur i:nth-child(3){-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);
+  -webkit-mask-image:linear-gradient(180deg,#000 0%,#000 35%,transparent 65%);mask-image:linear-gradient(180deg,#000 0%,#000 35%,transparent 65%)}
+.top-blur i:nth-child(4){background:linear-gradient(180deg,
+  color-mix(in srgb, #DFDAFB 72%, transparent) 0%,
+  color-mix(in srgb, #DFDAFB 72%, transparent) env(safe-area-inset-top, 0px),
+  transparent 100%)}
+[data-theme="dark"] .top-blur i:nth-child(4){background:linear-gradient(180deg,
+  color-mix(in srgb, #262A4C 72%, transparent) 0%,
+  color-mix(in srgb, #262A4C 72%, transparent) env(safe-area-inset-top, 0px),
+  transparent 100%)}
+@media (prefers-reduced-transparency: reduce){.top-blur i:nth-child(-n+3){-webkit-backdrop-filter:none;backdrop-filter:none}}
 </style>
 </head>
 <body>
@@ -1822,6 +1850,7 @@ body::before{
   <div class="aurora-crown"></div>
   <div class="aurora-blobs"></div>
 </div>
+<div class="top-blur" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
 <div class="shell">
   <div class="brand">
     <div class="brand-slot brand-slot-start">
@@ -1841,6 +1870,7 @@ body::before{
           </span>
         </span>
       </button>
+      <span class="tt-hit" aria-hidden="true"></span>
     </div>
   </div>
   <div class="fresh" role="status"><span><i aria-hidden="true"></i> Updated Oct 25, 2026</span></div>
@@ -2811,6 +2841,17 @@ document.querySelectorAll('.hp-sug').forEach(b=>b.addEventListener('click',()=>o
 list.addEventListener('click',e=>{if(e.target.closest('.empty-ask')) openComposer((qEl.value||'').trim())});
 /* v10.51: search found nothing in the selected topic → widen to All topics */
 list.addEventListener('click',e=>{if(!e.target.closest('.empty-all')) return;tab='all';document.querySelectorAll('.chip').forEach(b=>b.setAttribute('aria-selected',b.dataset.tab==='all'?'true':'false'));render()});
+</script>
+<script>
+/* v10.54: forward the transparent 44px hit area to the toggle; top scroll-blur on/off */
+(function(){
+  var hit=document.querySelector('.tt-hit'), btn=document.getElementById('themeToggle');
+  if(hit&&btn) hit.addEventListener('click',function(e){e.preventDefault();btn.click();});
+  var root=document.documentElement, on=null, raf=0;
+  function upd(){raf=0;var s=(window.scrollY||root.scrollTop||0)>8;if(s!==on){on=s;root.classList.toggle("page-scrolled",s);}}
+  addEventListener('scroll',function(){if(!raf)raf=requestAnimationFrame(upd);},{passive:true});
+  upd();
+})();
 </script>
 </body>
 </html>
